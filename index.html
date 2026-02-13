@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krokens Copa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #3b82f6 100%);
+            padding: 0;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+        }
+
+        .banner-content {
+            padding: 40px 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.15;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px);
+            z-index: 1;
+        }
+
+        .banner-fish {
+            position: absolute;
+            font-size: 5em;
+            opacity: 0.2;
+            z-index: 1;
+            animation: swim 4s ease-in-out infinite;
+        }
+
+        .banner-fish-left {
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-20deg);
+        }
+
+        .banner-fish-right {
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%) rotate(20deg);
+            animation-delay: 2s;
+        }
+
+        @keyframes swim {
+            0%, 100% { 
+                transform: translateY(-50%) translateX(0) rotate(-20deg); 
+            }
+            50% { 
+                transform: translateY(-55%) translateX(5px) rotate(-15deg); 
+            }
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+
+        .fishing-hook {
+            font-size: 5em;
+            line-height: 1;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            animation: swing 3s ease-in-out infinite;
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        h1 {
+            color: white;
+            font-size: 3.5em;
+            margin: 0;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .login-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .user-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .matches-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .match-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .match-teams {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .match-details {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .match-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .match-locked {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .prediction-section {
+            display: grid;
+            gap: 20px;
+        }
+
+        .prediction-match {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .prediction-match.locked {
+            background: #e9ecef;
+            border: 2px solid #6c757d;
+        }
+
+        .locked-overlay {
+            background: rgba(255, 243, 205, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #856404;
+            margin-top: 15px;
+            border: 2px solid #ffc107;
+        }
+
+        .outcome-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .outcome-btn {
+            flex: 1;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .outcome-btn:hover:not(:disabled) {
+            border-color: #667eea;
+        }
+
+        .outcome-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .outcome-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .outcome-label {
+            font-size: 0.6em;
+            margin-top: 5px;
+        }
+
+        .predictions-revealed {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .predictions-revealed h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prediction-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .prediction-row:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .leaderboard-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .rank {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #333; }
+        .rank-3 { color: #333; }
+        .rank-4 { color: #FF8C00; }
+        .rank-5 { color: #DC3545; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .modal-match-info {
+            text-align: center;
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .modal-outcome-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-outcome-btn {
+            padding: 30px 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-outcome-btn:hover {
+            border-color: #667eea;
+        }
+
+        .modal-outcome-btn.selected {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-outcome-label {
+            display: block;
+            font-size: 0.5em;
+            margin-top: 8px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .outcome-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="banner-bg"></div>
+            <div class="banner-fish banner-fish-left">🎣</div>
+            <div class="banner-fish banner-fish-right">🎣</div>
+            <div class="banner-content">
+                <div class="logo-container">
+                    <span class="fishing-hook">🎣</span>
+                    <h1>Krokens Copa</h1>
+                </div>
+                <p class="subtitle">Anmäl dig och tippa med fiskarna</p>
+            </div>
+        </header>
+
+        <div id="loginScreen">
+            <div class="login-container">
+                <h2 class="login-title">Välkommen! 🎣</h2>
+                <div id="statusContainer"></div>
+                <div class="form-group">
+                    <label for="playerSelect">Välj spelare:</label>
+                    <select id="playerSelect">
+                        <option value="">Välj spelare...</option>
+                        <option value="Hefner">Hefner</option>
+                        <option value="Majscht">Majscht</option>
+                        <option value="Olle">Olle</option>
+                        <option value="Dawod">Dawod</option>
+                        <option value="Ante">Ante</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="passwordInput">Lösenord:</label>
+                    <input type="password" id="passwordInput" placeholder="Skriv ditt lösenord">
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Första gången? Välj ett lösenord som du kommer ihåg!
+                    </small>
+                </div>
+                <button class="btn" id="loginButton" style="width: 100%;">Logga in</button>
+            </div>
+        </div>
+
+        <div id="mainApp" style="display: none;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div class="user-badge">
+                        <span>👤 Inloggad som:</span>
+                        <strong id="currentUserName"></strong>
+                    </div>
+                    <button class="btn btn-secondary" id="logoutButton">Logga ut</button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="setup">📅 Matcher</button>
+                <button class="tab" data-tab="predict">🎯 Tippa</button>
+                <button class="tab" data-tab="leaderboard">🏆 Topplista</button>
+                <button class="tab" id="adminTab" data-tab="admin" style="display: none;">⚙️ Admin</button>
+            </div>
+
+            <div id="setup" class="content active">
+                <div class="card">
+                    <h2 class="section-title">📅 OS Ishockey Gruppspel</h2>
+                    <div style="margin-bottom: 20px;" id="initMatchesContainer">
+                        <button class="btn btn-success" id="initMatchesBtn" style="display: none;">🔄 Ladda in matcher till Firebase (kör bara EN gång!)</button>
+                    </div>
+                    <div class="matches-list" id="matchesList">
+                        <div class="empty-state">Väntar på att matcher laddas in...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="predict" class="content">
+                <div class="card">
+                    <h2 class="section-title">🎯 Tippa matcher</h2>
+                    <div class="prediction-section" id="predictionsList"></div>
+                </div>
+            </div>
+
+            <div id="leaderboard" class="content">
+                <div class="card">
+                    <h2 class="section-title">🏆 Topplista</h2>
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Plats</th>
+                                <th>Spelare</th>
+                                <th>Poäng</th>
+                                <th>Rätt</th>
+                                <th>Snitt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody"></tbody>
+                    </table>
+                    
+                    <!-- Special titles for bottom positions -->
+                    <div id="specialTitles" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
+                        <div style="display: grid; gap: 15px;">
+                            <div id="masterSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #FFD700;">
+                                <div style="font-size: 1.1em; font-weight: 600; color: #FFD700; margin-bottom: 5px;">
+                                    👑 Mästare
+                                </div>
+                                <div id="masterName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            </div>
+                            
+                            <div id="sousChefSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #FF8C00;">
+                                <div style="font-size: 1.1em; font-weight: 600; color: #FF8C00; margin-bottom: 5px;">
+                                    🧑‍🍳 Sous-chef
+                                </div>
+                                <div id="sousChefName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            </div>
+                            
+                            <div id="chefSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #DC3545;">
+                                <div style="font-size: 1.1em; font-weight: 600; color: #DC3545; margin-bottom: 5px;">
+                                    👨‍🍳 Chef
+                                </div>
+                                <div id="chefName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Modal (only for Hefner) -->
+        <div id="resultModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">Sätt resultat</div>
+                <div class="modal-match-info" id="modalMatchInfo"></div>
+                <div class="modal-outcome-buttons" id="modalOutcomeButtons" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                    <button class="modal-outcome-btn" data-outcome="1">
+                        1
+                        <span class="modal-outcome-label" id="modalHome">Hemma</span>
+                    </button>
+                    <button class="modal-outcome-btn" data-outcome="X">
+                        X
+                        <span class="modal-outcome-label">Oavgjort</span>
+                    </button>
+                    <button class="modal-outcome-btn" data-outcome="2">
+                        2
+                        <span class="modal-outcome-label" id="modalAway">Borta</span>
+                    </button>
+                    <button class="modal-outcome-btn" data-outcome="null" style="background: #f8f9fa;">
+                        🗑️
+                        <span class="modal-outcome-label">Inget resultat</span>
+                    </button>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="modalCancelBtn">Avbryt</button>
+                    <button class="btn" id="modalSaveBtn">Spara</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel (Hefner only) -->
+        <div id="admin" class="content">
+            <div class="card">
+                <h2 class="section-title">⚙️ Admin-panel (Hefner)</h2>
+                
+                <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
+                    <h3 style="color: #ef4444; margin-bottom: 10px;">⚠️ Farliga åtgärder</h3>
+                    <p style="color: #666; margin-bottom: 15px;">Dessa knappar påverkar ALLA spelare. Var försiktig!</p>
+                </div>
+
+                <div style="display: grid; gap: 20px;">
+                    <!-- Load Matches -->
+                    <div style="background: #f0f9ff; border-radius: 10px; padding: 20px;">
+                        <h3 style="color: #1e40af; margin-bottom: 10px;">🔄 Ladda in matcher</h3>
+                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
+                            Laddar in alla 12 OS-matcher till Firebase. Kör bara EN gång i början, eller efter total reset.
+                        </p>
+                        <button class="btn btn-success" onclick="adminLoadMatches()">
+                            🔄 Ladda in matcher till Firebase
+                        </button>
+                    </div>
+
+                    <!-- Reset Predictions -->
+                    <div style="background: #fef2f2; border-radius: 10px; padding: 20px;">
+                        <h3 style="color: #dc2626; margin-bottom: 10px;">🗑️ Nollställ tippningar</h3>
+                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
+                            Raderar ALLA spelares tippningar. Matcher och resultat behålls. Alla kan börja tippa från början.
+                        </p>
+                        <button class="btn" style="background: #ef4444;" onclick="adminResetPredictions()">
+                            🗑️ Nollställ ALLA tippningar
+                        </button>
+                    </div>
+
+                    <!-- Reset Results -->
+                    <div style="background: #fef2f2; border-radius: 10px; padding: 20px;">
+                        <h3 style="color: #dc2626; margin-bottom: 10px;">🔄 Nollställ resultat</h3>
+                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
+                            Raderar alla matchresultat. Tippningar behålls. Bra om fel resultat satts.
+                        </p>
+                        <button class="btn" style="background: #ef4444;" onclick="adminResetResults()">
+                            🔄 Nollställ alla resultat
+                        </button>
+                    </div>
+
+                    <!-- Full Reset -->
+                    <div style="background: #450a0a; border-radius: 10px; padding: 20px; border: 3px solid #dc2626;">
+                        <h3 style="color: #fca5a5; margin-bottom: 10px;">💣 TOTAL RESET</h3>
+                        <p style="color: #fca5a5; margin-bottom: 15px; font-size: 0.9em;">
+                            Raderar ALLT: matcher, tippningar, resultat. Börja om från scratch. (Lösenord behålls)
+                        </p>
+                        <button class="btn" style="background: #7f1d1d; color: white;" onclick="adminFullReset()">
+                            💣 TOTAL RESET - Radera allt
+                        </button>
+                    </div>
+                </div>
+
+                <div id="adminOutput" style="background: #000; color: #10b981; padding: 20px; border-radius: 10px; margin-top: 30px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; display: none;"></div>
+
+                <!-- Activity Log -->
+                <div style="margin-top: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #1e40af;">📊 Aktivitetslogg</h3>
+                        <button class="btn btn-secondary" onclick="refreshActivityLog()" style="padding: 8px 16px;">🔄 Uppdatera</button>
+                    </div>
+                    <div id="activityLog" style="background: #0a0a0a; color: #10b981; padding: 20px; border-radius: 10px; font-family: monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto; border: 1px solid #333;">
+                        Laddar aktivitetslogg...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB2E_bnuPxJW9AtuxnA1LyewTVuA-LpOwk",
+            authDomain: "krokens-copa.firebaseapp.com",
+            databaseURL: "https://krokens-copa-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "krokens-copa",
+            storageBucket: "krokens-copa.firebasestorage.app",
+            messagingSenderId: "845438921539",
+            appId: "1:845438921539:web:c7ab471f954a81d9469df6"
+        };
+
+        // Global state
+        let app, database;
+        let matches = [];
+        let predictions = {};
+        let passwords = {};
+        let activityLog = [];
+        let currentUser = null;
+        let currentModalMatchId = null;
+        let currentModalOutcome = null;
+
+        const PLAYERS = ['Hefner', 'Majscht', 'Olle', 'Dawod', 'Ante'];
+        
+        // Session management (10 minute auto-login)
+        const SESSION_DURATION = 10 * 60 * 1000; // 10 minutes
+        
+        function saveSession(player) {
+            const session = {
+                player: player,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('krokens_session', JSON.stringify(session));
+        }
+        
+        function loadSession() {
+            const sessionData = localStorage.getItem('krokens_session');
+            if (!sessionData) return null;
+            
+            const session = JSON.parse(sessionData);
+            const age = Date.now() - session.timestamp;
+            
+            if (age > SESSION_DURATION) {
+                localStorage.removeItem('krokens_session');
+                return null;
+            }
+            
+            return session.player;
+        }
+        
+        function clearSession() {
+            localStorage.removeItem('krokens_session');
+        }
+        
+        // Activity logging
+        async function logActivity(action, details = '') {
+            const entry = {
+                timestamp: new Date().toISOString(),
+                user: currentUser,
+                action: action,
+                details: details
+            };
+            
+            activityLog.unshift(entry); // Add to beginning
+            
+            // Keep only last 100 entries
+            if (activityLog.length > 100) {
+                activityLog = activityLog.slice(0, 100);
+            }
+            
+            try {
+                await set(ref(database, 'activityLog'), activityLog);
+            } catch (error) {
+                console.error('Failed to log activity:', error);
+            }
+        }
+
+        const OS_MATCHES = [
+            // 11 Feb (Onsdag - SPELAD)
+            { id: 'm1', homeTeam: 'Slovakien', awayTeam: 'Finland', league: 'OS 2026 - Grupp B', date: '2026-02-11T16:40', actualOutcome: null },
+            { id: 'm2', homeTeam: 'Sverige', awayTeam: 'Italien', league: 'OS 2026 - Grupp B', date: '2026-02-11T21:10', actualOutcome: null },
+            
+            // 13 Feb (Fredag - IDAG!)
+            { id: 'm3', homeTeam: 'Finland', awayTeam: 'Sverige', league: 'OS 2026 - Grupp B', date: '2026-02-13T12:10', actualOutcome: null },
+            { id: 'm4', homeTeam: 'Italien', awayTeam: 'Slovakien', league: 'OS 2026 - Grupp B', date: '2026-02-13T12:10', actualOutcome: null },
+            { id: 'm5', homeTeam: 'Frankrike', awayTeam: 'Tjeckien', league: 'OS 2026 - Grupp A', date: '2026-02-13T16:40', actualOutcome: null },
+            { id: 'm6', homeTeam: 'Kanada', awayTeam: 'Schweiz', league: 'OS 2026 - Grupp A', date: '2026-02-13T21:10', actualOutcome: null },
+            
+            // 14 Feb (Lördag)
+            { id: 'm7', homeTeam: 'Sverige', awayTeam: 'Slovakien', league: 'OS 2026 - Grupp B', date: '2026-02-14T12:10', actualOutcome: null },
+            { id: 'm8', homeTeam: 'Finland', awayTeam: 'Italien', league: 'OS 2026 - Grupp B', date: '2026-02-14T16:40', actualOutcome: null },
+            { id: 'm9', homeTeam: 'Tyskland', awayTeam: 'Lettland', league: 'OS 2026 - Grupp C', date: '2026-02-14T12:10', actualOutcome: null },
+            { id: 'm10', homeTeam: 'USA', awayTeam: 'Danmark', league: 'OS 2026 - Grupp C', date: '2026-02-14T21:10', actualOutcome: null },
+            
+            // 15 Feb (Söndag)
+            { id: 'm11', homeTeam: 'Schweiz', awayTeam: 'Tjeckien', league: 'OS 2026 - Grupp A', date: '2026-02-15T12:10', actualOutcome: null },
+            { id: 'm12', homeTeam: 'Kanada', awayTeam: 'Frankrike', league: 'OS 2026 - Grupp A', date: '2026-02-15T16:40', actualOutcome: null }
+        ];
+
+        // Simple hash function
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function showStatus(message, type = 'info') {
+            const container = document.getElementById('statusContainer');
+            if (container) {
+                container.innerHTML = `<div class="status status-${type}">${message}</div>`;
+                setTimeout(() => { container.innerHTML = ''; }, 4000);
+            }
+        }
+
+        function isMatchStarted(matchDate) {
+            const now = new Date();
+            const matchTime = new Date(matchDate);
+            return now >= matchTime;
+        }
+
+        // Initialize Firebase
+        console.log('Initializing Firebase...');
+        try {
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+            console.log('Firebase initialized successfully');
+            
+            // Start listeners
+            const matchesRef = ref(database, 'matches');
+            onValue(matchesRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    matches = Array.isArray(data) ? data : Object.values(data);
+                    console.log('Matches loaded:', matches.length);
+                    renderMatches();
+                    renderPredictions();
+                }
+            });
+
+            const predictionsRef = ref(database, 'predictions');
+            onValue(predictionsRef, (snapshot) => {
+                predictions = snapshot.val() || {};
+                console.log('Predictions loaded');
+                renderPredictions();
+                renderLeaderboard();
+                renderMatches(); // Update match list to show who has predicted
+            });
+
+            const passwordsRef = ref(database, 'passwords');
+            onValue(passwordsRef, (snapshot) => {
+                passwords = snapshot.val() || {};
+                console.log('Passwords loaded');
+                
+                // Check for existing session on first load
+                if (!currentUser) {
+                    const sessionPlayer = loadSession();
+                    if (sessionPlayer && passwords[sessionPlayer]) {
+                        console.log('Auto-login from session:', sessionPlayer);
+                        currentUser = sessionPlayer;
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('mainApp').style.display = 'block';
+                        document.getElementById('currentUserName').textContent = sessionPlayer;
+                        
+                        // Show admin tab for Hefner
+                        const adminTab = document.getElementById('adminTab');
+                        if (adminTab) {
+                            adminTab.style.display = sessionPlayer === 'Hefner' ? 'inline-block' : 'none';
+                        }
+                        
+                        renderPredictions();
+                        logActivity('AUTO_LOGIN', 'Automatisk inloggning från session');
+                    }
+                }
+            });
+
+            const activityLogRef = ref(database, 'activityLog');
+            onValue(activityLogRef, (snapshot) => {
+                activityLog = snapshot.val() || [];
+                console.log('Activity log loaded:', activityLog.length, 'entries');
+                if (currentUser === 'Hefner') {
+                    renderActivityLog();
+                }
+            });
+
+        } catch (error) {
+            console.error('Firebase init error:', error);
+            alert('Firebase-fel: ' + error.message);
+        }
+
+        // LOGIN FUNCTION
+        async function handleLogin() {
+            console.log('Login button clicked');
+            const player = document.getElementById('playerSelect').value;
+            const password = document.getElementById('passwordInput').value;
+
+            console.log('Player:', player, 'Password length:', password.length);
+
+            if (!player) {
+                showStatus('❌ Välj en spelare!', 'error');
+                return;
+            }
+
+            if (!password) {
+                showStatus('❌ Skriv ett lösenord!', 'error');
+                return;
+            }
+
+            try {
+                const hashedPassword = await hashPassword(password);
+                console.log('Password hashed');
+
+                if (passwords[player]) {
+                    // Verify password
+                    if (passwords[player] === hashedPassword) {
+                        console.log('Password correct, logging in...');
+                        currentUser = player;
+                        saveSession(player); // Save session for auto-login
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('mainApp').style.display = 'block';
+                        document.getElementById('currentUserName').textContent = player;
+                        
+                        // Show admin tab for Hefner
+                        const adminTab = document.getElementById('adminTab');
+                        if (adminTab) {
+                            adminTab.style.display = player === 'Hefner' ? 'inline-block' : 'none';
+                        }
+                        
+                        // Log activity
+                        await logActivity('LOGIN', 'Loggade in');
+                        
+                        renderPredictions();
+                    } else {
+                        console.log('Wrong password');
+                        showStatus('❌ Fel lösenord!', 'error');
+                    }
+                } else {
+                    // First time - set password
+                    console.log('First time login, saving password...');
+                    passwords[player] = hashedPassword;
+                    await set(ref(database, 'passwords'), passwords);
+                    currentUser = player;
+                    saveSession(player); // Save session for auto-login
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    document.getElementById('currentUserName').textContent = player;
+                    
+                    // Show admin tab for Hefner
+                    const adminTab = document.getElementById('adminTab');
+                    if (adminTab) {
+                        adminTab.style.display = player === 'Hefner' ? 'inline-block' : 'none';
+                    }
+                    
+                    // Log activity
+                    await logActivity('FIRST_LOGIN', 'Skapade konto och loggade in');
+                    
+                    alert('✅ Lösenord sparat! Välkommen!');
+                    renderPredictions();
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showStatus('❌ Fel vid inloggning: ' + error.message, 'error');
+            }
+        }
+
+        // LOGOUT FUNCTION
+        async function handleLogout() {
+            console.log('Logging out...');
+            
+            // Log activity before clearing session
+            if (currentUser) {
+                await logActivity('LOGOUT', 'Loggade ut');
+            }
+            
+            currentUser = null;
+            clearSession(); // Clear auto-login session
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('playerSelect').value = '';
+            
+            // Hide admin tab
+            const adminTab = document.getElementById('adminTab');
+            if (adminTab) {
+                adminTab.style.display = 'none';
+            }
+        }
+
+        // INITIALIZE MATCHES
+        async function handleInitMatches() {
+            if (!confirm('Detta laddar in alla 12 OS-matcher till Firebase. Kör bara denna EN GÅNG! Fortsätta?')) {
+                return;
+            }
+            
+            console.log('Initializing matches...');
+            const btn = document.getElementById('initMatchesBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Laddar...';
+            
+            try {
+                await set(ref(database, 'matches'), OS_MATCHES);
+                alert('✅ Matcher laddade! Nu kan alla börja tippa!');
+                btn.style.display = 'none'; // Hide button after use
+                renderMatches(); // Refresh the list
+            } catch (error) {
+                console.error('Error initializing matches:', error);
+                alert('❌ Fel: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = '🔄 Ladda matcher';
+            }
+        }
+
+        // ADMIN FUNCTIONS (Hefner only)
+        function adminLog(msg, type = 'info') {
+            const output = document.getElementById('adminOutput');
+            if (!output) return;
+            
+            output.style.display = 'block';
+            const colors = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#60a5fa' };
+            const color = colors[type] || '#10b981';
+            const time = new Date().toLocaleTimeString();
+            output.innerHTML += `<span style="color: ${color}">[${time}] ${msg}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        window.adminLoadMatches = async function() {
+            if (currentUser !== 'Hefner') {
+                alert('⛔ Endast Hefner kan använda admin-funktioner!');
+                return;
+            }
+            
+            if (!confirm('Ladda in alla 12 OS-matcher till Firebase?\n\nKör bara EN gång!')) return;
+            
+            adminLog('🔄 Laddar in matcher...', 'info');
+            try {
+                await set(ref(database, 'matches'), OS_MATCHES);
+                await logActivity('ADMIN_LOAD_MATCHES', 'Laddade in 12 OS-matcher');
+                adminLog('✅ KLART! 12 matcher inladdade!', 'success');
+                alert('✅ Matcher laddade!');
+            } catch (error) {
+                adminLog('❌ FEL: ' + error.message, 'error');
+                alert('❌ Fel: ' + error.message);
+            }
+        };
+
+        window.adminResetPredictions = async function() {
+            if (currentUser !== 'Hefner') {
+                alert('⛔ Endast Hefner kan använda admin-funktioner!');
+                return;
+            }
+            
+            if (!confirm('⚠️ NOLLSTÄLL ALLA TIPPNINGAR?\n\nDetta raderar alla spelares tippningar!\nMatcher och resultat behålls.\n\nFortsätta?')) return;
+            if (!confirm('⚠️ SISTA VARNINGEN!\n\nAlla tippningar raderas permanent!\n\nÄr du HELT säker?')) return;
+            
+            adminLog('🗑️ Nollställer tippningar...', 'warning');
+            try {
+                await set(ref(database, 'predictions'), {});
+                await logActivity('ADMIN_RESET_PREDICTIONS', 'Nollställde alla tippningar');
+                adminLog('✅ KLART! Alla tippningar raderade!', 'success');
+                adminLog('📊 Tippningar: 0 kvar', 'info');
+                adminLog('📊 Matcher: Behållna', 'success');
+                adminLog('📊 Resultat: Behållna', 'success');
+                alert('✅ Alla tippningar raderade!');
+            } catch (error) {
+                adminLog('❌ FEL: ' + error.message, 'error');
+                alert('❌ Fel: ' + error.message);
+            }
+        };
+
+        window.adminResetResults = async function() {
+            if (currentUser !== 'Hefner') {
+                alert('⛔ Endast Hefner kan använda admin-funktioner!');
+                return;
+            }
+            
+            if (!confirm('⚠️ NOLLSTÄLL ALLA RESULTAT?\n\nDetta raderar alla matchresultat!\nTippningar behålls.\n\nFortsätta?')) return;
+            
+            adminLog('🔄 Nollställer resultat...', 'warning');
+            try {
+                const cleanMatches = matches.map(m => ({
+                    ...m,
+                    actualOutcome: null,
+                    setBy: null,
+                    setAt: null
+                }));
+                await set(ref(database, 'matches'), cleanMatches);
+                await logActivity('ADMIN_RESET_RESULTS', 'Nollställde alla matchresultat');
+                adminLog('✅ KLART! Alla resultat raderade!', 'success');
+                adminLog('📊 Resultat: 0 kvar', 'info');
+                adminLog('📊 Tippningar: Behållna', 'success');
+                alert('✅ Alla resultat raderade!');
+            } catch (error) {
+                adminLog('❌ FEL: ' + error.message, 'error');
+                alert('❌ Fel: ' + error.message);
+            }
+        };
+
+        window.adminFullReset = async function() {
+            if (currentUser !== 'Hefner') {
+                alert('⛔ Endast Hefner kan använda admin-funktioner!');
+                return;
+            }
+            
+            if (!confirm('💣 TOTAL RESET?\n\nDetta raderar:\n- Alla matcher\n- Alla tippningar\n- Alla resultat\n\nLösenord behålls.\n\nFortsätta?')) return;
+            if (!confirm('💣💣💣 SISTA VARNINGEN! 💣💣💣\n\nALLT kommer raderas!\n\nÄr du 100% säker?')) return;
+            if (!confirm('Skriv OK för att bekräfta total reset (detta kan inte ångras!)') !== null) return;
+            
+            adminLog('💣 TOTAL RESET påbörjad...', 'error');
+            try {
+                await logActivity('ADMIN_FULL_RESET', 'Genomförde total reset (matcher + tippningar + resultat)');
+                await set(ref(database, 'matches'), []);
+                adminLog('✅ Matcher raderade', 'success');
+                await set(ref(database, 'predictions'), {});
+                adminLog('✅ Tippningar raderade', 'success');
+                adminLog('💣 TOTAL RESET KLAR!', 'warning');
+                adminLog('📊 Allt borta. Börja om från scratch.', 'info');
+                alert('💣 Total reset klar! Ladda nu in matcher igen från Admin-panelen.');
+            } catch (error) {
+                adminLog('❌ FEL: ' + error.message, 'error');
+                alert('❌ Fel: ' + error.message);
+            }
+        };
+
+        // ACTIVITY LOG DISPLAY
+        function renderActivityLog() {
+            const logDiv = document.getElementById('activityLog');
+            if (!logDiv) return;
+            
+            if (!activityLog || activityLog.length === 0) {
+                logDiv.innerHTML = '<span style="color: #6b7280;">Ingen aktivitet ännu...</span>';
+                return;
+            }
+            
+            const actionIcons = {
+                'LOGIN': '🔓',
+                'LOGOUT': '🔒',
+                'AUTO_LOGIN': '⚡',
+                'FIRST_LOGIN': '✨',
+                'PREDICT': '🎯',
+                'SET_RESULT': '📝',
+                'CLEAR_RESULT': '🗑️',
+                'ADMIN_LOAD_MATCHES': '🔄',
+                'ADMIN_RESET_PREDICTIONS': '💣',
+                'ADMIN_RESET_RESULTS': '🔄',
+                'ADMIN_FULL_RESET': '💥'
+            };
+            
+            const actionColors = {
+                'LOGIN': '#10b981',
+                'LOGOUT': '#6b7280',
+                'AUTO_LOGIN': '#3b82f6',
+                'FIRST_LOGIN': '#f59e0b',
+                'PREDICT': '#8b5cf6',
+                'SET_RESULT': '#06b6d4',
+                'CLEAR_RESULT': '#ef4444',
+                'ADMIN_LOAD_MATCHES': '#10b981',
+                'ADMIN_RESET_PREDICTIONS': '#dc2626',
+                'ADMIN_RESET_RESULTS': '#f59e0b',
+                'ADMIN_FULL_RESET': '#7f1d1d'
+            };
+            
+            let html = '';
+            activityLog.forEach((entry, index) => {
+                const date = new Date(entry.timestamp);
+                const timeStr = date.toLocaleString('sv-SE', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                const icon = actionIcons[entry.action] || '📌';
+                const color = actionColors[entry.action] || '#10b981';
+                const user = entry.user || 'System';
+                
+                html += `<div style="color: ${color}; margin-bottom: 4px;">`;
+                html += `[${timeStr}] ${icon} ${user}: ${entry.details}`;
+                html += `</div>`;
+            });
+            
+            logDiv.innerHTML = html;
+            logDiv.scrollTop = 0; // Scroll to top (newest first)
+        }
+        
+        window.refreshActivityLog = function() {
+            if (currentUser !== 'Hefner') {
+                alert('⛔ Endast Hefner kan se aktivitetsloggen!');
+                return;
+            }
+            renderActivityLog();
+        };
+
+        // AUTOMATIC RESULT FETCHING
+        async function fetchMatchResults() {
+            console.log('🔍 Checking for match results from API-Football...');
+            
+            for (const match of matches) {
+                // Skip if already has result
+                if (match.actualOutcome) {
+                    console.log(`⏭️ Skipping ${match.homeTeam} vs ${match.awayTeam} - already has result`);
+                    continue;
+                }
+                
+                // Skip if match hasn't started yet
+                if (!isMatchStarted(match.date)) {
+                    console.log(`⏭️ Skipping ${match.homeTeam} vs ${match.awayTeam} - not started yet`);
+                    continue;
+                }
+                
+                try {
+                    console.log(`\n🏒 Fetching result for ${match.homeTeam} vs ${match.awayTeam}...`);
+                    const result = await fetchAPIFootball(match);
+                    
+                    if (result) {
+                        console.log(`✅ Result found: ${result}`);
+                        const matchIndex = matches.findIndex(m => m.id === match.id);
+                        if (matchIndex !== -1) {
+                            matches[matchIndex].actualOutcome = result;
+                            await set(ref(database, 'matches'), matches);
+                            console.log('💾 Result saved to database');
+                        }
+                    } else {
+                        console.log(`ℹ️ No result available yet for this match`);
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching result:', error);
+                }
+            }
+            console.log('\n✅ Finished checking all matches\n');
+        }
+
+        // API-Football integration
+        async function fetchAPIFootball(match) {
+            try {
+                const API_KEY = 'd3bbb6c3b52f0fb35326ecf925a5ffd5';
+                
+                // Wait at least 2 hours after match start
+                const matchTime = new Date(match.date);
+                const now = new Date();
+                const hoursSinceStart = (now - matchTime) / (1000 * 60 * 60);
+                if (hoursSinceStart < 2) {
+                    console.log(`  ⏰ Too early - ${hoursSinceStart.toFixed(1)}h since start (need 2h)`);
+                    return null;
+                }
+                
+                const matchDate = match.date.split('T')[0];
+                console.log(`  📅 Match date: ${matchDate}`);
+                
+                // Try multiple league IDs - Olympics uses ID 131
+                const leagueIds = [131, 147]; // 131 = Olympics, 147 = backup
+                
+                for (const leagueId of leagueIds) {
+                    console.log(`  🔍 Trying league ID ${leagueId}...`);
+                    
+                    const url = `https://v1.hockey.api-sports.io/games?date=${matchDate}&league=${leagueId}&season=2026`;
+                    
+                    try {
+                        const response = await fetch(url, {
+                            method: 'GET',
+                            headers: {
+                                'x-rapidapi-key': API_KEY,
+                                'x-rapidapi-host': 'v1.hockey.api-sports.io'
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            console.log(`    ⚠️ API responded with status ${response.status}`);
+                            continue;
+                        }
+                        
+                        const data = await response.json();
+                        console.log(`    📦 API response:`, data);
+                        
+                        const games = data.response || [];
+                        console.log(`    📊 Found ${games.length} games for this date/league`);
+                        
+                        if (games.length === 0) continue;
+                        
+                        // Log all games to help debug
+                        games.forEach((g, i) => {
+                            console.log(`      Game ${i+1}: ${g.teams?.home?.name} vs ${g.teams?.away?.name}`);
+                        });
+                        
+                        // Find matching game
+                        const game = games.find(g => {
+                            const apiHome = (g.teams?.home?.name || '').toLowerCase();
+                            const apiAway = (g.teams?.away?.name || '').toLowerCase();
+                            const ourHome = match.homeTeam.toLowerCase();
+                            const ourAway = match.awayTeam.toLowerCase();
+                            
+                            const homeMatch = apiHome.includes(ourHome) || ourHome.includes(apiHome);
+                            const awayMatch = apiAway.includes(ourAway) || ourAway.includes(apiAway);
+                            
+                            return homeMatch && awayMatch;
+                        });
+                        
+                        if (!game) {
+                            console.log(`    ❌ No matching game found in league ${leagueId}`);
+                            continue;
+                        }
+                        
+                        console.log(`    ✅ MATCH FOUND! ${game.teams.home.name} vs ${game.teams.away.name}`);
+                        console.log(`    📊 Status: ${game.status?.short}, Score: ${game.scores?.home}-${game.scores?.away}`);
+                        
+                        // Check if finished
+                        const finishedStatuses = ['FT', 'AOT', 'AP', 'FINAL', 'AET'];
+                        if (!finishedStatuses.includes(game.status?.short)) {
+                            console.log(`    ⏳ Game not finished yet (status: ${game.status?.short})`);
+                            return null;
+                        }
+                        
+                        const homeScore = parseInt(game.scores?.home) || 0;
+                        const awayScore = parseInt(game.scores?.away) || 0;
+                        
+                        console.log(`    🏆 FINAL SCORE: ${homeScore}-${awayScore}`);
+                        
+                        if (homeScore > awayScore) return '1';
+                        if (awayScore > homeScore) return '2';
+                        return 'X';
+                        
+                    } catch (fetchError) {
+                        console.log(`    ❌ Fetch error for league ${leagueId}:`, fetchError.message);
+                        continue;
+                    }
+                }
+                
+                console.log(`  ❌ No match found in any league`);
+                return null;
+                
+            } catch (error) {
+                console.error('  ❌ Fatal API error:', error);
+                return null;
+            }
+        }
+
+        // AUTO-FETCH DISABLED: API-Sports free plan only supports 2022-2024
+        // Hefner uses the Quick Helper tool for fast manual entry
+        console.log('💡 AUTO-FETCH: Disabled (API free plan limitation)');
+        console.log('💡 SOLUTION: Use Hefner-Helper.html for quick results!');
+
+        // RESULT MODAL (Anyone can use after match starts)
+        window.openResultModal = function(matchId) {
+            const match = matches.find(m => m.id === matchId);
+            if (!match) return;
+
+            currentModalMatchId = matchId;
+            currentModalOutcome = match.actualOutcome;
+
+            document.getElementById('modalMatchInfo').textContent = `${match.homeTeam} vs ${match.awayTeam}`;
+            document.getElementById('modalHome').textContent = match.homeTeam;
+            document.getElementById('modalAway').textContent = match.awayTeam;
+
+            document.querySelectorAll('.modal-outcome-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (match.actualOutcome === null && btn.dataset.outcome === 'null') {
+                    btn.classList.add('selected');
+                } else if (btn.dataset.outcome === currentModalOutcome) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            document.getElementById('resultModal').classList.add('active');
+        };
+
+        function handleModalOutcome(e) {
+            const btn = e.target.closest('.modal-outcome-btn');
+            if (!btn) return;
+            
+            const outcome = btn.dataset.outcome;
+            currentModalOutcome = outcome === 'null' ? null : outcome;
+            
+            document.querySelectorAll('.modal-outcome-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('resultModal');
+            if (modal) modal.classList.remove('active');
+            currentModalMatchId = null;
+            currentModalOutcome = null;
+        }
+
+        async function saveModalResult() {
+            if (currentModalMatchId === null || currentModalOutcome === undefined) {
+                alert('Välj ett alternativ först!');
+                return;
+            }
+
+            try {
+                const matchIndex = matches.findIndex(m => m.id === currentModalMatchId);
+                matches[matchIndex].actualOutcome = currentModalOutcome;
+                matches[matchIndex].setBy = currentModalOutcome !== null ? currentUser : null;
+                matches[matchIndex].setAt = currentModalOutcome !== null ? new Date().toISOString() : null;
+                await set(ref(database, 'matches'), matches);
+                
+                // Log activity
+                const match = matches[matchIndex];
+                if (currentModalOutcome === null) {
+                    await logActivity('CLEAR_RESULT', `Rensade resultat för ${match.homeTeam} vs ${match.awayTeam}`);
+                    alert('✅ Resultat rensat! Matchen väntar på resultat igen.');
+                } else {
+                    const outcomeText = { '1': match.homeTeam, 'X': 'Oavgjort', '2': match.awayTeam };
+                    await logActivity('SET_RESULT', `Satte resultat ${outcomeText[currentModalOutcome]} på ${match.homeTeam} vs ${match.awayTeam}`);
+                    alert(`✅ Resultat sparat av ${currentUser}!`);
+                }
+                
+                closeModal();
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('❌ Fel: ' + error.message);
+            }
+        }
+
+        // RENDER MATCHES
+        function renderMatches() {
+            const list = document.getElementById('matchesList');
+            if (!list) return;
+            
+            // Show init button only for Hefner if no matches exist
+            const initBtn = document.getElementById('initMatchesBtn');
+            if (initBtn && (!matches || matches.length === 0) && currentUser === 'Hefner') {
+                initBtn.style.display = 'block';
+            } else if (initBtn) {
+                initBtn.style.display = 'none';
+            }
+            
+            if (!matches || matches.length === 0) {
+                if (currentUser === 'Hefner') {
+                    list.innerHTML = '<div class="empty-state">Klicka "Ladda in matcher" ovan för att starta tävlingen</div>';
+                } else {
+                    list.innerHTML = '<div class="empty-state">Väntar på att Hefner laddar in matcherna...</div>';
+                }
+                return;
+            }
+
+            list.innerHTML = matches.map(m => {
+                const dateStr = new Date(m.date).toLocaleString('sv-SE', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+                
+                const started = isMatchStarted(m.date);
+                const outcomeText = {
+                    '1': `✅ ${m.homeTeam} vann`,
+                    'X': '✅ Oavgjort',
+                    '2': `✅ ${m.awayTeam} vann`
+                };
+                const setByText = m.setBy ? ` (inlagt av ${m.setBy})` : '';
+                const status = m.actualOutcome ? outcomeText[m.actualOutcome] + setByText : 
+                              (started ? '⏳ Väntar på resultat...' : '📅 Ej startad');
+
+                // Check who has predicted for this match
+                const matchPredictions = predictions[m.id] || {};
+                const allPlayers = ['Hefner', 'Majscht', 'Olle', 'Dawod', 'Ante'];
+                const predicted = allPlayers.filter(p => matchPredictions[p]);
+                const notPredicted = allPlayers.filter(p => !matchPredictions[p]);
+                
+                // Show predictions BEFORE match starts (who has tipped)
+                const predictionStatusBefore = !m.actualOutcome ? `
+                    <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 0.9em;">
+                        ${predicted.length > 0 ? `<div style="color: #10b981; margin-bottom: 5px;">✅ Tippat (${predicted.length}/5): ${predicted.join(', ')}</div>` : ''}
+                        ${notPredicted.length > 0 ? `<div style="color: #ef4444;">❌ Inte tippat (${notPredicted.length}/5): ${notPredicted.join(', ')}</div>` : ''}
+                    </div>
+                ` : '';
+
+                // Show predictions AFTER result is set (what everyone tipped)
+                const predictionStatusAfter = m.actualOutcome ? `
+                    <div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">
+                        <div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Alla tippningar:</div>
+                        ${allPlayers.map(player => {
+                            const playerPrediction = matchPredictions[player];
+                            const outcomeLabels = {
+                                '1': m.homeTeam,
+                                'X': 'Oavgjort',
+                                '2': m.awayTeam
+                            };
+                            
+                            if (!playerPrediction) {
+                                return `<div style="color: #6b7280; padding: 3px 0;">❌ ${player}: Tippade inte</div>`;
+                            }
+                            
+                            const isCorrect = playerPrediction === m.actualOutcome;
+                            const icon = isCorrect ? '✅' : '❌';
+                            const color = isCorrect ? '#10b981' : '#ef4444';
+                            
+                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${player}: ${outcomeLabels[playerPrediction]}</div>`;
+                        }).join('')}
+                    </div>
+                ` : '';
+
+                // Anyone can set results after match has started
+                const canSetResult = started;
+                const resultControls = canSetResult ? `
+                    <div class="match-actions">
+                        <button class="btn btn-secondary" onclick="openResultModal('${m.id}')">
+                            ${m.actualOutcome ? '✏️ Ändra' : '📝 Sätt'} resultat
+                        </button>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="match-item">
+                        <div class="match-teams">${m.homeTeam} vs ${m.awayTeam}</div>
+                        <div class="match-details">${m.league} • ${dateStr} • ${status}</div>
+                        ${started && !m.actualOutcome ? '<div class="match-locked">🔒 Matchen startad - Vem som helst kan sätta resultat</div>' : ''}
+                        ${predictionStatusBefore}
+                        ${predictionStatusAfter}
+                        ${resultControls}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // RENDER PREDICTIONS
+        function renderPredictions() {
+            const list = document.getElementById('predictionsList');
+            if (!list) return;
+            
+            if (!currentUser) {
+                list.innerHTML = '<div class="empty-state">Logga in för att tippa</div>';
+                return;
+            }
+
+            if (!matches || matches.length === 0) {
+                list.innerHTML = '<div class="empty-state">Inga matcher. Gå till Matcher-fliken och klicka "Ladda matcher"</div>';
+                return;
+            }
+
+            list.innerHTML = matches.map(m => {
+                const myPred = predictions[m.id]?.[currentUser];
+                const started = isMatchStarted(m.date);
+                const dateStr = new Date(m.date).toLocaleString('sv-SE', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                let predictionsHtml = '';
+                if (started) {
+                    const matchPreds = predictions[m.id] || {};
+                    if (Object.keys(matchPreds).length > 0) {
+                        predictionsHtml = `
+                            <div class="predictions-revealed">
+                                <h4>Alla tippningar:</h4>
+                                ${Object.entries(matchPreds).map(([player, pred]) => `
+                                    <div class="prediction-row">
+                                        <span><strong>${player}</strong></span>
+                                        <span style="font-weight: 600; color: #667eea;">${pred}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                }
+
+                return `
+                    <div class="prediction-match ${started ? 'locked' : ''}">
+                        <div style="text-align: center; font-size: 1.2em; font-weight: 600; margin-bottom: 5px;">
+                            ${m.homeTeam} vs ${m.awayTeam}
+                        </div>
+                        <div style="text-align: center; color: #666; margin-bottom: 20px;">
+                            ${m.league} • ${dateStr}
+                        </div>
+                        ${started ? `
+                            <div class="locked-overlay">
+                                🔒 Matchen har startat - Tippning stängd
+                            </div>
+                            ${predictionsHtml}
+                        ` : `
+                            <div class="outcome-buttons">
+                                <button class="outcome-btn ${myPred === '1' ? 'selected' : ''}" 
+                                        onclick="savePrediction('${m.id}', '1')">
+                                    1<span class="outcome-label">${m.homeTeam}</span>
+                                </button>
+                                <button class="outcome-btn ${myPred === 'X' ? 'selected' : ''}" 
+                                        onclick="savePrediction('${m.id}', 'X')">
+                                    X<span class="outcome-label">Oavgjort</span>
+                                </button>
+                                <button class="outcome-btn ${myPred === '2' ? 'selected' : ''}" 
+                                        onclick="savePrediction('${m.id}', '2')">
+                                    2<span class="outcome-label">${m.awayTeam}</span>
+                                </button>
+                            </div>
+                            ${myPred ? '<div style="text-align: center; color: #667eea; font-weight: 600;">✓ Din tippning sparad</div>' : ''}
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // SAVE PREDICTION
+        window.savePrediction = async function(matchId, outcome) {
+            if (!currentUser) {
+                alert('Du måste vara inloggad!');
+                return;
+            }
+
+            const match = matches.find(m => m.id === matchId);
+            if (isMatchStarted(match.date)) {
+                alert('Matchen har redan startat! Du kan inte längre tippa.');
+                return;
+            }
+
+            try {
+                if (!predictions[matchId]) predictions[matchId] = {};
+                predictions[matchId][currentUser] = outcome;
+                
+                await set(ref(database, 'predictions'), predictions);
+                console.log('Prediction saved');
+                
+                // Log activity
+                const match = matches.find(m => m.id === matchId);
+                await logActivity('PREDICT', `Tippade ${outcome} på ${match.homeTeam} vs ${match.awayTeam}`);
+                
+                renderPredictions();
+                renderMatches(); // Update match list to show who has predicted
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('❌ Fel: ' + error.message);
+            }
+        };
+
+        // CALCULATE POINTS
+        function calculatePoints(matchId, player) {
+            const match = matches.find(m => m.id === matchId);
+            if (!match || !match.actualOutcome) return 0;
+
+            const playerPred = predictions[matchId]?.[player];
+            if (!playerPred || playerPred !== match.actualOutcome) return 0;
+
+            const samePredCount = Object.values(predictions[matchId] || {})
+                .filter(p => p === playerPred).length;
+
+            if (samePredCount === 1) return 100;
+            if (samePredCount === 2) return 78;
+            if (samePredCount === 3) return 55;
+            if (samePredCount === 4) return 33;
+            return 0;
+        }
+
+        // RENDER LEADERBOARD
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+            if (!tbody) return;
+            
+            const scores = PLAYERS.map(player => {
+                let totalPoints = 0;
+                let correctPreds = 0;
+                let finishedMatches = 0;
+
+                matches.forEach(match => {
+                    if (match.actualOutcome) {
+                        finishedMatches++;
+                        const points = calculatePoints(match.id, player);
+                        totalPoints += points;
+                        if (points > 0) correctPreds++;
+                    }
+                });
+
+                return {
+                    player,
+                    totalPoints,
+                    correctPreds,
+                    average: finishedMatches > 0 ? (totalPoints / finishedMatches).toFixed(1) : '0.0'
+                };
+            });
+
+            scores.sort((a, b) => b.totalPoints - a.totalPoints);
+
+            tbody.innerHTML = scores.map((s, i) => {
+                const rankClass = i < 5 ? `rank-${i + 1}` : '';
+                return `
+                    <tr>
+                        <td><span class="rank ${rankClass}">${i + 1}</span></td>
+                        <td><strong>${s.player}</strong></td>
+                        <td><strong>${s.totalPoints}</strong></td>
+                        <td>${s.correctPreds}</td>
+                        <td>${s.average}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Show special titles for positions 1, 4 and 5
+            const specialTitlesDiv = document.getElementById('specialTitles');
+            const masterSection = document.getElementById('masterSection');
+            const sousChefSection = document.getElementById('sousChefSection');
+            const chefSection = document.getElementById('chefSection');
+            const masterName = document.getElementById('masterName');
+            const sousChefName = document.getElementById('sousChefName');
+            const chefName = document.getElementById('chefName');
+
+            // Show Mästare (1st place)
+            if (scores.length >= 1) {
+                masterName.textContent = scores[0].player;
+                masterSection.style.display = 'block';
+            } else {
+                masterSection.style.display = 'none';
+            }
+
+            // Show Sous-chef (4th place)
+            if (scores.length >= 4) {
+                sousChefName.textContent = scores[3].player;
+                sousChefSection.style.display = 'block';
+            } else {
+                sousChefSection.style.display = 'none';
+            }
+
+            // Show Chef (5th place)
+            if (scores.length >= 5) {
+                chefName.textContent = scores[4].player;
+                chefSection.style.display = 'block';
+            } else {
+                chefSection.style.display = 'none';
+            }
+
+            // Show the titles section if we have at least position 1
+            if (scores.length >= 1) {
+                specialTitlesDiv.style.display = 'block';
+            } else {
+                specialTitlesDiv.style.display = 'none';
+            }
+        }
+
+        // SHOW TAB
+        function handleTab(e) {
+            const tabName = e.target.dataset.tab;
+            if (!tabName) return;
+
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            e.target.classList.add('active');
+
+            if (tabName === 'leaderboard') renderLeaderboard();
+            if (tabName === 'predict') renderPredictions();
+            if (tabName === 'admin' && currentUser === 'Hefner') renderActivityLog();
+        }
+
+        // EVENT LISTENERS
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, setting up event listeners...');
+            
+            // Login
+            const loginBtn = document.getElementById('loginButton');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', handleLogin);
+                console.log('Login button listener added');
+            }
+
+            // Logout
+            const logoutBtn = document.getElementById('logoutButton');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+                console.log('Logout button listener added');
+            }
+
+            // Init matches
+            const initBtn = document.getElementById('initMatchesBtn');
+            if (initBtn) {
+                initBtn.addEventListener('click', handleInitMatches);
+                console.log('Init matches button listener added');
+            }
+
+            // Password enter key
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleLogin();
+                });
+                console.log('Password enter key listener added');
+            }
+
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', handleTab);
+            });
+            console.log('Tab listeners added');
+
+            // Admin modal (for Hefner)
+            const modalOutcomeButtons = document.getElementById('modalOutcomeButtons');
+            if (modalOutcomeButtons) {
+                modalOutcomeButtons.addEventListener('click', handleModalOutcome);
+            }
+
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+            if (modalCancelBtn) {
+                modalCancelBtn.addEventListener('click', closeModal);
+            }
+
+            const modalSaveBtn = document.getElementById('modalSaveBtn');
+            if (modalSaveBtn) {
+                modalSaveBtn.addEventListener('click', saveModalResult);
+            }
+
+            const modal = document.getElementById('resultModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target.id === 'resultModal') closeModal();
+                });
+            }
+
+            console.log('All event listeners set up successfully');
+        });
+    </script>
+</body>
+</html>

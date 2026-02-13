@@ -1237,7 +1237,9 @@
             };
             
             let html = '';
-            activityLog.forEach((entry, index) => {
+            // Reverse so oldest is first, newest is last (bottom)
+            const reversedLog = [...activityLog].reverse();
+            reversedLog.forEach((entry, index) => {
                 const date = new Date(entry.timestamp);
                 const timeStr = date.toLocaleString('sv-SE', {
                     month: 'short',
@@ -1257,7 +1259,7 @@
             });
             
             logDiv.innerHTML = html;
-            logDiv.scrollTop = 0; // Scroll to top (newest first)
+            logDiv.scrollTop = logDiv.scrollHeight; // Scroll to bottom (newest entries)
         }
         
         window.refreshActivityLog = function() {
@@ -1471,15 +1473,13 @@
                 matches[matchIndex].setAt = currentModalOutcome !== null ? new Date().toISOString() : null;
                 await set(ref(database, 'matches'), matches);
                 
-                // Log activity
+                // Log activity (no alert popups)
                 const match = matches[matchIndex];
                 if (currentModalOutcome === null) {
                     await logActivity('CLEAR_RESULT', `Rensade resultat för ${match.homeTeam} vs ${match.awayTeam}`);
-                    alert('✅ Resultat rensat! Matchen väntar på resultat igen.');
                 } else {
                     const outcomeText = { '1': match.homeTeam, 'X': 'Oavgjort', '2': match.awayTeam };
                     await logActivity('SET_RESULT', `Satte resultat ${outcomeText[currentModalOutcome]} på ${match.homeTeam} vs ${match.awayTeam}`);
-                    alert(`✅ Resultat sparat av ${currentUser}!`);
                 }
                 
                 closeModal();
@@ -1683,9 +1683,9 @@
                 await set(ref(database, 'predictions'), predictions);
                 console.log('Prediction saved');
                 
-                // Log activity
+                // Log activity (WITHOUT revealing the prediction)
                 const match = matches.find(m => m.id === matchId);
-                await logActivity('PREDICT', `Tippade ${outcome} på ${match.homeTeam} vs ${match.awayTeam}`);
+                await logActivity('PREDICT', `Tippade på ${match.homeTeam} vs ${match.awayTeam}`);
                 
                 renderPredictions();
                 renderMatches(); // Update match list to show who has predicted

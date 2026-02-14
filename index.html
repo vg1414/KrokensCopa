@@ -792,6 +792,7 @@
         let predictions = {};
         let passwords = {};
         let activityLog = [];
+        let activityLogLoaded = false; // Track if we've loaded from Firebase
         let currentUser = null;
         let currentModalMatchId = null;
         let currentModalOutcome = null;
@@ -830,6 +831,12 @@
         
         // Activity logging
         async function logActivity(action, details = '') {
+            // Don't log if we haven't loaded the activity log yet
+            if (!activityLogLoaded) {
+                console.warn('Activity log not loaded yet, skipping log entry');
+                return;
+            }
+            
             const entry = {
                 timestamp: new Date().toISOString(),
                 user: currentUser,
@@ -953,7 +960,15 @@
 
             const activityLogRef = ref(database, 'activityLog');
             onValue(activityLogRef, (snapshot) => {
-                activityLog = snapshot.val() || [];
+                const data = snapshot.val();
+                // Only update if we got actual data, or if this is the first load
+                if (data && Array.isArray(data)) {
+                    activityLog = data;
+                } else if (!activityLogLoaded) {
+                    // First load and no data exists - start with empty array
+                    activityLog = [];
+                }
+                activityLogLoaded = true;
                 console.log('Activity log loaded:', activityLog.length, 'entries');
                 if (currentUser === 'Hefner') {
                     renderActivityLog();

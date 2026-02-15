@@ -642,6 +642,17 @@
                         <tbody id="leaderboardBody"></tbody>
                     </table>
                     
+                    <!-- Sniper title -->
+                    <div id="sniperSection" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; display: none;">
+                        <div style="padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                            <div style="font-size: 1.1em; font-weight: 600; color: #8B5CF6; margin-bottom: 5px;">
+                                🎯 Ligans Sniper
+                            </div>
+                            <div id="sniperName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            <div id="sniperDetails" style="font-size: 0.9em; color: #666; margin-top: 4px;"></div>
+                        </div>
+                    </div>
+                    
                     <!-- Special titles for bottom positions -->
                     <div id="specialTitles" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
                         <div style="display: grid; gap: 15px;">
@@ -664,14 +675,6 @@
                                     👨‍🍳 Chef
                                 </div>
                                 <div id="chefName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
-                            </div>
-                            
-                            <div id="sniperSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                                <div style="font-size: 1.1em; font-weight: 600; color: #8B5CF6; margin-bottom: 5px;">
-                                    🎯 Ligans Sniper
-                                </div>
-                                <div id="sniperName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
-                                <div id="sniperDetails" style="font-size: 0.9em; color: #666; margin-top: 4px;"></div>
                             </div>
                         </div>
                     </div>
@@ -1865,7 +1868,7 @@
             
             if (sniperCounts[0] && sniperCounts[0].soloCorrect > 0) {
                 sniperName.textContent = sniperCounts[0].player;
-                sniperDetails.textContent = `${sniperCounts[0].soloCorrect} ensamma rätt`;
+                sniperDetails.textContent = `${sniperCounts[0].soloCorrect} st 100-poängare`;
                 sniperSection.style.display = 'block';
             } else {
                 sniperSection.style.display = 'none';

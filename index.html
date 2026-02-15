@@ -635,6 +635,7 @@
                                 <th>Spelare</th>
                                 <th>Poäng</th>
                                 <th>Rätt</th>
+                                <th>Streak</th>
                                 <th>Snitt</th>
                             </tr>
                         </thead>
@@ -663,6 +664,14 @@
                                     👨‍🍳 Chef
                                 </div>
                                 <div id="chefName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            </div>
+                            
+                            <div id="sniperSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                                <div style="font-size: 1.1em; font-weight: 600; color: #8B5CF6; margin-bottom: 5px;">
+                                    🎯 Ligans Sniper
+                                </div>
+                                <div id="sniperName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                                <div id="sniperDetails" style="font-size: 0.9em; color: #666; margin-top: 4px;"></div>
                             </div>
                         </div>
                     </div>
@@ -1732,6 +1741,29 @@
             return 0;
         }
 
+        // CALCULATE STREAK (current consecutive correct predictions)
+        function calculateStreak(player) {
+            // Get finished matches sorted by date
+            const finishedMatches = matches
+                .filter(m => m.actualOutcome)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            let currentStreak = 0;
+            let bestStreak = 0;
+            
+            finishedMatches.forEach(match => {
+                const playerPred = predictions[match.id]?.[player];
+                if (playerPred && playerPred === match.actualOutcome) {
+                    currentStreak++;
+                    if (currentStreak > bestStreak) bestStreak = currentStreak;
+                } else {
+                    currentStreak = 0;
+                }
+            });
+            
+            return { current: currentStreak, best: bestStreak };
+        }
+
         // RENDER LEADERBOARD
         function renderLeaderboard() {
             const tbody = document.getElementById('leaderboardBody');
@@ -1751,11 +1783,15 @@
                     }
                 });
 
+                const streak = calculateStreak(player);
+
                 return {
                     player,
                     totalPoints,
                     correctPreds,
-                    average: finishedMatches > 0 ? (totalPoints / finishedMatches).toFixed(1) : '0.0'
+                    average: finishedMatches > 0 ? (totalPoints / finishedMatches).toFixed(1) : '0.0',
+                    currentStreak: streak.current,
+                    bestStreak: streak.best
                 };
             });
 
@@ -1763,12 +1799,17 @@
 
             tbody.innerHTML = scores.map((s, i) => {
                 const rankClass = i < 5 ? `rank-${i + 1}` : '';
+                const fireEmoji = s.currentStreak >= 3 ? ' 🔥' : '';
+                const streakDisplay = s.currentStreak > 0 
+                    ? `<span style="color: ${s.currentStreak >= 3 ? '#ef4444' : '#666'}; font-weight: ${s.currentStreak >= 3 ? '700' : '400'};">${s.currentStreak}${fireEmoji}</span>`
+                    : '<span style="color: #ccc;">0</span>';
                 return `
                     <tr>
                         <td><span class="rank ${rankClass}">${i + 1}</span></td>
-                        <td><strong>${s.player}</strong></td>
+                        <td><strong>${s.player}${fireEmoji}</strong></td>
                         <td><strong>${s.totalPoints}</strong></td>
                         <td>${s.correctPreds}</td>
+                        <td>${streakDisplay}</td>
                         <td>${s.average}</td>
                     </tr>
                 `;
@@ -1805,6 +1846,29 @@
                 chefSection.style.display = 'block';
             } else {
                 chefSection.style.display = 'none';
+            }
+
+            // Show Ligans Sniper (most solo correct predictions = 100p matches)
+            const sniperSection = document.getElementById('sniperSection');
+            const sniperName = document.getElementById('sniperName');
+            const sniperDetails = document.getElementById('sniperDetails');
+            
+            const sniperCounts = PLAYERS.map(player => {
+                let soloCorrect = 0;
+                matches.forEach(match => {
+                    if (match.actualOutcome && calculatePoints(match.id, player) === 100) {
+                        soloCorrect++;
+                    }
+                });
+                return { player, soloCorrect };
+            }).sort((a, b) => b.soloCorrect - a.soloCorrect);
+            
+            if (sniperCounts[0] && sniperCounts[0].soloCorrect > 0) {
+                sniperName.textContent = sniperCounts[0].player;
+                sniperDetails.textContent = `${sniperCounts[0].soloCorrect} ensamma rätt`;
+                sniperSection.style.display = 'block';
+            } else {
+                sniperSection.style.display = 'none';
             }
 
             // Show the titles section if we have at least position 1

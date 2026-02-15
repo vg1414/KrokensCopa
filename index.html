@@ -544,6 +544,22 @@
             .outcome-buttons {
                 flex-direction: column;
             }
+
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 10px 6px;
+                font-size: 0.85em;
+                text-align: center;
+            }
+
+            .leaderboard-table th:nth-child(2),
+            .leaderboard-table td:nth-child(2) {
+                text-align: left;
+            }
+
+            .rank {
+                font-size: 1.2em;
+            }
         }
     </style>
 </head>
@@ -631,11 +647,11 @@
                     <table class="leaderboard-table">
                         <thead>
                             <tr>
-                                <th>Plats</th>
+                                <th>#</th>
                                 <th>Spelare</th>
                                 <th>Poäng</th>
                                 <th>Rätt</th>
-                                <th>Streak</th>
+                                <th>🔥</th>
                                 <th>Snitt</th>
                             </tr>
                         </thead>

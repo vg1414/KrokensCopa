@@ -624,7 +624,7 @@
 
             <div id="setup" class="content active">
                 <div class="card">
-                    <h2 class="section-title">📅 OS Ishockey Gruppspel</h2>
+                    <h2 class="section-title">📅 OS Ishockey Åttondelsfinaler</h2>
                     <div style="margin-bottom: 20px;" id="initMatchesContainer">
                         <button class="btn btn-success" id="initMatchesBtn" style="display: none;">🔄 Ladda in matcher till Firebase (kör bara EN gång!)</button>
                     </div>
@@ -754,7 +754,7 @@
                     <div style="background: #f0f9ff; border-radius: 10px; padding: 20px;">
                         <h3 style="color: #1e40af; margin-bottom: 10px;">🔄 Ladda in matcher</h3>
                         <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
-                            Laddar in alla 12 OS-matcher till Firebase. Kör bara EN gång i början, eller efter total reset.
+                            Laddar in alla 4 OS-åttondelsfinaler till Firebase. Kör bara EN gång i början, eller efter total reset.
                         </p>
                         <button class="btn btn-success" onclick="adminLoadMatches()">
                             🔄 Ladda in matcher till Firebase
@@ -891,25 +891,11 @@
         }
 
         const OS_MATCHES = [
-            // 11 Feb (Onsdag - SPELAD)
-            { id: 'm1', homeTeam: 'Slovakien', awayTeam: 'Finland', league: 'OS 2026 - Grupp B', date: '2026-02-11T16:40', actualOutcome: null },
-            { id: 'm2', homeTeam: 'Sverige', awayTeam: 'Italien', league: 'OS 2026 - Grupp B', date: '2026-02-11T21:10', actualOutcome: null },
-            
-            // 13 Feb (Fredag - IDAG!)
-            { id: 'm3', homeTeam: 'Finland', awayTeam: 'Sverige', league: 'OS 2026 - Grupp B', date: '2026-02-13T12:10', actualOutcome: null },
-            { id: 'm4', homeTeam: 'Italien', awayTeam: 'Slovakien', league: 'OS 2026 - Grupp B', date: '2026-02-13T12:10', actualOutcome: null },
-            { id: 'm5', homeTeam: 'Frankrike', awayTeam: 'Tjeckien', league: 'OS 2026 - Grupp A', date: '2026-02-13T16:40', actualOutcome: null },
-            { id: 'm6', homeTeam: 'Kanada', awayTeam: 'Schweiz', league: 'OS 2026 - Grupp A', date: '2026-02-13T21:10', actualOutcome: null },
-            
-            // 14 Feb (Lördag)
-            { id: 'm7', homeTeam: 'Sverige', awayTeam: 'Slovakien', league: 'OS 2026 - Grupp B', date: '2026-02-14T12:10', actualOutcome: null },
-            { id: 'm8', homeTeam: 'Finland', awayTeam: 'Italien', league: 'OS 2026 - Grupp B', date: '2026-02-14T16:40', actualOutcome: null },
-            { id: 'm9', homeTeam: 'Tyskland', awayTeam: 'Lettland', league: 'OS 2026 - Grupp C', date: '2026-02-14T12:10', actualOutcome: null },
-            { id: 'm10', homeTeam: 'USA', awayTeam: 'Danmark', league: 'OS 2026 - Grupp C', date: '2026-02-14T21:10', actualOutcome: null },
-            
-            // 15 Feb (Söndag)
-            { id: 'm11', homeTeam: 'Schweiz', awayTeam: 'Tjeckien', league: 'OS 2026 - Grupp A', date: '2026-02-15T12:10', actualOutcome: null },
-            { id: 'm12', homeTeam: 'Kanada', awayTeam: 'Frankrike', league: 'OS 2026 - Grupp A', date: '2026-02-15T16:40', actualOutcome: null }
+            // 17 Feb (Tisdag) - Åttondelsfinaler
+            { id: 'qf1', homeTeam: 'Schweiz', awayTeam: 'Italien', league: 'OS 2026 - Åttondelsfinal', date: '2026-02-17T12:10', actualOutcome: null },
+            { id: 'qf2', homeTeam: 'Tyskland', awayTeam: 'Frankrike', league: 'OS 2026 - Åttondelsfinal', date: '2026-02-17T12:10', actualOutcome: null },
+            { id: 'qf3', homeTeam: 'Tjeckien', awayTeam: 'Danmark', league: 'OS 2026 - Åttondelsfinal', date: '2026-02-17T16:40', actualOutcome: null },
+            { id: 'qf4', homeTeam: 'Sverige', awayTeam: 'Lettland', league: 'OS 2026 - Åttondelsfinal', date: '2026-02-17T21:10', actualOutcome: null }
         ];
 
         // Simple hash function
@@ -1112,7 +1098,7 @@
 
         // INITIALIZE MATCHES
         async function handleInitMatches() {
-            if (!confirm('Detta laddar in alla 12 OS-matcher till Firebase. Kör bara denna EN GÅNG! Fortsätta?')) {
+            if (!confirm('Detta laddar in alla 4 OS-åttondelsfinaler till Firebase. Kör bara denna EN GÅNG! Fortsätta?')) {
                 return;
             }
             
@@ -1153,13 +1139,13 @@
                 return;
             }
             
-            if (!confirm('Ladda in alla 12 OS-matcher till Firebase?\n\nKör bara EN gång!')) return;
+            if (!confirm('Ladda in alla 4 OS-åttondelsfinaler till Firebase?\n\nKör bara EN gång!')) return;
             
             adminLog('🔄 Laddar in matcher...', 'info');
             try {
                 await set(ref(database, 'matches'), OS_MATCHES);
-                await logActivity('ADMIN_LOAD_MATCHES', 'Laddade in 12 OS-matcher');
-                adminLog('✅ KLART! 12 matcher inladdade!', 'success');
+                await logActivity('ADMIN_LOAD_MATCHES', 'Laddade in 4 OS-åttondelsfinaler');
+                adminLog('✅ KLART! 4 matcher inladdade!', 'success');
                 alert('✅ Matcher laddade!');
             } catch (error) {
                 adminLog('❌ FEL: ' + error.message, 'error');

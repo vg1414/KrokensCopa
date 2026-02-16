@@ -758,17 +758,10 @@
                 
                 <!-- API Configuration -->
                 <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
-                    <h3 style="color: #15803d; margin-bottom: 10px;">⚽ Auto-rättning (football-data.org)</h3>
+                    <h3 style="color: #15803d; margin-bottom: 10px;">⚽ Auto-rättning</h3>
                     <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
-                        Gratis API som hämtar PL-resultat automatiskt. Skaffa nyckel på 
-                        <a href="https://www.football-data.org/client/register" target="_blank" style="color: #15803d;">football-data.org</a> (2 min, gratis).
+                        Hämtar automatiskt PL-resultat från football-data.org API. Aktivera för att slippa sätta resultat manuellt.
                     </p>
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
-                        <input type="text" id="apiKeyInput" placeholder="Din API-nyckel..." 
-                            style="flex: 1; min-width: 200px; padding: 10px; border: 2px solid #d1d5db; border-radius: 8px; font-family: monospace; font-size: 0.9em;">
-                        <button class="btn btn-success" onclick="saveApiKey()" style="white-space: nowrap;">💾 Spara nyckel</button>
-                    </div>
-                    <div id="apiKeyStatus" style="margin-bottom: 15px; font-size: 0.9em;"></div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                         <button class="btn" style="background: #15803d;" onclick="toggleAutoFetch()">
                             <span id="autoFetchBtnText">⚽ Aktivera auto-hämtning</span>
@@ -788,8 +781,11 @@
                     <!-- Load Matches -->
                     <div style="background: #f0f9ff; border-radius: 10px; padding: 20px;">
                         <h3 style="color: #1e40af; margin-bottom: 10px;">🔄 Ladda in matcher</h3>
-                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
+                        <p style="color: #666; margin-bottom: 10px; font-size: 0.9em;">
                             Hämtar kommande omgångar från Premier League via API. Välj hur många omgångar som ska tippas samtidigt.
+                        </p>
+                        <p style="color: #f59e0b; margin-bottom: 15px; font-size: 0.85em; background: #fef3c7; padding: 8px; border-radius: 5px;">
+                            ℹ️ Använder CORS proxy (corsproxy.io) för att nå API:et. Om det inte fungerar, prova igen om några minuter.
                         </p>
                         <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
                             <label for="roundsToLoad" style="font-weight: 600; color: #1e40af;">Antal omgångar att ladda:</label>
@@ -875,7 +871,7 @@
         let currentUser = null;
         let currentModalMatchId = null;
         let currentModalOutcome = null;
-        let plApiKey = ''; // football-data.org API key
+        let plApiKey = '406217531e18462e97f40aea2c744b8e'; // football-data.org API key (hårdkodad)
         let autoFetchInterval = null; // Auto-fetch timer
         let autoFetchActive = false;
 
@@ -1048,17 +1044,6 @@
                 }
             });
 
-            // Load API key from Firebase
-            const apiKeyRef = ref(database, 'settings/plApiKey');
-            onValue(apiKeyRef, (snapshot) => {
-                plApiKey = snapshot.val() || '';
-                if (plApiKey && currentUser === 'Hefner') {
-                    const input = document.getElementById('apiKeyInput');
-                    if (input) input.value = plApiKey;
-                    updateApiKeyStatus(true);
-                }
-            });
-
         } catch (error) {
             console.error('Firebase init error:', error);
             alert('Firebase-fel: ' + error.message);
@@ -1181,11 +1166,6 @@
                 return;
             }
             
-            if (!plApiKey) {
-                alert('⚠️ Spara en API-nyckel först under "Auto-rättning"!');
-                return;
-            }
-            
             // Get number of rounds from dropdown
             const roundsSelect = document.getElementById('roundsToLoad');
             const roundsToLoad = parseInt(roundsSelect?.value || 2);
@@ -1195,14 +1175,24 @@
             adminLog(`⚽ Hämtar ${roundsToLoad} PL-omgångar från API...`, 'info');
             
             try {
-                // Fetch all matches for current season
-                const url = 'https://api.football-data.org/v4/competitions/PL/matches?status=SCHEDULED,TIMED';
+                // Use CORS proxy to avoid CORS issues
+                // Note: For production, you should use your own backend server
+                const apiUrl = 'https://api.football-data.org/v4/competitions/PL/matches?status=SCHEDULED,TIMED';
+                const corsProxy = 'https://corsproxy.io/?';
+                const url = corsProxy + encodeURIComponent(apiUrl);
+                
+                adminLog(`🔗 Anropar API via CORS proxy...`, 'info');
                 
                 const response = await fetch(url, {
-                    headers: { 'X-Auth-Token': plApiKey }
+                    method: 'GET',
+                    headers: { 
+                        'X-Auth-Token': plApiKey
+                    }
                 });
                 
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    adminLog(`❌ API error: ${response.status} - ${errorText}`, 'error');
                     throw new Error(`API svarade med status ${response.status}`);
                 }
                 
@@ -1210,6 +1200,12 @@
                 const allMatches = data.matches || [];
                 
                 adminLog(`📊 Hittade ${allMatches.length} kommande matcher totalt`, 'info');
+                
+                if (allMatches.length === 0) {
+                    adminLog('⚠️ Inga kommande matcher i API:et. Kanske är säsongen slut?', 'warning');
+                    alert('Inga kommande matcher hittades. Kontrollera att Premier League-säsongen pågår.');
+                    return;
+                }
                 
                 // Group matches by matchday
                 const matchesByRound = {};
@@ -1287,7 +1283,26 @@
                 
             } catch (error) {
                 adminLog('❌ FEL: ' + error.message, 'error');
-                alert('❌ Fel vid hämtning: ' + error.message);
+                console.error('Fetch error details:', error);
+                
+                // Provide helpful error message
+                let errorMsg = '❌ Kunde inte hämta matcher från API.\n\n';
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+                    errorMsg += 'CORS-problem detekterat. Möjliga lösningar:\n\n';
+                    errorMsg += '1. Kontrollera att API-nyckeln är korrekt\n';
+                    errorMsg += '2. CORS proxy kan vara nere - prova igen om några minuter\n';
+                    errorMsg += '3. Använd en modern webbläsare (Chrome, Firefox, Edge)\n\n';
+                    errorMsg += 'Teknisk info: ' + error.message;
+                } else if (error.message.includes('401') || error.message.includes('403')) {
+                    errorMsg += 'API-nyckel problem:\n';
+                    errorMsg += '- Kontrollera att din API-nyckel är korrekt\n';
+                    errorMsg += '- Verifiera på football-data.org att nyckeln är aktiv\n';
+                } else {
+                    errorMsg += 'Tekniskt fel: ' + error.message;
+                }
+                
+                alert(errorMsg);
             }
         };
 
@@ -1605,16 +1620,6 @@
             log.scrollTop = log.scrollHeight;
         }
         
-        function updateApiKeyStatus(hasKey) {
-            const el = document.getElementById('apiKeyStatus');
-            if (!el) return;
-            if (hasKey) {
-                el.innerHTML = '<span style="color: #15803d;">✅ API-nyckel sparad</span>';
-            } else {
-                el.innerHTML = '<span style="color: #666;">Ingen API-nyckel sparad ännu</span>';
-            }
-        }
-        
         function updateAutoFetchUI() {
             const btn = document.getElementById('autoFetchBtnText');
             const status = document.getElementById('autoFetchStatus');
@@ -1622,29 +1627,7 @@
             if (status) status.textContent = autoFetchActive ? '🟢 Aktiv – kollar var 15:e minut' : '⚪ Inaktiv';
         }
         
-        window.saveApiKey = async function() {
-            if (currentUser !== 'Hefner') return;
-            const key = document.getElementById('apiKeyInput')?.value?.trim();
-            if (!key) {
-                alert('Ange en API-nyckel!');
-                return;
-            }
-            try {
-                await set(ref(database, 'settings/plApiKey'), key);
-                plApiKey = key;
-                updateApiKeyStatus(true);
-                await logActivity('ADMIN_API_KEY', 'Sparade football-data.org API-nyckel');
-                fetchLog('✅ API-nyckel sparad!', 'success');
-            } catch (error) {
-                alert('Fel: ' + error.message);
-            }
-        };
-        
         window.toggleAutoFetch = function() {
-            if (!plApiKey) {
-                alert('Spara en API-nyckel först!');
-                return;
-            }
             if (autoFetchActive) {
                 // Stop
                 clearInterval(autoFetchInterval);
@@ -1662,10 +1645,6 @@
         };
         
         window.manualFetchResults = async function() {
-            if (!plApiKey) {
-                alert('Spara en API-nyckel först!');
-                return;
-            }
             fetchLog('🔄 Manuell hämtning...', 'info');
             await fetchPLResults();
         };
@@ -1700,9 +1679,12 @@
                 
                 try {
                     const matchDate = match.date.split('T')[0];
-                    const url = `https://api.football-data.org/v4/competitions/PL/matches?dateFrom=${matchDate}&dateTo=${matchDate}`;
+                    const apiUrl = `https://api.football-data.org/v4/competitions/PL/matches?dateFrom=${matchDate}&dateTo=${matchDate}`;
+                    const corsProxy = 'https://corsproxy.io/?';
+                    const url = corsProxy + encodeURIComponent(apiUrl);
                     
                     const response = await fetch(url, {
+                        method: 'GET',
                         headers: { 'X-Auth-Token': plApiKey }
                     });
                     

@@ -649,7 +649,6 @@
                                 <th>Poäng</th>
                                 <th>Rätt</th>
                                 <th>⭐</th>
-                                <th>🔥</th>
                                 <th>Snitt</th>
                             </tr>
                         </thead>
@@ -2006,11 +2005,13 @@
                                 <h4>Alla tippningar:</h4>
                                 ${Object.entries(matchPreds).map(([player, pred]) => {
                                     const playerExact = matchExactPreds[player];
-                                    const exactStr = playerExact ? ` (${playerExact})` : '';
                                     return `
                                     <div class="prediction-row">
                                         <span><strong>${player}</strong></span>
-                                        <span style="font-weight: 600; color: #667eea;">${pred}${exactStr}</span>
+                                        <span style="font-weight: 600; color: #667eea;">
+                                            ${playerExact ? playerExact.replace('-', ' – ') : pred}
+                                            <span style="color: #aaa; font-weight: 400; font-size: 0.85em;">(${pred})</span>
+                                        </span>
                                     </div>
                                 `}).join('')}
                             </div>
@@ -2032,53 +2033,61 @@
                             </div>
                             ${predictionsHtml}
                         ` : `
-                            <div class="outcome-buttons">
-                                <button class="outcome-btn ${myPred === '1' ? 'selected' : ''}" 
-                                        onclick="savePrediction('${m.id}', '1')">
-                                    1<span class="outcome-label">${m.homeTeam}</span>
-                                </button>
-                                <button class="outcome-btn ${myPred === 'X' ? 'selected' : ''}" 
-                                        onclick="savePrediction('${m.id}', 'X')">
-                                    X<span class="outcome-label">Oavgjort</span>
-                                </button>
-                                <button class="outcome-btn ${myPred === '2' ? 'selected' : ''}" 
-                                        onclick="savePrediction('${m.id}', '2')">
-                                    2<span class="outcome-label">${m.awayTeam}</span>
-                                </button>
-                            </div>
-                            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 2px dashed #667eea;">
-                                <div style="font-size: 0.9em; font-weight: 600; color: #667eea; margin-bottom: 10px; text-align: center;">⭐ Resultatbonus (valfritt)</div>
-                                <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                    <span style="font-weight: 600;">${m.homeTeam}</span>
-                                    <input type="number" min="0" max="99" id="exact-home-${m.id}" 
+                            <div style="padding: 10px 0 5px;">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px;">
+                                    <span style="font-weight: 600; font-size: 1em; min-width: 80px; text-align: right;">${m.homeTeam}</span>
+                                    <input type="number" min="0" max="99" id="exact-home-${m.id}"
                                         value="${myExact ? myExact.split('-')[0] : ''}"
-                                        style="width: 50px; padding: 8px; text-align: center; font-size: 1.2em; font-weight: bold; border: 2px solid #e0e0e0; border-radius: 8px;"
-                                        placeholder="-">
-                                    <span style="font-weight: bold; font-size: 1.2em;">-</span>
+                                        oninput="updateScorePrediction('${m.id}')"
+                                        style="width: 55px; padding: 10px; text-align: center; font-size: 1.4em; font-weight: bold; border: 2px solid #e0e0e0; border-radius: 8px;"
+                                        placeholder="?">
+                                    <span style="font-weight: bold; font-size: 1.4em; color: #999;">-</span>
                                     <input type="number" min="0" max="99" id="exact-away-${m.id}"
                                         value="${myExact ? myExact.split('-')[1] : ''}"
-                                        style="width: 50px; padding: 8px; text-align: center; font-size: 1.2em; font-weight: bold; border: 2px solid #e0e0e0; border-radius: 8px;"
-                                        placeholder="-">
-                                    <span style="font-weight: 600;">${m.awayTeam}</span>
+                                        oninput="updateScorePrediction('${m.id}')"
+                                        style="width: 55px; padding: 10px; text-align: center; font-size: 1.4em; font-weight: bold; border: 2px solid #e0e0e0; border-radius: 8px;"
+                                        placeholder="?">
+                                    <span style="font-weight: 600; font-size: 1em; min-width: 80px; text-align: left;">${m.awayTeam}</span>
                                 </div>
-                                <div style="text-align: center; margin-top: 8px;">
-                                    <button class="btn" style="padding: 8px 20px; font-size: 0.85em;" onclick="saveExactPrediction('${m.id}')">Spara resultat</button>
+                                <div id="prediction-label-${m.id}" style="text-align: center; margin-bottom: 10px; font-size: 0.95em; min-height: 22px;">
+                                    ${myExact ? `<span style="color: #667eea; font-weight: 600;">
+                                        ${(() => { const [h,a] = myExact.split('-').map(Number); return h > a ? '1 – ' + m.homeTeam + ' vinner' : h < a ? '2 – ' + m.awayTeam + ' vinner' : 'X – Oavgjort'; })()}
+                                    </span>` : '<span style="color: #aaa;">Ange resultatet du tror på</span>'}
                                 </div>
-                                ${myExact ? '<div style="text-align: center; color: #667eea; font-weight: 600; margin-top: 8px; font-size: 0.9em;">✓ Resultattips: ' + myExact.replace('-', ' - ') + '</div>' : '<div style="text-align: center; color: #999; font-size: 0.8em; margin-top: 5px;">Rätt resultat = +25 bonuspoäng!</div>'}
+                                <div style="text-align: center;">
+                                    <button class="btn" style="padding: 10px 30px;" onclick="saveScorePrediction('${m.id}')">Spara tips</button>
+                                </div>
                             </div>
-                            ${myPred ? '<div style="text-align: center; color: #667eea; font-weight: 600; margin-top: 10px;">✓ Din 1X2-tippning sparad</div>' : ''}
+                            ${myExact ? '<div style="text-align: center; color: #667eea; font-weight: 600; margin-top: 8px; font-size: 0.9em;">✓ Sparat: ' + myExact.replace('-', ' – ') + '</div>' : ''}
                         `}
                     </div>
                 `;
             }).join('');
         }
 
-        // SAVE PREDICTION
-        window.savePrediction = async function(matchId, outcome) {
-            if (!currentUser) {
-                alert('Du måste vara inloggad!');
+        // Live-uppdatering av 1X2-label när man skriver in siffror
+        window.updateScorePrediction = function(matchId) {
+            const homeVal = document.getElementById(`exact-home-${matchId}`)?.value;
+            const awayVal = document.getElementById(`exact-away-${matchId}`)?.value;
+            const label = document.getElementById(`prediction-label-${matchId}`);
+            const match = matches.find(m => m.id === matchId);
+            if (!label || !match) return;
+
+            if (homeVal === '' || awayVal === '') {
+                label.innerHTML = '<span style="color: #aaa;">Ange resultatet du tror på</span>';
                 return;
             }
+            const h = parseInt(homeVal), a = parseInt(awayVal);
+            let text, color;
+            if (h > a)      { text = `1 – ${match.homeTeam} vinner`; color = '#10b981'; }
+            else if (h < a) { text = `2 – ${match.awayTeam} vinner`; color = '#ef4444'; }
+            else            { text = 'X – Oavgjort'; color = '#f59e0b'; }
+            label.innerHTML = `<span style="color:${color}; font-weight:600;">${text}</span>`;
+        };
+
+        // Spara resultat + automatisk 1X2
+        window.saveScorePrediction = async function(matchId) {
+            if (!currentUser) { alert('Du måste vara inloggad!'); return; }
 
             const match = matches.find(m => m.id === matchId);
             if (isMatchStarted(match.date)) {
@@ -2086,57 +2095,31 @@
                 return;
             }
 
+            const homeVal = document.getElementById(`exact-home-${matchId}`)?.value;
+            const awayVal = document.getElementById(`exact-away-${matchId}`)?.value;
+
+            if (homeVal === '' || awayVal === '') {
+                alert('Fyll i båda siffrorna!');
+                return;
+            }
+
+            const h = parseInt(homeVal), a = parseInt(awayVal);
+            const outcome = h > a ? '1' : h < a ? '2' : 'X';
+            const scoreStr = `${h}-${a}`;
+
             try {
                 if (!predictions[matchId]) predictions[matchId] = {};
                 predictions[matchId][currentUser] = outcome;
-                
-                await set(ref(database, 'predictions'), predictions);
-                console.log('Prediction saved');
-                
-                // Log activity (WITHOUT revealing the prediction)
-                const match = matches.find(m => m.id === matchId);
-                await logActivity('PREDICT', `Tippade på ${match.homeTeam} vs ${match.awayTeam}`);
-                
-                renderPredictions();
-                renderMatches(); // Update match list to show who has predicted
-            } catch (error) {
-                console.error('Save error:', error);
-                alert('❌ Fel: ' + error.message);
-            }
-        };
-
-        // SAVE EXACT SCORE PREDICTION
-        window.saveExactPrediction = async function(matchId) {
-            if (!currentUser) {
-                alert('Du måste vara inloggad!');
-                return;
-            }
-
-            const match = matches.find(m => m.id === matchId);
-            if (isMatchStarted(match.date)) {
-                alert('Matchen har redan startat!');
-                return;
-            }
-
-            const homeScore = document.getElementById(`exact-home-${matchId}`).value;
-            const awayScore = document.getElementById(`exact-away-${matchId}`).value;
-
-            if (homeScore === '' || awayScore === '') {
-                alert('Fyll i båda målsiffrorna!');
-                return;
-            }
-
-            try {
                 if (!exactPredictions[matchId]) exactPredictions[matchId] = {};
-                exactPredictions[matchId][currentUser] = `${homeScore}-${awayScore}`;
-                
+                exactPredictions[matchId][currentUser] = scoreStr;
+
+                await set(ref(database, 'predictions'), predictions);
                 await set(ref(database, 'exactPredictions'), exactPredictions);
-                console.log('Exact prediction saved');
-                
-                const matchInfo = matches.find(m => m.id === matchId);
-                await logActivity('PREDICT_EXACT', `Tippade exakt resultat på ${matchInfo.homeTeam} vs ${matchInfo.awayTeam}`);
-                
+
+                await logActivity('PREDICT', `Tippade på ${match.homeTeam} vs ${match.awayTeam}`);
+
                 renderPredictions();
+                renderMatches();
             } catch (error) {
                 console.error('Save error:', error);
                 alert('❌ Fel: ' + error.message);
@@ -2173,29 +2156,6 @@
             return points;
         }
 
-        // CALCULATE STREAK (current consecutive correct predictions)
-        function calculateStreak(player) {
-            // Get finished matches sorted by date (exclude POSTPONED)
-            const finishedMatches = matches
-                .filter(m => m.actualOutcome && m.actualOutcome !== 'POSTPONED')
-                .sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            let currentStreak = 0;
-            let bestStreak = 0;
-            
-            finishedMatches.forEach(match => {
-                const playerPred = predictions[match.id]?.[player];
-                if (playerPred && playerPred === match.actualOutcome) {
-                    currentStreak++;
-                    if (currentStreak > bestStreak) bestStreak = currentStreak;
-                } else {
-                    currentStreak = 0;
-                }
-            });
-            
-            return { current: currentStreak, best: bestStreak };
-        }
-
         // RENDER LEADERBOARD
         function renderLeaderboard() {
             const tbody = document.getElementById('leaderboardBody');
@@ -2208,50 +2168,44 @@
                 let finishedMatches = 0;
 
                 matches.forEach(match => {
-                    if (match.actualOutcome) {
+                    if (match.actualOutcome && match.actualOutcome !== 'POSTPONED') {
                         finishedMatches++;
                         const points = calculatePoints(match.id, player);
                         totalPoints += points;
                         if (points > 0) correctPreds++;
-                        // Check if bonus was awarded
                         if (match.actualScore && exactPredictions[match.id]?.[player] === match.actualScore && points > 0) {
                             bonusCount++;
                         }
                     }
                 });
 
-                const streak = calculateStreak(player);
-
                 return {
                     player,
                     totalPoints,
                     correctPreds,
                     bonusCount,
-                    average: finishedMatches > 0 ? (totalPoints / finishedMatches).toFixed(1) : '0.0',
-                    currentStreak: streak.current,
-                    bestStreak: streak.best
+                    average: finishedMatches > 0 ? (totalPoints / finishedMatches).toFixed(1) : '0.0'
                 };
             });
 
-            scores.sort((a, b) => b.totalPoints - a.totalPoints);
+            // Sort: first by points, then by exact score count as tiebreaker
+            scores.sort((a, b) => {
+                if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+                return b.bonusCount - a.bonusCount;
+            });
 
             tbody.innerHTML = scores.map((s, i) => {
                 const rankClass = i < 5 ? `rank-${i + 1}` : '';
-                const fireEmoji = s.currentStreak >= 3 ? ' 🔥' : '';
-                const streakDisplay = s.currentStreak > 0 
-                    ? `<span style="color: ${s.currentStreak >= 3 ? '#ef4444' : '#666'}; font-weight: ${s.currentStreak >= 3 ? '700' : '400'};">${s.currentStreak}${fireEmoji}</span>`
-                    : '<span style="color: #ccc;">0</span>';
-                const bonusDisplay = s.bonusCount > 0 
+                const bonusDisplay = s.bonusCount > 0
                     ? `<span style="color: #667eea; font-weight: 600;">${s.bonusCount}</span>`
                     : '<span style="color: #ccc;">0</span>';
                 return `
                     <tr>
                         <td><span class="rank ${rankClass}">${i + 1}</span></td>
-                        <td><strong>${s.player}${fireEmoji}</strong></td>
+                        <td><strong>${s.player}</strong></td>
                         <td><strong>${s.totalPoints}</strong></td>
                         <td>${s.correctPreds}</td>
                         <td>${bonusDisplay}</td>
-                        <td>${streakDisplay}</td>
                         <td>${s.average}</td>
                     </tr>
                 `;

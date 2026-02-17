@@ -215,6 +215,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             margin-bottom: 20px;
+            overflow: hidden;
         }
 
         .section-title {
@@ -309,6 +310,8 @@
             padding: 25px;
             border-radius: 10px;
             position: relative;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .prediction-match.locked {
@@ -533,10 +536,10 @@
         }
 
         .score-input {
-            width: 44px;
-            padding: 8px 4px;
+            width: 38px;
+            padding: 6px 2px;
             text-align: center;
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: bold;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
@@ -556,20 +559,20 @@
         }
 
         .score-entry {
-            padding: 10px 0 5px;
+            padding: 4px 0;
         }
 
         .score-entry-teams {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .score-team {
             font-weight: 700;
-            font-size: 0.95em;
+            font-size: 0.88em;
             flex: 1;
             min-width: 0;
             overflow: hidden;
@@ -583,24 +586,27 @@
         .score-inputs {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             flex-shrink: 0;
         }
 
         .score-dash {
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1em;
             color: #999;
         }
 
         .score-label {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 0.95em;
-            min-height: 22px;
+            margin-bottom: 8px;
+            min-height: 20px;
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
             h1 {
                 font-size: 1.8em;
             }
@@ -609,16 +615,28 @@
                 flex-direction: column;
             }
 
-            .outcome-buttons {
-                flex-direction: column;
+            .card {
+                padding: 12px;
             }
 
             .prediction-match {
-                padding: 15px;
+                padding: 12px;
             }
 
             .score-team {
-                font-size: 0.85em;
+                font-size: 0.82em;
+            }
+
+            .score-entry-teams {
+                gap: 6px;
+            }
+
+            .score-inputs {
+                gap: 4px;
+            }
+
+            .outcome-buttons {
+                flex-direction: column;
             }
 
             .leaderboard-table th,
@@ -2097,15 +2115,12 @@
 
                 return `
                     <div class="prediction-match ${started ? 'locked' : ''}">
-                        <div style="text-align: center; font-size: 1.2em; font-weight: 600; margin-bottom: 5px;">
-                            ${m.homeTeam} vs ${m.awayTeam}
-                        </div>
-                        <div style="text-align: center; color: #666; margin-bottom: 20px;">
+                        <div style="text-align: center; color: #666; font-size: 0.8em; margin-bottom: 10px;">
                             ${m.league} • ${dateStr}
                         </div>
                         ${started ? `
                             <div class="locked-overlay">
-                                🔒 Matchen har startat - Tippning stängd
+                                🔒 Tippning stängd
                             </div>
                             ${predictionsHtml}
                         ` : `
@@ -2128,15 +2143,15 @@
                                     <span class="score-team score-team-away">${m.awayTeam}</span>
                                 </div>
                                 <div id="prediction-label-${m.id}" class="score-label">
-                                    ${myExact ? `<span style="color: #667eea; font-weight: 600;">
+                                    ${myExact ? `<span style="color: #667eea; font-weight: 600; font-size: 0.85em;">
                                         ${(() => { const [h,a] = myExact.split('-').map(Number); return h > a ? '1 – ' + m.homeTeam + ' vinner' : h < a ? '2 – ' + m.awayTeam + ' vinner' : 'X – Oavgjort'; })()}
-                                    </span>` : '<span style="color: #aaa;">Ange resultatet du tror på</span>'}
+                                    </span>` : '<span style="color: #bbb; font-size: 0.85em;">Ange resultatet du tror på</span>'}
                                 </div>
                                 <div style="text-align: center;">
-                                    <button class="btn" style="padding: 10px 30px;" onclick="saveScorePrediction('${m.id}')">Spara tips</button>
+                                    <button class="btn" style="padding: 8px 24px; font-size: 0.9em;" onclick="saveScorePrediction('${m.id}')">Spara tips</button>
                                 </div>
                             </div>
-                            ${myExact ? '<div style="text-align: center; color: #667eea; font-weight: 600; margin-top: 8px; font-size: 0.9em;">✓ Sparat: ' + myExact.replace('-', ' – ') + '</div>' : ''}
+                            ${myExact ? '<div style="text-align: center; color: #667eea; font-weight: 600; margin-top: 6px; font-size: 0.85em;">✓ Sparat: ' + myExact.replace('-', ' – ') + '</div>' : ''}
                         `}
                     </div>
                 `;

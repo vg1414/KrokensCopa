@@ -719,6 +719,7 @@
             <div id="setup" class="content active">
                 <div class="card">
                     <h2 class="section-title">⚽ Premier League Matcher</h2>
+                    <div id="lastFetchStatus" style="font-size: 0.85em; color: #888; margin-bottom: 15px;"></div>
                     <div class="matches-list" id="matchesList">
                         <div class="empty-state">Väntar på att matcher laddas in...</div>
                     </div>
@@ -1138,6 +1139,16 @@
                             updateAutoFetchUI();
                         }
                     }
+                }
+            });
+
+            const lastFetchRef = ref(database, 'lastAutoFetch');
+            onValue(lastFetchRef, (snapshot) => {
+                const ts = snapshot.val();
+                const el = document.getElementById('lastFetchStatus');
+                if (el && ts) {
+                    const time = new Date(ts).toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    el.textContent = `🔄 Resultat senast hämtade: ${time}`;
                 }
             });
 
@@ -1738,6 +1749,8 @@
             } else {
                 fetchLog(`✅ Klar! ${foundResults} nya resultat av ${checked} kollade`, 'success');
             }
+
+            await set(ref(database, 'lastAutoFetch'), new Date().toISOString());
         }
 
         // RESULT MODAL (Anyone can use after match starts)
@@ -1891,7 +1904,7 @@
                 // Show predictions BEFORE result is set
                 let predictionStatusBefore = '';
                 if (!m.actualOutcome) {
-                    if (!started) {
+                    if (!isFirstMatchStarted()) {
                         predictionStatusBefore = `
                     <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 0.9em;">
                         ${predicted.length > 0 ? `<div style="color: #10b981; margin-bottom: 5px;">✅ Tippat (${predicted.length}/5): ${predicted.join(', ')}</div>` : ''}

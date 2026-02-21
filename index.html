@@ -1086,6 +1086,7 @@
                     console.log('Matches loaded:', matches.length);
                     renderMatches();
                     renderPredictions();
+                    renderLeaderboard();
                 }
             });
 
@@ -1906,8 +1907,10 @@
                             const exact = matchExactPreds[player];
                             if (!pred) return `<div style="color: #6b7280; padding: 3px 0;">❌ ${player}: Tippade inte</div>`;
                             const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
-                            const exactTag = exact ? ` [${exact}]` : '';
-                            return `<div style="color: #333; padding: 3px 0;">🎯 ${player}: ${label}${exactTag}</div>`;
+                            const scoreDisplay = exact
+                                ? `<strong>${exact.replace('-', ' – ')}</strong> <span style="color: #888; font-size: 0.85em;">(${label})</span>`
+                                : `<strong>${label}</strong>`;
+                            return `<div style="color: #333; padding: 3px 0;">🎯 ${player}: ${scoreDisplay}</div>`;
                         }).join('')}
                     </div>
                     `;

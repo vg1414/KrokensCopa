@@ -1584,149 +1584,6 @@
             renderActivityLog();
         };
 
-        // AUTOMATIC RESULT FETCHING
-        async function fetchMatchResults() {
-            console.log('🔍 Checking for match results from API-Football...');
-            
-            for (const match of matches) {
-                // Skip if already has result
-                if (match.actualOutcome) {
-                    console.log(`⏭️ Skipping ${match.homeTeam} vs ${match.awayTeam} - already has result`);
-                    continue;
-                }
-                
-                // Skip if match hasn't started yet
-                if (!isMatchStarted(match.date)) {
-                    console.log(`⏭️ Skipping ${match.homeTeam} vs ${match.awayTeam} - not started yet`);
-                    continue;
-                }
-                
-                try {
-                    console.log(`\n🏒 Fetching result for ${match.homeTeam} vs ${match.awayTeam}...`);
-                    const result = await fetchAPIFootball(match);
-                    
-                    if (result) {
-                        console.log(`✅ Result found: ${result}`);
-                        const matchIndex = matches.findIndex(m => m.id === match.id);
-                        if (matchIndex !== -1) {
-                            matches[matchIndex].actualOutcome = result;
-                            await set(ref(database, 'matches'), matches);
-                            console.log('💾 Result saved to database');
-                        }
-                    } else {
-                        console.log(`ℹ️ No result available yet for this match`);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching result:', error);
-                }
-            }
-            console.log('\n✅ Finished checking all matches\n');
-        }
-
-        // API-Football integration
-        async function fetchAPIFootball(match) {
-            try {
-                const API_KEY = '406217531e18462e97f40aea2c744b8e';
-                
-                // Wait at least 2 hours after match start
-                const matchTime = new Date(match.date);
-                const now = new Date();
-                const hoursSinceStart = (now - matchTime) / (1000 * 60 * 60);
-                if (hoursSinceStart < 2) {
-                    console.log(`  ⏰ Too early - ${hoursSinceStart.toFixed(1)}h since start (need 2h)`);
-                    return null;
-                }
-                
-                const matchDate = match.date.split('T')[0];
-                console.log(`  📅 Match date: ${matchDate}`);
-                
-                // Try multiple league IDs - Olympics uses ID 131
-                const leagueIds = [131, 147]; // 131 = Olympics, 147 = backup
-                
-                for (const leagueId of leagueIds) {
-                    console.log(`  🔍 Trying league ID ${leagueId}...`);
-                    
-                    const url = `https://v1.hockey.api-sports.io/games?date=${matchDate}&league=${leagueId}&season=2026`;
-                    
-                    try {
-                        const response = await fetch(url, {
-                            method: 'GET',
-                            headers: {
-                                'x-rapidapi-key': API_KEY,
-                                'x-rapidapi-host': 'v1.hockey.api-sports.io'
-                            }
-                        });
-                        
-                        if (!response.ok) {
-                            console.log(`    ⚠️ API responded with status ${response.status}`);
-                            continue;
-                        }
-                        
-                        const data = await response.json();
-                        console.log(`    📦 API response:`, data);
-                        
-                        const games = data.response || [];
-                        console.log(`    📊 Found ${games.length} games for this date/league`);
-                        
-                        if (games.length === 0) continue;
-                        
-                        // Log all games to help debug
-                        games.forEach((g, i) => {
-                            console.log(`      Game ${i+1}: ${g.teams?.home?.name} vs ${g.teams?.away?.name}`);
-                        });
-                        
-                        // Find matching game
-                        const game = games.find(g => {
-                            const apiHome = (g.teams?.home?.name || '').toLowerCase();
-                            const apiAway = (g.teams?.away?.name || '').toLowerCase();
-                            const ourHome = match.homeTeam.toLowerCase();
-                            const ourAway = match.awayTeam.toLowerCase();
-                            
-                            const homeMatch = apiHome.includes(ourHome) || ourHome.includes(apiHome);
-                            const awayMatch = apiAway.includes(ourAway) || ourAway.includes(apiAway);
-                            
-                            return homeMatch && awayMatch;
-                        });
-                        
-                        if (!game) {
-                            console.log(`    ❌ No matching game found in league ${leagueId}`);
-                            continue;
-                        }
-                        
-                        console.log(`    ✅ MATCH FOUND! ${game.teams.home.name} vs ${game.teams.away.name}`);
-                        console.log(`    📊 Status: ${game.status?.short}, Score: ${game.scores?.home}-${game.scores?.away}`);
-                        
-                        // Check if finished
-                        const finishedStatuses = ['FT', 'AOT', 'AP', 'FINAL', 'AET'];
-                        if (!finishedStatuses.includes(game.status?.short)) {
-                            console.log(`    ⏳ Game not finished yet (status: ${game.status?.short})`);
-                            return null;
-                        }
-                        
-                        const homeScore = parseInt(game.scores?.home) || 0;
-                        const awayScore = parseInt(game.scores?.away) || 0;
-                        
-                        console.log(`    🏆 FINAL SCORE: ${homeScore}-${awayScore}`);
-                        
-                        if (homeScore > awayScore) return '1';
-                        if (awayScore > homeScore) return '2';
-                        return 'X';
-                        
-                    } catch (fetchError) {
-                        console.log(`    ❌ Fetch error for league ${leagueId}:`, fetchError.message);
-                        continue;
-                    }
-                }
-                
-                console.log(`  ❌ No match found in any league`);
-                return null;
-                
-            } catch (error) {
-                console.error('  ❌ Fatal API error:', error);
-                return null;
-            }
-        }
-
         // FOOTBALL-DATA.ORG API INTEGRATION (Premier League auto-results)
         // Free tier: 10 requests/minute, PL included forever
         
@@ -2030,13 +1887,32 @@
                 const predicted = allPlayers.filter(p => matchPredictions[p]);
                 const notPredicted = allPlayers.filter(p => !matchPredictions[p]);
                 
-                // Show predictions BEFORE match starts (who has tipped)
-                const predictionStatusBefore = !m.actualOutcome ? `
+                // Show predictions BEFORE result is set
+                let predictionStatusBefore = '';
+                if (!m.actualOutcome) {
+                    if (!started) {
+                        predictionStatusBefore = `
                     <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 0.9em;">
                         ${predicted.length > 0 ? `<div style="color: #10b981; margin-bottom: 5px;">✅ Tippat (${predicted.length}/5): ${predicted.join(', ')}</div>` : ''}
                         ${notPredicted.length > 0 ? `<div style="color: #ef4444;">❌ Inte tippat (${notPredicted.length}/5): ${notPredicted.join(', ')}</div>` : ''}
                     </div>
-                ` : '';
+                    `;
+                    } else {
+                        predictionStatusBefore = `
+                    <div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">
+                        <div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>
+                        ${allPlayers.map(player => {
+                            const pred = matchPredictions[player];
+                            const exact = matchExactPreds[player];
+                            if (!pred) return `<div style="color: #6b7280; padding: 3px 0;">❌ ${player}: Tippade inte</div>`;
+                            const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
+                            const exactTag = exact ? ` [${exact}]` : '';
+                            return `<div style="color: #333; padding: 3px 0;">🎯 ${player}: ${label}${exactTag}</div>`;
+                        }).join('')}
+                    </div>
+                    `;
+                    }
+                }
 
                 // Show predictions AFTER result is set (what everyone tipped)
                 const predictionStatusAfter = m.actualOutcome ? `
@@ -2167,6 +2043,9 @@
                             ${m.league} • ${dateStr}
                         </div>
                         ${tippingClosed ? `
+                            <div style="text-align: center; font-size: 1.1em; font-weight: 700; color: #333; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
+                                ${m.homeTeam} <span style="color: #667eea;">vs</span> ${m.awayTeam}
+                            </div>
                             <div class="locked-overlay">
                                 🔒 Tippning stängd
                                 ${myExact ? `<div style="margin-top: 6px; font-size: 0.9em; color: #667eea;">Din tipp: ${myExact.replace('-', ' – ')}</div>` : '<div style="margin-top: 6px; font-size: 0.9em; color: #999;">Du tippade inte denna match</div>'}

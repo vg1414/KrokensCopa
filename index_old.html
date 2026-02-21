@@ -857,11 +857,7 @@
                         Hämtar automatiskt PL-resultat från football-data.org API. Aktivera för att slippa sätta resultat manuellt.
                     </p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                        <button class="btn" style="background: #15803d;" onclick="toggleAutoFetch()">
-                            <span id="autoFetchBtnText">⚽ Aktivera auto-hämtning</span>
-                        </button>
                         <button class="btn btn-secondary" onclick="manualFetchResults()">🔄 Hämta resultat nu</button>
-                        <span id="autoFetchStatus" style="font-size: 0.85em; color: #666;"></span>
                     </div>
                     <div id="fetchLog" style="background: #0a0a0a; color: #10b981; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; white-space: pre-wrap; max-height: 200px; overflow-y: auto; margin-top: 15px; display: none;"></div>
                 </div>
@@ -963,12 +959,10 @@
         let activityLog = [];
         let activityLogLoaded = false; // Track if we've loaded from Firebase
         let currentUser = null;
+        let autoFetchInterval = null;
         let currentModalMatchId = null;
         let currentModalOutcome = null;
         let plApiKey = '406217531e18462e97f40aea2c744b8e'; // football-data.org API key (hårdkodad)
-        let autoFetchInterval = null; // Auto-fetch timer
-        let autoFetchActive = false;
-
         const PLAYERS = ['Hefner', 'Majscht', 'Olle', 'Dawod', 'Ante'];
         
         // Session management (10 minute auto-login)
@@ -1133,12 +1127,7 @@
                         renderPredictions();
                         logActivity('AUTO_LOGIN', 'Automatisk inloggning från session');
 
-                        // Restore auto-fetch if Hefner had it active
-                        if (sessionPlayer === 'Hefner' && localStorage.getItem('krokens_autofetch') === 'true' && !autoFetchActive) {
-                            autoFetchActive = true;
-                            autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
-                            updateAutoFetchUI();
-                        }
+                        startAutoFetch();
                     }
                 }
             });
@@ -1218,12 +1207,7 @@
 
                         renderPredictions();
 
-                        // Restore auto-fetch if Hefner had it active
-                        if (player === 'Hefner' && localStorage.getItem('krokens_autofetch') === 'true' && !autoFetchActive) {
-                            autoFetchActive = true;
-                            autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
-                            updateAutoFetchUI();
-                        }
+                        startAutoFetch();
                     } else {
                         console.log('Wrong password');
                         showStatus('❌ Fel lösenord!', 'error');
@@ -1250,10 +1234,25 @@
                     
                     alert('✅ Lösenord sparat! Välkommen!');
                     renderPredictions();
+                    startAutoFetch();
                 }
             } catch (error) {
                 console.error('Login error:', error);
                 showStatus('❌ Fel vid inloggning: ' + error.message, 'error');
+            }
+        }
+
+        function startAutoFetch() {
+            fetchPLResults();
+            if (!autoFetchInterval) {
+                autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
+            }
+        }
+
+        function stopAutoFetch() {
+            if (autoFetchInterval) {
+                clearInterval(autoFetchInterval);
+                autoFetchInterval = null;
             }
         }
 
@@ -1267,6 +1266,7 @@
             }
             
             currentUser = null;
+            stopAutoFetch();
             clearSession(); // Clear auto-login session
             document.getElementById('loginScreen').style.display = 'block';
             document.getElementById('mainApp').style.display = 'none';
@@ -1609,32 +1609,6 @@
             log.innerHTML += `<span style="color: ${colors[type] || '#10b981'}">[${time}] ${msg}</span>\n`;
             log.scrollTop = log.scrollHeight;
         }
-        
-        function updateAutoFetchUI() {
-            const btn = document.getElementById('autoFetchBtnText');
-            const status = document.getElementById('autoFetchStatus');
-            if (btn) btn.textContent = autoFetchActive ? '⏹️ Stoppa auto-hämtning' : '⚽ Aktivera auto-hämtning';
-            if (status) status.textContent = autoFetchActive ? '🟢 Aktiv – kollar var 15:e minut' : '⚪ Inaktiv';
-        }
-        
-        window.toggleAutoFetch = function() {
-            if (autoFetchActive) {
-                // Stop
-                clearInterval(autoFetchInterval);
-                autoFetchInterval = null;
-                autoFetchActive = false;
-                localStorage.setItem('krokens_autofetch', 'false');
-                fetchLog('⏹️ Auto-hämtning stoppad', 'warning');
-            } else {
-                // Start
-                autoFetchActive = true;
-                localStorage.setItem('krokens_autofetch', 'true');
-                fetchPLResults(); // Immediate first check
-                autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000); // Every 15 min
-                fetchLog('⚽ Auto-hämtning aktiverad (var 15:e minut)', 'success');
-            }
-            updateAutoFetchUI();
-        };
         
         window.manualFetchResults = async function() {
             fetchLog('🔄 Manuell hämtning...', 'info');

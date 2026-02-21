@@ -1657,11 +1657,11 @@
                 // Skip if match hasn't started yet
                 if (!isMatchStarted(match.date)) continue;
                 
-                // Wait at least 2 hours after match start
+                // Wait at least 100 minutes after match start
                 const matchTime = new Date(match.date);
                 const now = new Date();
                 const hoursSinceStart = (now - matchTime) / (1000 * 60 * 60);
-                if (hoursSinceStart < 2) {
+                if (hoursSinceStart < 100/60) {
                     fetchLog(`  ⏰ ${match.homeTeam} vs ${match.awayTeam}: Väntar (${hoursSinceStart.toFixed(1)}h)`, 'warning');
                     continue;
                 }

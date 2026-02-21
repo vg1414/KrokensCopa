@@ -719,6 +719,7 @@
             <div id="setup" class="content active">
                 <div class="card">
                     <h2 class="section-title">⚽ Premier League Matcher</h2>
+                    <div id="lastFetchStatus" style="font-size: 0.85em; color: #888; margin-bottom: 15px;"></div>
                     <div class="matches-list" id="matchesList">
                         <div class="empty-state">Väntar på att matcher laddas in...</div>
                     </div>
@@ -1086,6 +1087,7 @@
                     console.log('Matches loaded:', matches.length);
                     renderMatches();
                     renderPredictions();
+                    renderLeaderboard();
                 }
             });
 
@@ -1104,6 +1106,7 @@
                 console.log('Exact predictions loaded');
                 renderPredictions();
                 renderLeaderboard();
+                renderMatches();
             });
 
             const passwordsRef = ref(database, 'passwords');
@@ -1129,7 +1132,24 @@
                         
                         renderPredictions();
                         logActivity('AUTO_LOGIN', 'Automatisk inloggning från session');
+
+                        // Restore auto-fetch if Hefner had it active
+                        if (sessionPlayer === 'Hefner' && localStorage.getItem('krokens_autofetch') === 'true' && !autoFetchActive) {
+                            autoFetchActive = true;
+                            autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
+                            updateAutoFetchUI();
+                        }
                     }
+                }
+            });
+
+            const lastFetchRef = ref(database, 'lastAutoFetch');
+            onValue(lastFetchRef, (snapshot) => {
+                const ts = snapshot.val();
+                const el = document.getElementById('lastFetchStatus');
+                if (el && ts) {
+                    const time = new Date(ts).toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    el.textContent = `🔄 Resultat senast hämtade: ${time}`;
                 }
             });
 
@@ -1195,8 +1215,15 @@
                         
                         // Log activity
                         await logActivity('LOGIN', 'Loggade in');
-                        
+
                         renderPredictions();
+
+                        // Restore auto-fetch if Hefner had it active
+                        if (player === 'Hefner' && localStorage.getItem('krokens_autofetch') === 'true' && !autoFetchActive) {
+                            autoFetchActive = true;
+                            autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
+                            updateAutoFetchUI();
+                        }
                     } else {
                         console.log('Wrong password');
                         showStatus('❌ Fel lösenord!', 'error');
@@ -1570,149 +1597,6 @@
             renderActivityLog();
         };
 
-        // AUTOMATIC RESULT FETCHING
-        async function fetchMatchResults() {
-            console.log('🔍 Checking for match results from API-Football...');
-            
-            for (const match of matches) {
-                // Skip if already has result
-                if (match.actualOutcome) {
-                    console.log(`⏭️ Skipping ${match.homeTeam} vs ${match.awayTeam} - already has result`);
-                    continue;
-                }
-                
-                // Skip if match hasn't started yet
-                if (!isMatchStarted(match.date)) {
-                    console.log(`⏭️ Skipping ${match.homeTeam} vs ${match.awayTeam} - not started yet`);
-                    continue;
-                }
-                
-                try {
-                    console.log(`\n🏒 Fetching result for ${match.homeTeam} vs ${match.awayTeam}...`);
-                    const result = await fetchAPIFootball(match);
-                    
-                    if (result) {
-                        console.log(`✅ Result found: ${result}`);
-                        const matchIndex = matches.findIndex(m => m.id === match.id);
-                        if (matchIndex !== -1) {
-                            matches[matchIndex].actualOutcome = result;
-                            await set(ref(database, 'matches'), matches);
-                            console.log('💾 Result saved to database');
-                        }
-                    } else {
-                        console.log(`ℹ️ No result available yet for this match`);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching result:', error);
-                }
-            }
-            console.log('\n✅ Finished checking all matches\n');
-        }
-
-        // API-Football integration
-        async function fetchAPIFootball(match) {
-            try {
-                const API_KEY = '406217531e18462e97f40aea2c744b8e';
-                
-                // Wait at least 2 hours after match start
-                const matchTime = new Date(match.date);
-                const now = new Date();
-                const hoursSinceStart = (now - matchTime) / (1000 * 60 * 60);
-                if (hoursSinceStart < 2) {
-                    console.log(`  ⏰ Too early - ${hoursSinceStart.toFixed(1)}h since start (need 2h)`);
-                    return null;
-                }
-                
-                const matchDate = match.date.split('T')[0];
-                console.log(`  📅 Match date: ${matchDate}`);
-                
-                // Try multiple league IDs - Olympics uses ID 131
-                const leagueIds = [131, 147]; // 131 = Olympics, 147 = backup
-                
-                for (const leagueId of leagueIds) {
-                    console.log(`  🔍 Trying league ID ${leagueId}...`);
-                    
-                    const url = `https://v1.hockey.api-sports.io/games?date=${matchDate}&league=${leagueId}&season=2026`;
-                    
-                    try {
-                        const response = await fetch(url, {
-                            method: 'GET',
-                            headers: {
-                                'x-rapidapi-key': API_KEY,
-                                'x-rapidapi-host': 'v1.hockey.api-sports.io'
-                            }
-                        });
-                        
-                        if (!response.ok) {
-                            console.log(`    ⚠️ API responded with status ${response.status}`);
-                            continue;
-                        }
-                        
-                        const data = await response.json();
-                        console.log(`    📦 API response:`, data);
-                        
-                        const games = data.response || [];
-                        console.log(`    📊 Found ${games.length} games for this date/league`);
-                        
-                        if (games.length === 0) continue;
-                        
-                        // Log all games to help debug
-                        games.forEach((g, i) => {
-                            console.log(`      Game ${i+1}: ${g.teams?.home?.name} vs ${g.teams?.away?.name}`);
-                        });
-                        
-                        // Find matching game
-                        const game = games.find(g => {
-                            const apiHome = (g.teams?.home?.name || '').toLowerCase();
-                            const apiAway = (g.teams?.away?.name || '').toLowerCase();
-                            const ourHome = match.homeTeam.toLowerCase();
-                            const ourAway = match.awayTeam.toLowerCase();
-                            
-                            const homeMatch = apiHome.includes(ourHome) || ourHome.includes(apiHome);
-                            const awayMatch = apiAway.includes(ourAway) || ourAway.includes(apiAway);
-                            
-                            return homeMatch && awayMatch;
-                        });
-                        
-                        if (!game) {
-                            console.log(`    ❌ No matching game found in league ${leagueId}`);
-                            continue;
-                        }
-                        
-                        console.log(`    ✅ MATCH FOUND! ${game.teams.home.name} vs ${game.teams.away.name}`);
-                        console.log(`    📊 Status: ${game.status?.short}, Score: ${game.scores?.home}-${game.scores?.away}`);
-                        
-                        // Check if finished
-                        const finishedStatuses = ['FT', 'AOT', 'AP', 'FINAL', 'AET'];
-                        if (!finishedStatuses.includes(game.status?.short)) {
-                            console.log(`    ⏳ Game not finished yet (status: ${game.status?.short})`);
-                            return null;
-                        }
-                        
-                        const homeScore = parseInt(game.scores?.home) || 0;
-                        const awayScore = parseInt(game.scores?.away) || 0;
-                        
-                        console.log(`    🏆 FINAL SCORE: ${homeScore}-${awayScore}`);
-                        
-                        if (homeScore > awayScore) return '1';
-                        if (awayScore > homeScore) return '2';
-                        return 'X';
-                        
-                    } catch (fetchError) {
-                        console.log(`    ❌ Fetch error for league ${leagueId}:`, fetchError.message);
-                        continue;
-                    }
-                }
-                
-                console.log(`  ❌ No match found in any league`);
-                return null;
-                
-            } catch (error) {
-                console.error('  ❌ Fatal API error:', error);
-                return null;
-            }
-        }
-
         // FOOTBALL-DATA.ORG API INTEGRATION (Premier League auto-results)
         // Free tier: 10 requests/minute, PL included forever
         
@@ -1739,10 +1623,12 @@
                 clearInterval(autoFetchInterval);
                 autoFetchInterval = null;
                 autoFetchActive = false;
+                localStorage.setItem('krokens_autofetch', 'false');
                 fetchLog('⏹️ Auto-hämtning stoppad', 'warning');
             } else {
                 // Start
                 autoFetchActive = true;
+                localStorage.setItem('krokens_autofetch', 'true');
                 fetchPLResults(); // Immediate first check
                 autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000); // Every 15 min
                 fetchLog('⚽ Auto-hämtning aktiverad (var 15:e minut)', 'success');
@@ -1772,11 +1658,11 @@
                 // Skip if match hasn't started yet
                 if (!isMatchStarted(match.date)) continue;
                 
-                // Wait at least 2 hours after match start
+                // Wait at least 100 minutes after match start
                 const matchTime = new Date(match.date);
                 const now = new Date();
                 const hoursSinceStart = (now - matchTime) / (1000 * 60 * 60);
-                if (hoursSinceStart < 2) {
+                if (hoursSinceStart < 100/60) {
                     fetchLog(`  ⏰ ${match.homeTeam} vs ${match.awayTeam}: Väntar (${hoursSinceStart.toFixed(1)}h)`, 'warning');
                     continue;
                 }
@@ -1864,6 +1750,8 @@
             } else {
                 fetchLog(`✅ Klar! ${foundResults} nya resultat av ${checked} kollade`, 'success');
             }
+
+            await set(ref(database, 'lastAutoFetch'), new Date().toISOString());
         }
 
         // RESULT MODAL (Anyone can use after match starts)
@@ -2014,13 +1902,27 @@
                 const predicted = allPlayers.filter(p => matchPredictions[p]);
                 const notPredicted = allPlayers.filter(p => !matchPredictions[p]);
                 
-                // Show predictions BEFORE match starts (who has tipped)
-                const predictionStatusBefore = !m.actualOutcome ? `
-                    <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 0.9em;">
-                        ${predicted.length > 0 ? `<div style="color: #10b981; margin-bottom: 5px;">✅ Tippat (${predicted.length}/5): ${predicted.join(', ')}</div>` : ''}
-                        ${notPredicted.length > 0 ? `<div style="color: #ef4444;">❌ Inte tippat (${notPredicted.length}/5): ${notPredicted.join(', ')}</div>` : ''}
-                    </div>
-                ` : '';
+                // Show predictions BEFORE result is set
+                let predictionStatusBefore = '';
+                if (!m.actualOutcome) {
+                    let predsHtml = '<div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">';
+                    predsHtml += '<div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>';
+                    allPlayers.forEach(function(player) {
+                        const pred = matchPredictions[player];
+                        const exact = matchExactPreds[player];
+                        if (!pred) {
+                            predsHtml += '<div style="color: #6b7280; padding: 3px 0;">❌ ' + player + ': Tippade inte</div>';
+                        } else {
+                            const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
+                            const scoreDisplay = exact
+                                ? '<strong>' + exact.replace('-', ' \u2013 ') + '</strong> <span style="color: #888; font-size: 0.85em;">(' + label + ')</span>'
+                                : '<strong>' + label + '</strong>';
+                            predsHtml += '<div style="color: #333; padding: 3px 0;">🎯 ' + player + ': ' + scoreDisplay + '</div>';
+                        }
+                    });
+                    predsHtml += '</div>';
+                    predictionStatusBefore = predsHtml;
+                }
 
                 // Show predictions AFTER result is set (what everyone tipped)
                 const predictionStatusAfter = m.actualOutcome ? `
@@ -2050,8 +1952,10 @@
                             const icon = isCorrect ? '✅' : '❌';
                             const color = isCorrect ? '#10b981' : '#ef4444';
                             const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+25' : ''}` : '';
-                            
-                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${player}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
+                            const pts = calculatePoints(m.id, player);
+                            const ptsTag = ` <span style="background: ${isCorrect ? '#10b981' : '#e5e7eb'}; color: ${isCorrect ? 'white' : '#6b7280'}; padding: 1px 6px; border-radius: 10px; font-size: 0.82em; font-weight: 600;">${pts}p</span>`;
+
+                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${player}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
                         }).join('')}
                     </div>
                 ` : '';
@@ -2149,6 +2053,9 @@
                             ${m.league} • ${dateStr}
                         </div>
                         ${tippingClosed ? `
+                            <div style="text-align: center; font-size: 1.1em; font-weight: 700; color: #333; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
+                                ${m.homeTeam} <span style="color: #667eea;">vs</span> ${m.awayTeam}
+                            </div>
                             <div class="locked-overlay">
                                 🔒 Tippning stängd
                                 ${myExact ? `<div style="margin-top: 6px; font-size: 0.9em; color: #667eea;">Din tipp: ${myExact.replace('-', ' – ')}</div>` : '<div style="margin-top: 6px; font-size: 0.9em; color: #999;">Du tippade inte denna match</div>'}

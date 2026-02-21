@@ -1912,21 +1912,23 @@
                     </div>
                     `;
                     } else {
-                        predictionStatusBefore = `
-                    <div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">
-                        <div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>
-                        ${allPlayers.map(player => {
+                        let predsHtml = '<div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">';
+                        predsHtml += '<div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>';
+                        allPlayers.forEach(function(player) {
                             const pred = matchPredictions[player];
                             const exact = matchExactPreds[player];
-                            if (!pred) return `<div style="color: #6b7280; padding: 3px 0;">❌ ${player}: Tippade inte</div>`;
-                            const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
-                            const scoreDisplay = exact
-                                ? `<strong>${exact.replace('-', ' – ')}</strong> <span style="color: #888; font-size: 0.85em;">(${label})</span>`
-                                : `<strong>${label}</strong>`;
-                            return `<div style="color: #333; padding: 3px 0;">🎯 ${player}: ${scoreDisplay}</div>`;
-                        }).join('')}
-                    </div>
-                    `;
+                            if (!pred) {
+                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">❌ ' + player + ': Tippade inte</div>';
+                            } else {
+                                const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
+                                const scoreDisplay = exact
+                                    ? '<strong>' + exact.replace('-', ' \u2013 ') + '</strong> <span style="color: #888; font-size: 0.85em;">(' + label + ')</span>'
+                                    : '<strong>' + label + '</strong>';
+                                predsHtml += '<div style="color: #333; padding: 3px 0;">🎯 ' + player + ': ' + scoreDisplay + '</div>';
+                            }
+                        });
+                        predsHtml += '</div>';
+                        predictionStatusBefore = predsHtml;
                     }
                 }
 

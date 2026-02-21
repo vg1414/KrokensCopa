@@ -1904,7 +1904,7 @@
                 // Show predictions BEFORE result is set
                 let predictionStatusBefore = '';
                 if (!m.actualOutcome) {
-                    if (!isFirstMatchStarted()) {
+                    if (!started) {
                         predictionStatusBefore = `
                     <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 0.9em;">
                         ${predicted.length > 0 ? `<div style="color: #10b981; margin-bottom: 5px;">✅ Tippat (${predicted.length}/5): ${predicted.join(', ')}</div>` : ''}

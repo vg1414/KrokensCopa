@@ -1106,6 +1106,7 @@
                 console.log('Exact predictions loaded');
                 renderPredictions();
                 renderLeaderboard();
+                renderMatches();
             });
 
             const passwordsRef = ref(database, 'passwords');
@@ -1904,32 +1905,23 @@
                 // Show predictions BEFORE result is set
                 let predictionStatusBefore = '';
                 if (!m.actualOutcome) {
-                    if (!started) {
-                        predictionStatusBefore = `
-                    <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 0.9em;">
-                        ${predicted.length > 0 ? `<div style="color: #10b981; margin-bottom: 5px;">✅ Tippat (${predicted.length}/5): ${predicted.join(', ')}</div>` : ''}
-                        ${notPredicted.length > 0 ? `<div style="color: #ef4444;">❌ Inte tippat (${notPredicted.length}/5): ${notPredicted.join(', ')}</div>` : ''}
-                    </div>
-                    `;
-                    } else {
-                        let predsHtml = '<div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">';
-                        predsHtml += '<div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>';
-                        allPlayers.forEach(function(player) {
-                            const pred = matchPredictions[player];
-                            const exact = matchExactPreds[player];
-                            if (!pred) {
-                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">❌ ' + player + ': Tippade inte</div>';
-                            } else {
-                                const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
-                                const scoreDisplay = exact
-                                    ? '<strong>' + exact.replace('-', ' \u2013 ') + '</strong> <span style="color: #888; font-size: 0.85em;">(' + label + ')</span>'
-                                    : '<strong>' + label + '</strong>';
-                                predsHtml += '<div style="color: #333; padding: 3px 0;">🎯 ' + player + ': ' + scoreDisplay + '</div>';
-                            }
-                        });
-                        predsHtml += '</div>';
-                        predictionStatusBefore = predsHtml;
-                    }
+                    let predsHtml = '<div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">';
+                    predsHtml += '<div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>';
+                    allPlayers.forEach(function(player) {
+                        const pred = matchPredictions[player];
+                        const exact = matchExactPreds[player];
+                        if (!pred) {
+                            predsHtml += '<div style="color: #6b7280; padding: 3px 0;">❌ ' + player + ': Tippade inte</div>';
+                        } else {
+                            const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
+                            const scoreDisplay = exact
+                                ? '<strong>' + exact.replace('-', ' \u2013 ') + '</strong> <span style="color: #888; font-size: 0.85em;">(' + label + ')</span>'
+                                : '<strong>' + label + '</strong>';
+                            predsHtml += '<div style="color: #333; padding: 3px 0;">🎯 ' + player + ': ' + scoreDisplay + '</div>';
+                        }
+                    });
+                    predsHtml += '</div>';
+                    predictionStatusBefore = predsHtml;
                 }
 
                 // Show predictions AFTER result is set (what everyone tipped)

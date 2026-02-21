@@ -1129,6 +1129,13 @@
                         
                         renderPredictions();
                         logActivity('AUTO_LOGIN', 'Automatisk inloggning från session');
+
+                        // Restore auto-fetch if Hefner had it active
+                        if (sessionPlayer === 'Hefner' && localStorage.getItem('krokens_autofetch') === 'true' && !autoFetchActive) {
+                            autoFetchActive = true;
+                            autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
+                            updateAutoFetchUI();
+                        }
                     }
                 }
             });
@@ -1195,8 +1202,15 @@
                         
                         // Log activity
                         await logActivity('LOGIN', 'Loggade in');
-                        
+
                         renderPredictions();
+
+                        // Restore auto-fetch if Hefner had it active
+                        if (player === 'Hefner' && localStorage.getItem('krokens_autofetch') === 'true' && !autoFetchActive) {
+                            autoFetchActive = true;
+                            autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
+                            updateAutoFetchUI();
+                        }
                     } else {
                         console.log('Wrong password');
                         showStatus('❌ Fel lösenord!', 'error');
@@ -1739,10 +1753,12 @@
                 clearInterval(autoFetchInterval);
                 autoFetchInterval = null;
                 autoFetchActive = false;
+                localStorage.setItem('krokens_autofetch', 'false');
                 fetchLog('⏹️ Auto-hämtning stoppad', 'warning');
             } else {
                 // Start
                 autoFetchActive = true;
+                localStorage.setItem('krokens_autofetch', 'true');
                 fetchPLResults(); // Immediate first check
                 autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000); // Every 15 min
                 fetchLog('⚽ Auto-hämtning aktiverad (var 15:e minut)', 'success');
@@ -2050,8 +2066,10 @@
                             const icon = isCorrect ? '✅' : '❌';
                             const color = isCorrect ? '#10b981' : '#ef4444';
                             const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+25' : ''}` : '';
-                            
-                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${player}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
+                            const pts = calculatePoints(m.id, player);
+                            const ptsTag = ` <span style="background: ${isCorrect ? '#10b981' : '#e5e7eb'}; color: ${isCorrect ? 'white' : '#6b7280'}; padding: 1px 6px; border-radius: 10px; font-size: 0.82em; font-weight: 600;">${pts}p</span>`;
+
+                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${player}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
                         }).join('')}
                     </div>
                 ` : '';

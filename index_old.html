@@ -1057,6 +1057,19 @@
             return now >= matchTime;
         }
 
+        function getFirstMatch() {
+            if (!matches || matches.length === 0) return null;
+            return matches.reduce((earliest, m) =>
+                new Date(m.date) < new Date(earliest.date) ? m : earliest
+            );
+        }
+
+        function isFirstMatchStarted() {
+            const first = getFirstMatch();
+            if (!first) return false;
+            return isMatchStarted(first.date);
+        }
+
         // Initialize Firebase
         console.log('Initializing Firebase...');
         try {
@@ -2081,16 +2094,33 @@
                 return;
             }
 
-            list.innerHTML = matches.map(m => {
+            const tippingClosed = isFirstMatchStarted();
+            const firstMatch = getFirstMatch();
+
+            let deadlineBanner = '';
+            if (!tippingClosed && firstMatch) {
+                const deadlineStr = new Date(firstMatch.date).toLocaleString('sv-SE', {
+                    weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+                deadlineBanner = `<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #92400e; font-weight: 600; text-align: center;">
+                    ⏰ Tippa klart innan <span style="color: #b45309;">${deadlineStr}</span> – då stänger tippningen för ALLA matcher!
+                </div>`;
+            } else if (tippingClosed) {
+                deadlineBanner = `<div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #991b1b; font-weight: 700; text-align: center; font-size: 1.1em;">
+                    🔒 Tippning stängd – inga ändringar tillåtna
+                </div>`;
+            }
+
+            list.innerHTML = deadlineBanner + matches.map(m => {
                 const myPred = predictions[m.id]?.[currentUser];
                 const myExact = exactPredictions[m.id]?.[currentUser];
-                const started = isMatchStarted(m.date);
+                const matchActuallyStarted = isMatchStarted(m.date);
                 const dateStr = new Date(m.date).toLocaleString('sv-SE', {
                     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
 
                 let predictionsHtml = '';
-                if (started) {
+                if (matchActuallyStarted) {
                     const matchPreds = predictions[m.id] || {};
                     const matchExactPreds = exactPredictions[m.id] || {};
                     if (Object.keys(matchPreds).length > 0) {
@@ -2114,13 +2144,14 @@
                 }
 
                 return `
-                    <div class="prediction-match ${started ? 'locked' : ''}">
+                    <div class="prediction-match ${tippingClosed ? 'locked' : ''}">
                         <div style="text-align: center; color: #666; font-size: 0.8em; margin-bottom: 10px;">
                             ${m.league} • ${dateStr}
                         </div>
-                        ${started ? `
+                        ${tippingClosed ? `
                             <div class="locked-overlay">
                                 🔒 Tippning stängd
+                                ${myExact ? `<div style="margin-top: 6px; font-size: 0.9em; color: #667eea;">Din tipp: ${myExact.replace('-', ' – ')}</div>` : '<div style="margin-top: 6px; font-size: 0.9em; color: #999;">Du tippade inte denna match</div>'}
                             </div>
                             ${predictionsHtml}
                         ` : `
@@ -2183,8 +2214,8 @@
             if (!currentUser) { alert('Du måste vara inloggad!'); return; }
 
             const match = matches.find(m => m.id === matchId);
-            if (isMatchStarted(match.date)) {
-                alert('Matchen har redan startat! Du kan inte längre tippa.');
+            if (isFirstMatchStarted()) {
+                alert('Tippningen är stängd! Första matchen har redan startat – inga ändringar tillåtna.');
                 return;
             }
 

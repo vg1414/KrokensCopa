@@ -761,6 +761,18 @@
                         </div>
                     </div>
                     
+                    <!-- Nostradamus section -->
+                    <div id="nostradamusSection" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; display: none;">
+                        <div style="padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                            <div style="font-size: 1.1em; font-weight: 600; color: #0ea5e9; margin-bottom: 5px;">
+                                🔮 Ligans Nostradamus
+                            </div>
+                            <div id="nostradamusLeader" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            <div id="nostradamusLeaderDetail" style="font-size: 0.9em; color: #666; margin-top: 4px;"></div>
+                            <div id="nostradamusRest" style="font-size: 0.9em; color: #666; margin-top: 6px;"></div>
+                        </div>
+                    </div>
+
                     <!-- Special titles for bottom positions -->
                     <div id="specialTitles" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
                         <div style="display: grid; gap: 15px;">
@@ -2186,7 +2198,7 @@
                         finishedMatches++;
                         const points = calculatePoints(match.id, player);
                         totalPoints += points;
-                        if (points > 0) correctPreds++;
+                        if (predictions[match.id]?.[player] === match.actualOutcome) correctPreds++;
                         if (match.actualScore && exactPredictions[match.id]?.[player] === match.actualScore && points > 0) {
                             bonusCount++;
                         }
@@ -2274,11 +2286,46 @@
             }).sort((a, b) => b.soloCorrect - a.soloCorrect);
             
             if (sniperCounts[0] && sniperCounts[0].soloCorrect > 0) {
-                sniperName.textContent = sniperCounts[0].player;
-                sniperDetails.textContent = `${sniperCounts[0].soloCorrect} st 100-poängare`;
+                const topSniperScore = sniperCounts[0].soloCorrect;
+                const sniperLeaders = sniperCounts.filter(p => p.soloCorrect === topSniperScore);
+                sniperName.textContent = sniperLeaders.map(p => p.player).join(' & ');
+                sniperDetails.textContent = `${topSniperScore} st 100-poängare`;
                 sniperSection.style.display = 'block';
             } else {
                 sniperSection.style.display = 'none';
+            }
+
+            // Show Ligans Nostradamus (1p per correct exact score, independent of 1X2)
+            const nostradamusSection = document.getElementById('nostradamusSection');
+            const nostradamusBody = document.getElementById('nostradamusBody');
+
+            const nostradamusCounts = PLAYERS.map(player => {
+                let correctExact = 0;
+                matches.forEach(match => {
+                    if (match.actualScore && exactPredictions[match.id]?.[player] === match.actualScore) {
+                        correctExact++;
+                    }
+                });
+                return { player, correctExact };
+            }).sort((a, b) => b.correctExact - a.correctExact);
+
+            const nostradamusLeader = document.getElementById('nostradamusLeader');
+            const nostradamusLeaderDetail = document.getElementById('nostradamusLeaderDetail');
+            const nostradamusRest = document.getElementById('nostradamusRest');
+            const withPoints = nostradamusCounts.filter(p => p.correctExact > 0);
+
+            if (withPoints.length > 0) {
+                const topNostradamusScore = withPoints[0].correctExact;
+                const nostradamusLeaders = withPoints.filter(p => p.correctExact === topNostradamusScore);
+                const nostradamusOthers = withPoints.filter(p => p.correctExact < topNostradamusScore);
+                nostradamusLeader.textContent = nostradamusLeaders.map(p => p.player).join(' & ');
+                nostradamusLeaderDetail.textContent = `${topNostradamusScore} st korrekt resultat`;
+                nostradamusRest.textContent = nostradamusOthers.length > 0
+                    ? nostradamusOthers.map(p => `${p.player} – ${p.correctExact} st`).join(', ')
+                    : '';
+                nostradamusSection.style.display = 'block';
+            } else {
+                nostradamusSection.style.display = 'none';
             }
 
             // Show the titles section if we have at least position 1

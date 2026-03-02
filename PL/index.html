@@ -658,6 +658,128 @@
                 font-size: 1.2em;
             }
         }
+
+        /* Admin panel sections */
+        .admin-section {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .admin-section-blue {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+        }
+
+        .admin-section-green {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+        }
+
+        .admin-section-red {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+        }
+
+        .admin-section-danger {
+            background: #450a0a;
+            border: 3px solid #dc2626;
+        }
+
+        .admin-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .admin-section p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .admin-subsection {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .admin-subsection-red {
+            background: #fef2f2;
+        }
+
+        .admin-terminal {
+            background: #0a0a0a;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .admin-terminal-small {
+            padding: 15px;
+            font-size: 0.85em;
+            max-height: 200px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .admin-flex-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-select {
+            padding: 10px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            color: #1e40af;
+            background: white;
+            cursor: pointer;
+        }
+
+        .admin-label {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .admin-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1em;
+            min-width: 160px;
+        }
+
+        .admin-player-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .admin-player-name {
+            font-weight: 600;
+        }
+
+        .admin-remove-btn {
+            padding: 4px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
     </style>
 </head>
 <body>
@@ -688,6 +810,7 @@
                         <option value="Olle">Olle</option>
                         <option value="Dawod">Dawod</option>
                         <option value="Ante">Ante</option>
+                        <option value="Lennart">Lennart</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -716,6 +839,7 @@
                 <button class="tab active" data-tab="setup">📅 Matcher</button>
                 <button class="tab" data-tab="predict">🎯 Tippa</button>
                 <button class="tab" data-tab="leaderboard">🏆 Topplista</button>
+                <button class="tab" data-tab="historik">📜 Historik</button>
                 <button class="tab" id="adminTab" data-tab="admin" style="display: none;">⚙️ Admin</button>
             </div>
 
@@ -805,6 +929,17 @@
             </div>
         </div>
 
+        <!-- Historik-flik -->
+        <div id="historik" class="content">
+            <div class="card">
+                <h2 class="section-title">📜 Historik</h2>
+                <p style="color: #666; margin-bottom: 20px; font-size: 0.9em;">Arkiv över avslutade ligor. Vinnaren markeras med 🏆. Fem pokaler byts ut mot ⭐.</p>
+                <div id="historyList">
+                    <div class="empty-state">Inga sparade säsonger ännu.</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin Modal (only for Hefner) -->
         <div id="resultModal" class="modal">
             <div class="modal-content">
@@ -860,41 +995,100 @@
                         <h3 style="color: #1e40af;">📊 Aktivitetslogg</h3>
                         <button class="btn btn-secondary" onclick="refreshActivityLog()" style="padding: 8px 16px;">🔄 Uppdatera</button>
                     </div>
-                    <div id="activityLog" style="background: #0a0a0a; color: #10b981; padding: 20px; border-radius: 10px; font-family: monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto; border: 1px solid #333;">
+                    <div id="activityLog" class="admin-terminal">
                         Laddar aktivitetslogg...
                     </div>
                 </div>
-                
-                <!-- API Configuration -->
-                <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
-                    <h3 style="color: #15803d; margin-bottom: 10px;">⚽ Auto-rättning</h3>
-                    <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
-                        Hämtar automatiskt PL-resultat från football-data.org API. Aktivera för att slippa sätta resultat manuellt.
-                    </p>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                        <button class="btn btn-secondary" onclick="manualFetchResults()">🔄 Hämta resultat nu</button>
+
+                <!-- Player Management -->
+                <div class="admin-section admin-section-blue">
+                    <h3 style="color: #1e40af; margin-bottom: 15px;">👥 Hantera spelare</h3>
+                    <div id="adminPlayersList" style="margin-bottom: 15px;"></div>
+                    <div class="admin-flex-row">
+                        <input type="text" id="newPlayerNameInput" placeholder="Nytt spelarnamn"
+                            class="admin-input" style="border: 2px solid #3b82f6;">
+                        <button class="btn" onclick="adminAddPlayer()" style="background: #3b82f6;">
+                            ➕ Lägg till
+                        </button>
                     </div>
-                    <div id="fetchLog" style="background: #0a0a0a; color: #10b981; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.85em; white-space: pre-wrap; max-height: 200px; overflow-y: auto; margin-top: 15px; display: none;"></div>
                 </div>
 
-                <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
-                    <h3 style="color: #ef4444; margin-bottom: 10px;">⚠️ Farliga åtgärder</h3>
-                    <p style="color: #666; margin-bottom: 15px;">Dessa knappar påverkar ALLA spelare. Var försiktig!</p>
+                <!-- API Configuration -->
+                <div class="admin-section admin-section-green">
+                    <h3 style="color: #15803d;">⚽ Auto-rättning</h3>
+                    <p>
+                        Hämtar automatiskt PL-resultat från football-data.org API. Aktivera för att slippa sätta resultat manuellt.
+                    </p>
+                    <div class="admin-flex-row">
+                        <button class="btn btn-secondary" onclick="manualFetchResults()">🔄 Hämta resultat nu</button>
+                    </div>
+                    <div id="fetchLog" class="admin-terminal admin-terminal-small"></div>
+                </div>
+
+                <!-- Spara säsong till historik -->
+                <div class="admin-section admin-section-green">
+                    <h3 style="color: #15803d;">📜 Spara säsong till historik</h3>
+                    <p>
+                        Sparar den aktuella tabellen permanent i Historik-fliken. Gör detta <strong>innan</strong> du nollställer inför ny omgång!
+                    </p>
+                    <div class="admin-flex-row">
+                        <input type="text" id="seasonNameInput" placeholder='T.ex. Premier League 2024-25'
+                            class="admin-input" style="border: 2px solid #22c55e; min-width: 200px;">
+                        <button class="btn btn-success" onclick="saveSeasonToHistory()">
+                            📜 Spara till historik
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-section admin-section-red">
+                    <h3 style="color: #ef4444;">⚠️ Farliga åtgärder</h3>
+                    <p>Dessa knappar påverkar ALLA spelare. Var försiktig!</p>
                 </div>
 
                 <div style="display: grid; gap: 20px;">
                     <!-- Load Matches -->
-                    <div style="background: #f0f9ff; border-radius: 10px; padding: 20px;">
-                        <h3 style="color: #1e40af; margin-bottom: 10px;">🔄 Ladda in matcher</h3>
+                    <div class="admin-subsection" style="background: #f0f9ff;">
+                        <h3 style="color: #1e40af;">🔄 Ladda in matcher</h3>
                         <p style="color: #666; margin-bottom: 10px; font-size: 0.9em;">
-                            Hämtar kommande omgångar från Premier League via API. Välj hur många omgångar som ska tippas samtidigt.
+                            Hämtar kommande omgångar från vald liga via API. Välj liga och hur många omgångar som ska tippas samtidigt.
                         </p>
                         <p style="color: #f59e0b; margin-bottom: 15px; font-size: 0.85em; background: #fef3c7; padding: 8px; border-radius: 5px;">
                             ℹ️ Använder CORS proxy (corsproxy.io) för att nå API:et. Om det inte fungerar, prova igen om några minuter.
                         </p>
-                        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
-                            <label for="roundsToLoad" style="font-weight: 600; color: #1e40af;">Antal omgångar att ladda:</label>
-                            <select id="roundsToLoad" style="padding: 10px; border: 2px solid #3b82f6; border-radius: 8px; font-size: 1em; font-weight: 600; color: #1e40af; background: white; cursor: pointer;">
+                        <div class="admin-flex-row" style="margin-bottom: 10px;">
+                            <label for="competitionSelect" class="admin-label">Liga:</label>
+                            <select id="competitionSelect" onchange="updateRoundsVisibility()" class="admin-select">
+                                <option value="PL">⚽ Premier League</option>
+                                <option value="CL">🏆 Champions League</option>
+                                <option value="WC">🌍 VM</option>
+                                <option value="BOTH">⚽🏆 PL + CL</option>
+                            </select>
+                        </div>
+                        <div id="plRoundsRow" class="admin-flex-row" style="margin-bottom: 10px;">
+                            <label for="plRoundsToLoad" class="admin-label" style="min-width: 180px;">⚽ PL – antal omgångar:</label>
+                            <select id="plRoundsToLoad" class="admin-select">
+                                <option value="1">1 omgång</option>
+                                <option value="2" selected>2 omgångar</option>
+                                <option value="3">3 omgångar</option>
+                                <option value="4">4 omgångar</option>
+                                <option value="5">5 omgångar</option>
+                                <option value="6">6 omgångar</option>
+                            </select>
+                        </div>
+                        <div id="vmRoundsRow" class="admin-flex-row" style="display: none; margin-bottom: 10px;">
+                            <label for="vmRoundsToLoad" class="admin-label" style="min-width: 180px;">🌍 VM – antal omgångar:</label>
+                            <select id="vmRoundsToLoad" class="admin-select">
+                                <option value="1">1 omgång</option>
+                                <option value="2" selected>2 omgångar</option>
+                                <option value="3">3 omgångar</option>
+                                <option value="4">4 omgångar</option>
+                                <option value="5">5 omgångar</option>
+                                <option value="6">6 omgångar</option>
+                            </select>
+                        </div>
+                        <div id="clRoundsRow" class="admin-flex-row" style="margin-bottom: 15px;">
+                            <label for="clRoundsToLoad" class="admin-label" style="min-width: 180px;">🏆 CL – antal omgångar:</label>
+                            <select id="clRoundsToLoad" class="admin-select">
                                 <option value="1">1 omgång</option>
                                 <option value="2" selected>2 omgångar</option>
                                 <option value="3">3 omgångar</option>
@@ -904,13 +1098,13 @@
                             </select>
                         </div>
                         <button class="btn btn-success" onclick="adminLoadMatches()">
-                            ⚽ Hämta valda PL-omgångar
+                            📥 Hämta valda omgångar
                         </button>
                     </div>
 
                     <!-- Reset Predictions -->
-                    <div style="background: #fef2f2; border-radius: 10px; padding: 20px;">
-                        <h3 style="color: #dc2626; margin-bottom: 10px;">🗑️ Nollställ tippningar</h3>
+                    <div class="admin-subsection admin-subsection-red">
+                        <h3 style="color: #dc2626;">🗑️ Nollställ tippningar</h3>
                         <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
                             Raderar ALLA spelares tippningar. Matcher och resultat behålls. Alla kan börja tippa från början.
                         </p>
@@ -920,8 +1114,8 @@
                     </div>
 
                     <!-- Reset Results -->
-                    <div style="background: #fef2f2; border-radius: 10px; padding: 20px;">
-                        <h3 style="color: #dc2626; margin-bottom: 10px;">🔄 Nollställ resultat</h3>
+                    <div class="admin-subsection admin-subsection-red">
+                        <h3 style="color: #dc2626;">🔄 Nollställ resultat</h3>
                         <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
                             Raderar alla matchresultat. Tippningar behålls. Bra om fel resultat satts.
                         </p>
@@ -931,10 +1125,10 @@
                     </div>
 
                     <!-- Full Reset -->
-                    <div style="background: #450a0a; border-radius: 10px; padding: 20px; border: 3px solid #dc2626;">
-                        <h3 style="color: #fca5a5; margin-bottom: 10px;">💣 TOTAL RESET</h3>
+                    <div class="admin-subsection admin-section-danger">
+                        <h3 style="color: #fca5a5;">💣 TOTAL RESET</h3>
                         <p style="color: #fca5a5; margin-bottom: 15px; font-size: 0.9em;">
-                            Raderar ALLT: matcher, tippningar, resultat. Börja om från scratch. (Lösenord behålls)
+                            Raderar ALLT: matcher, tippningar, resultat. Börja om från scratch. (Lösenord och historik behålls)
                         </p>
                         <button class="btn" style="background: #7f1d1d; color: white;" onclick="adminFullReset()">
                             💣 TOTAL RESET - Radera allt
@@ -942,7 +1136,7 @@
                     </div>
                 </div>
 
-                <div id="adminOutput" style="background: #000; color: #10b981; padding: 20px; border-radius: 10px; margin-top: 30px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; display: none;"></div>
+                <div id="adminOutput" class="admin-terminal" style="margin-top: 30px; max-height: 300px; display: none;"></div>
             </div>
         </div>
     </div>
@@ -953,7 +1147,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getDatabase, ref, set, onValue, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyB2E_bnuPxJW9AtuxnA1LyewTVuA-LpOwk",
@@ -972,13 +1166,15 @@
         let exactPredictions = {};
         let passwords = {};
         let activityLog = [];
-        let activityLogLoaded = false; // Track if we've loaded from Firebase
+        let seasonHistory = [];
+        let activityLogLoaded = false;
+        let passwordsLoaded = false;
         let currentUser = null;
         let autoFetchInterval = null;
         let currentModalMatchId = null;
         let currentModalOutcome = null;
         let plApiKey = '406217531e18462e97f40aea2c744b8e'; // football-data.org API key (hårdkodad)
-        const PLAYERS = ['Hefner', 'Majscht', 'Olle', 'Dawod', 'Ante'];
+        let PLAYERS = ['Hefner', 'Majscht', 'Olle', 'Dawod', 'Ante', 'Lennart'];
         
         // Session management (10 minute auto-login)
         const SESSION_DURATION = 10 * 60 * 1000; // 10 minutes
@@ -1039,10 +1235,51 @@
             }
         }
 
-        // Premier League configuration
-        const PL_LEAGUE_ID = 39; // Premier League ID in API-Football
-        const CURRENT_SEASON = 2024; // 2024-2025 season
-        let currentRound = null; // Will be fetched from API
+        // Points cache – recalculated once per render cycle
+        let pointsCache = {};
+        function rebuildPointsCache() {
+            pointsCache = {};
+            matches.forEach(match => {
+                if (!match.actualOutcome) return;
+                pointsCache[match.id] = {};
+                PLAYERS.forEach(player => {
+                    pointsCache[match.id][player] = calculatePoints(match.id, player);
+                });
+            });
+        }
+
+        function getCachedPoints(matchId, player) {
+            return pointsCache[matchId]?.[player] ?? 0;
+        }
+
+        // Debounced rendering – collects multiple render calls into one frame
+        let renderScheduled = false;
+        function scheduleRender() {
+            if (renderScheduled) return;
+            renderScheduled = true;
+            requestAnimationFrame(() => {
+                renderScheduled = false;
+                rebuildPointsCache();
+                renderMatches();
+                renderPredictions();
+                renderLeaderboard();
+            });
+        }
+
+        // Activate session after login (shared by all login paths)
+        function activateSession(player) {
+            currentUser = player;
+            saveSession(player);
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('currentUserName').textContent = player;
+            const adminTab = document.getElementById('adminTab');
+            if (adminTab) {
+                adminTab.style.display = player === 'Hefner' ? 'inline-block' : 'none';
+            }
+            renderPredictions();
+            startAutoFetch();
+        }
 
         // Simple hash function
         async function hashPassword(password) {
@@ -1094,9 +1331,7 @@
                 if (data) {
                     matches = Array.isArray(data) ? data : Object.values(data);
                     console.log('Matches loaded:', matches.length);
-                    renderMatches();
-                    renderPredictions();
-                    renderLeaderboard();
+                    scheduleRender();
                 }
             });
 
@@ -1104,23 +1339,20 @@
             onValue(predictionsRef, (snapshot) => {
                 predictions = snapshot.val() || {};
                 console.log('Predictions loaded');
-                renderPredictions();
-                renderLeaderboard();
-                renderMatches();
+                scheduleRender();
             });
 
             const exactPredictionsRef = ref(database, 'exactPredictions');
             onValue(exactPredictionsRef, (snapshot) => {
                 exactPredictions = snapshot.val() || {};
                 console.log('Exact predictions loaded');
-                renderPredictions();
-                renderLeaderboard();
-                renderMatches();
+                scheduleRender();
             });
 
             const passwordsRef = ref(database, 'passwords');
             onValue(passwordsRef, (snapshot) => {
                 passwords = snapshot.val() || {};
+                passwordsLoaded = true;
                 console.log('Passwords loaded');
                 
                 // Check for existing session on first load
@@ -1128,21 +1360,8 @@
                     const sessionPlayer = loadSession();
                     if (sessionPlayer && passwords[sessionPlayer]) {
                         console.log('Auto-login from session:', sessionPlayer);
-                        currentUser = sessionPlayer;
-                        document.getElementById('loginScreen').style.display = 'none';
-                        document.getElementById('mainApp').style.display = 'block';
-                        document.getElementById('currentUserName').textContent = sessionPlayer;
-                        
-                        // Show admin tab for Hefner
-                        const adminTab = document.getElementById('adminTab');
-                        if (adminTab) {
-                            adminTab.style.display = sessionPlayer === 'Hefner' ? 'inline-block' : 'none';
-                        }
-                        
-                        renderPredictions();
+                        activateSession(sessionPlayer);
                         logActivity('AUTO_LOGIN', 'Automatisk inloggning från session');
-
-                        startAutoFetch();
                     }
                 }
             });
@@ -1156,6 +1375,29 @@
                 } else {
                     updateLastFetchStatus('🔄 Ej hämtat ännu');
                 }
+            });
+
+            const playersRef = ref(database, 'players');
+            onValue(playersRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data && Array.isArray(data) && data.length > 0) {
+                    PLAYERS = data;
+                }
+                renderPlayerSelect();
+                scheduleRender();
+                if (currentUser === 'Hefner') renderAdminPlayers();
+            });
+
+            const historyRef = ref(database, 'seasonHistory');
+            onValue(historyRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    seasonHistory = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    seasonHistory = [];
+                }
+                scheduleRender();
+                renderHistory();
             });
 
             const activityLogRef = ref(database, 'activityLog');
@@ -1183,6 +1425,12 @@
         // LOGIN FUNCTION
         async function handleLogin() {
             console.log('Login button clicked');
+
+            if (!passwordsLoaded) {
+                showStatus('⏳ Appen laddar fortfarande, försök igen om ett ögonblick...', 'error');
+                return;
+            }
+
             const player = document.getElementById('playerSelect').value;
             const password = document.getElementById('passwordInput').value;
 
@@ -1206,24 +1454,8 @@
                     // Verify password
                     if (passwords[player] === hashedPassword) {
                         console.log('Password correct, logging in...');
-                        currentUser = player;
-                        saveSession(player); // Save session for auto-login
-                        document.getElementById('loginScreen').style.display = 'none';
-                        document.getElementById('mainApp').style.display = 'block';
-                        document.getElementById('currentUserName').textContent = player;
-                        
-                        // Show admin tab for Hefner
-                        const adminTab = document.getElementById('adminTab');
-                        if (adminTab) {
-                            adminTab.style.display = player === 'Hefner' ? 'inline-block' : 'none';
-                        }
-                        
-                        // Log activity
+                        activateSession(player);
                         await logActivity('LOGIN', 'Loggade in');
-
-                        renderPredictions();
-
-                        startAutoFetch();
                     } else {
                         console.log('Wrong password');
                         showStatus('❌ Fel lösenord!', 'error');
@@ -1233,24 +1465,9 @@
                     console.log('First time login, saving password...');
                     passwords[player] = hashedPassword;
                     await set(ref(database, 'passwords'), passwords);
-                    currentUser = player;
-                    saveSession(player); // Save session for auto-login
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'block';
-                    document.getElementById('currentUserName').textContent = player;
-                    
-                    // Show admin tab for Hefner
-                    const adminTab = document.getElementById('adminTab');
-                    if (adminTab) {
-                        adminTab.style.display = player === 'Hefner' ? 'inline-block' : 'none';
-                    }
-                    
-                    // Log activity
+                    activateSession(player);
                     await logActivity('FIRST_LOGIN', 'Skapade konto och loggade in');
-                    
                     alert('✅ Lösenord sparat! Välkommen!');
-                    renderPredictions();
-                    startAutoFetch();
                 }
             } catch (error) {
                 console.error('Login error:', error);
@@ -1259,9 +1476,9 @@
         }
 
         function startAutoFetch() {
-            fetchPLResults();
+            fetchResults();
             if (!autoFetchInterval) {
-                autoFetchInterval = setInterval(fetchPLResults, 15 * 60 * 1000);
+                autoFetchInterval = setInterval(fetchResults, 15 * 60 * 1000);
             }
         }
 
@@ -1309,126 +1526,144 @@
             output.scrollTop = output.scrollHeight;
         }
 
+        window.updateRoundsVisibility = function() {
+            const competition = document.getElementById('competitionSelect')?.value || 'PL';
+            const plRow = document.getElementById('plRoundsRow');
+            const clRow = document.getElementById('clRoundsRow');
+            const vmRow = document.getElementById('vmRoundsRow');
+            if (!plRow || !clRow || !vmRow) return;
+            plRow.style.display = (competition === 'PL' || competition === 'BOTH') ? 'flex' : 'none';
+            clRow.style.display = (competition === 'CL' || competition === 'BOTH') ? 'flex' : 'none';
+            vmRow.style.display = competition === 'WC' ? 'flex' : 'none';
+        };
+
+        const CL_STAGE_LABELS = {
+            'LEAGUE_PHASE': 'Ligafas',
+            'KNOCKOUT_ROUND_PLAY_OFF': 'Playoff',
+            'GROUP_STAGE': 'Gruppspel',
+            'ROUND_OF_16': 'Åttondel',
+            'ROUND_OF_32': 'Sextondelsfinal',
+            'QUARTER_FINALS': 'Kvartsfinal',
+            'SEMI_FINALS': 'Semifinal',
+            'THIRD_PLACE': 'Bronsmatch',
+            'FINAL': 'Final'
+        };
+
         window.adminLoadMatches = async function() {
             if (currentUser !== 'Hefner') {
                 alert('⛔ Endast Hefner kan använda admin-funktioner!');
                 return;
             }
-            
-            // Get number of rounds from dropdown
-            const roundsSelect = document.getElementById('roundsToLoad');
-            const roundsToLoad = parseInt(roundsSelect?.value || 2);
-            
-            if (!confirm(`Hämta kommande ${roundsToLoad} omgång${roundsToLoad > 1 ? 'ar' : ''} från Premier League?\n\nDetta kommer ladda in matcherna från football-data.org API.`)) return;
-            
-            adminLog(`⚽ Hämtar ${roundsToLoad} PL-omgångar från API...`, 'info');
-            
-            try {
-                // Use CORS proxy to avoid CORS issues
-                // Note: For production, you should use your own backend server
-                const apiUrl = 'https://api.football-data.org/v4/competitions/PL/matches?status=SCHEDULED,TIMED';
-                const corsProxy = 'https://corsproxy.io/?';
-                const url = corsProxy + encodeURIComponent(apiUrl);
-                
-                adminLog(`🔗 Anropar API via CORS proxy...`, 'info');
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: { 
-                        'X-Auth-Token': plApiKey
-                    }
-                });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    adminLog(`❌ API error: ${response.status} - ${errorText}`, 'error');
-                    throw new Error(`API svarade med status ${response.status}`);
-                }
-                
+
+            const competition = document.getElementById('competitionSelect')?.value || 'PL';
+            const plRoundsToLoad = parseInt(document.getElementById('plRoundsToLoad')?.value || 2);
+            const clRoundsToLoad = parseInt(document.getElementById('clRoundsToLoad')?.value || 2);
+            const vmRoundsToLoad = parseInt(document.getElementById('vmRoundsToLoad')?.value || 2);
+            const competitionNames = { PL: 'Premier League', CL: 'Champions League', WC: 'VM', BOTH: 'PL + CL' };
+            const competitionName = competitionNames[competition] || 'Premier League';
+
+            const roundsForSingle = { PL: plRoundsToLoad, CL: clRoundsToLoad, WC: vmRoundsToLoad }[competition] || 2;
+            const confirmText = competition === 'BOTH'
+                ? `Hämta ${plRoundsToLoad} PL-omgångar + ${clRoundsToLoad} CL-omgångar?\n\nDetta ersätter befintliga matcher i Firebase.`
+                : `Hämta kommande ${roundsForSingle} omgångar från ${competitionName}?\n\nDetta ersätter befintliga matcher i Firebase.`;
+            if (!confirm(confirmText)) return;
+
+            adminLog(`📥 Hämtar från ${competitionName}...`, 'info');
+
+            // Helper: fetch and convert matches for one competition
+            async function fetchCompetitionMatches(code, rounds) {
+                const apiUrl = `https://api.football-data.org/v4/competitions/${code}/matches?status=SCHEDULED,TIMED`;
+                const url = 'https://corsproxy.io/?' + encodeURIComponent(apiUrl);
+                adminLog(`🔗 Hämtar ${code}...`, 'info');
+
+                const response = await fetch(url, { headers: { 'X-Auth-Token': plApiKey } });
+                if (!response.ok) throw new Error(`${code} API svarade ${response.status}`);
+
                 const data = await response.json();
                 const allMatches = data.matches || [];
-                
-                adminLog(`📊 Hittade ${allMatches.length} kommande matcher totalt`, 'info');
-                
-                if (allMatches.length === 0) {
-                    adminLog('⚠️ Inga kommande matcher i API:et. Kanske är säsongen slut?', 'warning');
-                    alert('Inga kommande matcher hittades. Kontrollera att Premier League-säsongen pågår.');
-                    return;
-                }
-                
-                // Group matches by matchday
+                adminLog(`📊 ${code}: ${allMatches.length} kommande matcher`, 'info');
+
                 const matchesByRound = {};
+                const stageBasedCompetition = code !== 'PL';
                 allMatches.forEach(m => {
-                    const round = m.matchday;
-                    if (!matchesByRound[round]) matchesByRound[round] = [];
-                    matchesByRound[round].push(m);
+                    const roundKey = stageBasedCompetition
+                        ? `${m.stage}_${m.matchday || 1}`
+                        : String(m.matchday);
+                    if (!matchesByRound[roundKey]) matchesByRound[roundKey] = [];
+                    matchesByRound[roundKey].push(m);
                 });
-                
-                // Find the next X rounds that have matches (based on dropdown selection)
-                const rounds = Object.keys(matchesByRound).map(Number).sort((a, b) => a - b);
-                const nextRounds = rounds.slice(0, roundsToLoad);
-                
-                if (nextRounds.length === 0) {
-                    adminLog('❌ Inga kommande matcher hittades!', 'error');
-                    alert('Inga kommande matcher kunde hittas i API:et.');
-                    return;
+
+                let roundKeys = Object.keys(matchesByRound);
+                if (code === 'PL') {
+                    roundKeys.sort((a, b) => Number(a) - Number(b));
+                } else {
+                    roundKeys.sort((a, b) => new Date(matchesByRound[a][0].utcDate) - new Date(matchesByRound[b][0].utcDate));
                 }
-                
-                if (nextRounds.length < roundsToLoad) {
-                    adminLog(`⚠️ Kunde bara hitta ${nextRounds.length} omgångar (du valde ${roundsToLoad})`, 'warning');
-                }
-                
-                adminLog(`🎯 Laddar omgång ${nextRounds.join(', ')}`, 'info');
-                
-                // Convert API matches to our format
-                const matchesToLoad = [];
-                nextRounds.forEach(roundNum => {
-                    const roundMatches = matchesByRound[roundNum];
+                roundKeys = roundKeys.slice(0, rounds);
+
+                const converted = [];
+                const labels = [];
+                roundKeys.forEach(roundKey => {
+                    const roundMatches = matchesByRound[roundKey];
+                    const first = roundMatches[0];
+                    const leagueName = { PL: 'Premier League', CL: 'Champions League', WC: 'VM' }[code] || code;
+                    const roundLabel = code === 'PL'
+                        ? `Premier League - Omgång ${roundKey}`
+                        : `${leagueName} - ${CL_STAGE_LABELS[first.stage] || first.stage}${first.matchday > 1 ? ' (Returmatch)' : ''}`;
+                    labels.push(roundLabel);
+
                     roundMatches.forEach((m, idx) => {
-                        // Convert UTC to CET/CEST properly using Intl
                         const utcDate = new Date(m.utcDate);
-                        
-                        // Get date string in CET timezone (Europe/Stockholm = CET/CEST)
-                        const options = {
-                            timeZone: 'Europe/Stockholm',
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        };
-                        
-                        const parts = new Intl.DateTimeFormat('sv-SE', options).formatToParts(utcDate);
-                        const dateParts = {};
-                        parts.forEach(part => {
-                            dateParts[part.type] = part.value;
-                        });
-                        
-                        // Format as ISO string for our system
-                        const isoString = `${dateParts.year}-${dateParts.month}-${dateParts.day}T${dateParts.hour}:${dateParts.minute}`;
-                        
-                        matchesToLoad.push({
-                            id: `pl_r${roundNum}_${idx}`,
+                        const opts = { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
+                        const dp = {};
+                        new Intl.DateTimeFormat('sv-SE', opts).formatToParts(utcDate).forEach(p => { dp[p.type] = p.value; });
+                        converted.push({
+                            id: `${code.toLowerCase()}_${roundKey}_${idx}`,
                             homeTeam: m.homeTeam.shortName || m.homeTeam.name,
                             awayTeam: m.awayTeam.shortName || m.awayTeam.name,
-                            league: `Premier League - Omgång ${roundNum}`,
-                            date: isoString,
+                            league: roundLabel,
+                            date: `${dp.year}-${dp.month}-${dp.day}T${dp.hour}:${dp.minute}`,
                             actualOutcome: null,
                             actualScore: null,
                             apiMatchId: m.id
                         });
                     });
                 });
-                
-                adminLog(`✅ Konverterade ${matchesToLoad.length} matcher`, 'success');
-                
-                // Save to Firebase
+                return { converted, labels };
+            }
+
+            try {
+                let matchesToLoad = [];
+                let roundLabels = [];
+
+                if (competition === 'BOTH') {
+                    const [pl, cl] = await Promise.all([
+                        fetchCompetitionMatches('PL', plRoundsToLoad),
+                        fetchCompetitionMatches('CL', clRoundsToLoad)
+                    ]);
+                    matchesToLoad = [...pl.converted, ...cl.converted];
+                    roundLabels = [...pl.labels, ...cl.labels];
+                    matchesToLoad.sort((a, b) => new Date(a.date) - new Date(b.date));
+                } else {
+                    const rounds = { PL: plRoundsToLoad, CL: clRoundsToLoad, WC: vmRoundsToLoad }[competition] || 2;
+                    const result = await fetchCompetitionMatches(competition, rounds);
+                    matchesToLoad = result.converted;
+                    roundLabels = result.labels;
+                }
+
+                if (matchesToLoad.length === 0) {
+                    adminLog('⚠️ Inga matcher hittades.', 'warning');
+                    alert('Inga kommande matcher hittades.');
+                    return;
+                }
+
+                adminLog(`✅ Konverterade ${matchesToLoad.length} matcher totalt`, 'success');
+
                 await set(ref(database, 'matches'), matchesToLoad);
-                await logActivity('ADMIN_LOAD_MATCHES', `Laddade ${matchesToLoad.length} PL-matcher (omgång ${nextRounds.join(', ')})`);
-                
+                await logActivity('ADMIN_LOAD_MATCHES', `Laddade ${matchesToLoad.length} ${competitionName}-matcher (${roundLabels.join(', ')})`);
+
                 adminLog(`✅ KLART! ${matchesToLoad.length} matcher sparade i Firebase`, 'success');
-                alert(`✅ ${matchesToLoad.length} PL-matcher från omgång ${nextRounds.join(' och ')} är nu laddade!`);
+                alert(`✅ ${matchesToLoad.length} matcher laddade!\n\n${roundLabels.join('\n')}`);
                 
             } catch (error) {
                 adminLog('❌ FEL: ' + error.message, 'error');
@@ -1514,7 +1749,7 @@
                 return;
             }
             
-            if (!confirm('💣 TOTAL RESET?\n\nDetta raderar:\n- Alla matcher\n- Alla tippningar\n- Alla resultat\n\nLösenord behålls.\n\nFortsätta?')) return;
+            if (!confirm('💣 TOTAL RESET?\n\nDetta raderar:\n- Alla matcher\n- Alla tippningar\n- Alla resultat\n\nLösenord och historik behålls.\n\nFortsätta?')) return;
             if (!confirm('💣💣💣 SISTA VARNINGEN! 💣💣💣\n\nALLT kommer raderas!\n\nÄr du 100% säker?')) return;
             if (!confirm('Skriv OK för att bekräfta total reset (detta kan inte ångras!)') !== null) return;
             
@@ -1628,7 +1863,7 @@
         
         window.manualFetchResults = async function() {
             fetchLog('🔄 Manuell hämtning...', 'info');
-            await fetchPLResults();
+            await fetchResults();
         };
         
         function updateLastFetchStatus(text) {
@@ -1636,117 +1871,133 @@
             if (el) el.textContent = text;
         }
 
-        async function fetchPLResults() {
+        async function fetchResults() {
             if (!plApiKey) {
                 fetchLog('❌ Ingen API-nyckel konfigurerad', 'error');
                 return;
             }
 
             updateLastFetchStatus('🔄 Hämtar resultat...');
-            fetchLog('⚽ Kollar PL-resultat...', 'info');
+            fetchLog('⚽ Kollar resultat...', 'info');
             let foundResults = 0;
-            let checked = 0;
-            
-            for (const match of matches) {
-                // Skip if already has result
-                if (match.actualOutcome) continue;
-                
-                // Skip if match hasn't started yet
-                if (!isMatchStarted(match.date)) continue;
-                
-                // Wait at least 100 minutes after match start
-                const matchTime = new Date(match.date);
-                const now = new Date();
-                const hoursSinceStart = (now - matchTime) / (1000 * 60 * 60);
+
+            // Filter matches that need checking
+            const now = new Date();
+            const pendingMatches = matches.filter(match => {
+                if (match.actualOutcome) return false;
+                if (!isMatchStarted(match.date)) return false;
+                const hoursSinceStart = (now - new Date(match.date)) / (1000 * 60 * 60);
                 if (hoursSinceStart < 100/60) {
                     fetchLog(`  ⏰ ${match.homeTeam} vs ${match.awayTeam}: Väntar (${hoursSinceStart.toFixed(1)}h)`, 'warning');
-                    continue;
+                    return false;
                 }
-                
-                checked++;
-                
+                return true;
+            });
+
+            if (pendingMatches.length === 0) {
+                fetchLog('ℹ️ Inga matcher att kolla just nu', 'info');
+                const time = new Date().toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                updateLastFetchStatus(`🔄 Senast hämtat: ${time}`);
+                try { await set(ref(database, 'lastAutoFetch'), new Date().toISOString()); } catch (e) {}
+                return;
+            }
+
+            // Group pending matches by date + competition for batch API calls
+            const groups = {};
+            pendingMatches.forEach(match => {
+                const matchDate = match.date.split('T')[0];
+                const competitionCode = match.id?.startsWith('cl_') ? 'CL' : 'PL';
+                const key = `${competitionCode}_${matchDate}`;
+                if (!groups[key]) groups[key] = { competitionCode, matchDate, matches: [] };
+                groups[key].matches.push(match);
+            });
+
+            const groupKeys = Object.keys(groups);
+            fetchLog(`📊 ${pendingMatches.length} matcher att kolla i ${groupKeys.length} API-anrop (istället för ${pendingMatches.length})`, 'info');
+
+            // One API call per date+competition group
+            for (const key of groupKeys) {
+                const group = groups[key];
                 try {
-                    const matchDate = match.date.split('T')[0];
-                    const apiUrl = `https://api.football-data.org/v4/competitions/PL/matches?dateFrom=${matchDate}&dateTo=${matchDate}`;
-                    const corsProxy = 'https://corsproxy.io/?';
-                    const url = corsProxy + encodeURIComponent(apiUrl);
-                    
+                    const apiUrl = `https://api.football-data.org/v4/competitions/${group.competitionCode}/matches?dateFrom=${group.matchDate}&dateTo=${group.matchDate}`;
+                    const url = 'https://corsproxy.io/?' + encodeURIComponent(apiUrl);
+
                     const response = await fetch(url, {
                         method: 'GET',
                         headers: { 'X-Auth-Token': plApiKey }
                     });
-                    
+
                     if (response.status === 429) {
                         fetchLog('  ⚠️ Rate limit – väntar 60s...', 'warning');
                         await new Promise(r => setTimeout(r, 60000));
                         continue;
                     }
-                    
+
                     if (!response.ok) {
-                        fetchLog(`  ⚠️ API status ${response.status}`, 'warning');
+                        fetchLog(`  ⚠️ API status ${response.status} för ${group.competitionCode} ${group.matchDate}`, 'warning');
                         continue;
                     }
-                    
+
                     const data = await response.json();
                     const games = data.matches || [];
-                    
-                    // Find matching game by team names
-                    const game = games.find(g => {
-                        const apiHome = (g.homeTeam?.shortName || g.homeTeam?.name || '').toLowerCase();
-                        const apiAway = (g.awayTeam?.shortName || g.awayTeam?.name || '').toLowerCase();
-                        const ourHome = match.homeTeam.toLowerCase();
-                        const ourAway = match.awayTeam.toLowerCase();
-                        return (apiHome.includes(ourHome) || ourHome.includes(apiHome)) &&
-                               (apiAway.includes(ourAway) || ourAway.includes(apiAway));
-                    });
-                    
-                    if (!game) {
-                        fetchLog(`  ❌ ${match.homeTeam} vs ${match.awayTeam}: Hittar ej i API`, 'warning');
-                        continue;
+
+                    // Match each pending match against API results
+                    for (const match of group.matches) {
+                        const game = games.find(g => {
+                            const apiHome = (g.homeTeam?.shortName || g.homeTeam?.name || '').toLowerCase();
+                            const apiAway = (g.awayTeam?.shortName || g.awayTeam?.name || '').toLowerCase();
+                            const ourHome = match.homeTeam.toLowerCase();
+                            const ourAway = match.awayTeam.toLowerCase();
+                            return (apiHome.includes(ourHome) || ourHome.includes(apiHome)) &&
+                                   (apiAway.includes(ourAway) || ourAway.includes(apiAway));
+                        });
+
+                        if (!game) {
+                            fetchLog(`  ❌ ${match.homeTeam} vs ${match.awayTeam}: Hittar ej i API`, 'warning');
+                            continue;
+                        }
+
+                        if (game.status !== 'FINISHED') {
+                            fetchLog(`  ⏳ ${match.homeTeam} vs ${match.awayTeam}: ${game.status}`, 'info');
+                            continue;
+                        }
+
+                        const homeGoals = game.score?.fullTime?.home;
+                        const awayGoals = game.score?.fullTime?.away;
+                        if (homeGoals === null || homeGoals === undefined || awayGoals === null || awayGoals === undefined) continue;
+
+                        let outcome;
+                        if (homeGoals > awayGoals) outcome = '1';
+                        else if (homeGoals < awayGoals) outcome = '2';
+                        else outcome = 'X';
+
+                        const matchIndex = matches.findIndex(m => m.id === match.id);
+                        matches[matchIndex].actualOutcome = outcome;
+                        matches[matchIndex].actualScore = `${homeGoals}-${awayGoals}`;
+                        matches[matchIndex].setBy = 'API';
+                        matches[matchIndex].setAt = new Date().toISOString();
+
+                        foundResults++;
+                        fetchLog(`  ✅ ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`, 'success');
+                        await logActivity('AUTO_RESULT', `API: ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`);
                     }
-                    
-                    if (game.status !== 'FINISHED') {
-                        fetchLog(`  ⏳ ${match.homeTeam} vs ${match.awayTeam}: ${game.status}`, 'info');
-                        continue;
+
+                    // Rate limit: wait 6s between group requests (free = 10/min)
+                    if (groupKeys.indexOf(key) < groupKeys.length - 1) {
+                        await new Promise(r => setTimeout(r, 6000));
                     }
-                    
-                    const homeGoals = game.score?.fullTime?.home;
-                    const awayGoals = game.score?.fullTime?.away;
-                    
-                    if (homeGoals === null || homeGoals === undefined || awayGoals === null || awayGoals === undefined) continue;
-                    
-                    // Determine 1X2
-                    let outcome;
-                    if (homeGoals > awayGoals) outcome = '1';
-                    else if (homeGoals < awayGoals) outcome = '2';
-                    else outcome = 'X';
-                    
-                    // Save result + actual score for bonus check
-                    const matchIndex = matches.findIndex(m => m.id === match.id);
-                    matches[matchIndex].actualOutcome = outcome;
-                    matches[matchIndex].actualScore = `${homeGoals}-${awayGoals}`;
-                    matches[matchIndex].setBy = 'API';
-                    matches[matchIndex].setAt = new Date().toISOString();
-                    
-                    await set(ref(database, 'matches'), matches);
-                    foundResults++;
-                    fetchLog(`  ✅ ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`, 'success');
-                    await logActivity('AUTO_RESULT', `API: ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`);
-                    
-                    // Rate limit: wait 6s between requests (free = 10/min)
-                    await new Promise(r => setTimeout(r, 6000));
-                    
+
                 } catch (error) {
-                    fetchLog(`  ❌ ${match.homeTeam} vs ${match.awayTeam}: ${error.message}`, 'error');
+                    fetchLog(`  ❌ ${group.competitionCode} ${group.matchDate}: ${error.message}`, 'error');
                 }
             }
-            
-            if (checked === 0) {
-                fetchLog('ℹ️ Inga matcher att kolla just nu', 'info');
-            } else {
-                fetchLog(`✅ Klar! ${foundResults} nya resultat av ${checked} kollade`, 'success');
+
+            // Save all results in one write (instead of per match)
+            if (foundResults > 0) {
+                await set(ref(database, 'matches'), matches);
             }
 
+            fetchLog(`✅ Klar! ${foundResults} nya resultat av ${pendingMatches.length} kollade`, 'success');
             const time = new Date().toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
             updateLastFetchStatus(`🔄 Senast hämtat: ${time}`);
             try { await set(ref(database, 'lastAutoFetch'), new Date().toISOString()); } catch (e) {}
@@ -1896,7 +2147,7 @@
                 // Check who has predicted for this match
                 const matchPredictions = predictions[m.id] || {};
                 const matchExactPreds = exactPredictions[m.id] || {};
-                const allPlayers = ['Hefner', 'Majscht', 'Olle', 'Dawod', 'Ante'];
+                const allPlayers = PLAYERS;
                 const predicted = allPlayers.filter(p => matchPredictions[p]);
                 const notPredicted = allPlayers.filter(p => !matchPredictions[p]);
                 
@@ -1950,7 +2201,7 @@
                             const icon = isCorrect ? '✅' : '❌';
                             const color = isCorrect ? '#10b981' : '#ef4444';
                             const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+25' : ''}` : '';
-                            const pts = calculatePoints(m.id, player);
+                            const pts = getCachedPoints(m.id, player);
                             const ptsTag = ` <span style="background: ${isCorrect ? '#10b981' : '#e5e7eb'}; color: ${isCorrect ? 'white' : '#6b7280'}; padding: 1px 6px; border-radius: 10px; font-size: 0.82em; font-weight: 600;">${pts}p</span>`;
 
                             return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${player}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
@@ -2169,27 +2420,24 @@
                 const samePredCount = Object.values(predictions[matchId] || {})
                     .filter(p => p === playerPred).length;
 
-                if (samePredCount === 1) points = 100;
-                else if (samePredCount === 2) points = 78;
-                else if (samePredCount === 3) points = 55;
-                else if (samePredCount === 4) points = 33;
+                const totalPlayers = PLAYERS.length;
+                if (samePredCount < totalPlayers) {
+                    points = Math.round(100 * (totalPlayers - samePredCount) / (totalPlayers - 1));
+                }
             }
 
-            // Exact score bonus (+25) - only if 1X2 was also correct
-            if (points > 0 && match.actualScore && exactPredictions[matchId]?.[player]) {
+            // Exact score bonus (+50)
+            if (match.actualScore && exactPredictions[matchId]?.[player]) {
                 if (exactPredictions[matchId][player] === match.actualScore) {
-                    points += 25;
+                    points += 50;
                 }
             }
 
             return points;
         }
 
-        // RENDER LEADERBOARD
-        function renderLeaderboard() {
-            const tbody = document.getElementById('leaderboardBody');
-            if (!tbody) return;
-            
+        // Shared standings calculation (used by leaderboard and save season)
+        function getStandings() {
             const scores = PLAYERS.map(player => {
                 let totalPoints = 0;
                 let correctPreds = 0;
@@ -2199,7 +2447,7 @@
                 matches.forEach(match => {
                     if (match.actualOutcome && match.actualOutcome !== 'POSTPONED') {
                         finishedMatches++;
-                        const points = calculatePoints(match.id, player);
+                        const points = getCachedPoints(match.id, player);
                         totalPoints += points;
                         if (predictions[match.id]?.[player] === match.actualOutcome) correctPreds++;
                         if (match.actualScore && exactPredictions[match.id]?.[player] === match.actualScore && points > 0) {
@@ -2217,10 +2465,28 @@
                 };
             });
 
-            // Sort: first by points, then by exact score count as tiebreaker
             scores.sort((a, b) => {
                 if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
                 return b.bonusCount - a.bonusCount;
+            });
+
+            return scores;
+        }
+
+        // RENDER LEADERBOARD
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+            if (!tbody) return;
+
+            const scores = getStandings();
+
+            // Count season wins per player from history
+            const seasonWins = {};
+            PLAYERS.forEach(p => { seasonWins[p] = 0; });
+            seasonHistory.forEach(season => {
+                if (season.winner && seasonWins[season.winner] !== undefined) {
+                    seasonWins[season.winner]++;
+                }
             });
 
             tbody.innerHTML = scores.map((s, i) => {
@@ -2228,10 +2494,18 @@
                 const bonusDisplay = s.bonusCount > 0
                     ? `<span style="color: #667eea; font-weight: 600;">${s.bonusCount}</span>`
                     : '<span style="color: #ccc;">0</span>';
+                const wins = seasonWins[s.player] || 0;
+                let winsDisplay = '';
+                if (wins > 0) {
+                    const stars = Math.floor(wins / 5);
+                    const trophies = wins % 5;
+                    const icons = '⭐'.repeat(stars) + '🏆'.repeat(trophies);
+                    winsDisplay = ` <span style="color: #FFD700; font-size: 0.85em;" title="${wins} säsongsvinst${wins > 1 ? 'er' : ''}">${icons}</span>`;
+                }
                 return `
                     <tr>
                         <td><span class="rank ${rankClass}">${i + 1}</span></td>
-                        <td><strong>${s.player}</strong></td>
+                        <td><strong>${s.player}</strong>${winsDisplay}</td>
                         <td><strong>${s.totalPoints}</strong></td>
                         <td>${s.correctPreds}</td>
                         <td>${bonusDisplay}</td>
@@ -2281,7 +2555,7 @@
             const sniperCounts = PLAYERS.map(player => {
                 let soloCorrect = 0;
                 matches.forEach(match => {
-                    if (match.actualOutcome && calculatePoints(match.id, player) === 100) {
+                    if (match.actualOutcome && getCachedPoints(match.id, player) === 100) {
                         soloCorrect++;
                     }
                 });
@@ -2339,6 +2613,147 @@
             }
         }
 
+        // SAVE SEASON TO HISTORY
+        window.saveSeasonToHistory = async function() {
+            const nameInput = document.getElementById('seasonNameInput');
+            const seasonName = nameInput ? nameInput.value.trim() : '';
+            if (!seasonName) {
+                alert('Ange ett namn för säsongen, t.ex. "Premier League 2024-25"');
+                return;
+            }
+
+            // Calculate current standings
+            const scores = getStandings();
+
+            const winner = scores[0]?.player || '';
+            const entry = {
+                seasonName,
+                savedAt: new Date().toISOString().slice(0, 10),
+                winner,
+                matchCount: matches.filter(m => m.actualOutcome && m.actualOutcome !== 'POSTPONED').length,
+                standings: scores.map((s, i) => ({ ...s, rank: i + 1 }))
+            };
+
+            if (!confirm(`Spara säsongen "${seasonName}" till historik?\nVinnare: ${winner}`)) return;
+
+            try {
+                const historyRef = ref(database, 'seasonHistory');
+                await push(historyRef, entry);
+
+                await logActivity('SAVE_SEASON', `Sparade säsong: ${seasonName} (vinnare: ${winner})`);
+                if (nameInput) nameInput.value = '';
+                renderActivityLog();
+                alert(`✅ Säsongen "${seasonName}" sparad till historiken!\n🏆 Vinnare: ${winner}`);
+            } catch (err) {
+                console.error('Error saving season:', err);
+                alert('❌ Fel vid sparning: ' + err.message);
+            }
+        };
+
+        // RENDER HISTORY
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            if (!container) return;
+
+            if (!seasonHistory || seasonHistory.length === 0) {
+                container.innerHTML = '<div class="empty-state">Inga sparade säsonger ännu.</div>';
+                return;
+            }
+
+            // Sort newest first by savedAt
+            const sorted = [...seasonHistory].sort((a, b) => (b.savedAt || '').localeCompare(a.savedAt || ''));
+
+            container.innerHTML = sorted.map(season => {
+                const rows = (season.standings || []).map((s, i) => {
+                    const isWinner = i === 0;
+                    const winnerStar = isWinner ? ' 🏆' : '';
+                    const rankClass = i < 5 ? `rank-${i + 1}` : '';
+                    const bonusDisplay = s.bonusCount > 0
+                        ? `<span style="color: #667eea; font-weight: 600;">${s.bonusCount}</span>`
+                        : '<span style="color: #ccc;">0</span>';
+                    return `
+                        <tr>
+                            <td><span class="rank ${rankClass}">${s.rank}</span></td>
+                            <td><strong>${s.player}${winnerStar}</strong></td>
+                            <td><strong>${s.totalPoints}</strong></td>
+                            <td>${s.correctPreds}</td>
+                            <td>${bonusDisplay}</td>
+                            <td>${s.average}</td>
+                        </tr>`;
+                }).join('');
+
+                return `
+                    <div style="margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 1.1em; font-weight: 700; color: white;">🏆 ${season.seasonName}</div>
+                                <div style="font-size: 0.85em; color: rgba(255,255,255,0.8); margin-top: 3px;">Sparad: ${season.savedAt} &nbsp;·&nbsp; ${season.matchCount} matcher</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.8em; color: rgba(255,255,255,0.7);">Vinnare</div>
+                                <div style="font-size: 1.1em; font-weight: 700; color: #FFD700;">🏆 ${season.winner}</div>
+                            </div>
+                        </div>
+                        <table class="leaderboard-table" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Spelare</th>
+                                    <th>Poäng</th>
+                                    <th>Rätt</th>
+                                    <th>⭐</th>
+                                    <th>Snitt</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>`;
+            }).join('');
+        }
+
+        // PLAYER MANAGEMENT
+        function renderPlayerSelect() {
+            const select = document.getElementById('playerSelect');
+            if (!select) return;
+            const current = select.value;
+            select.innerHTML = '<option value="">Välj spelare...</option>' +
+                PLAYERS.map(p => `<option value="${p}"${p === current ? ' selected' : ''}>${p}</option>`).join('');
+        }
+
+        function renderAdminPlayers() {
+            const container = document.getElementById('adminPlayersList');
+            if (!container) return;
+            container.innerHTML = PLAYERS.map(p => `
+                <div class="admin-player-row">
+                    <span class="admin-player-name">${p}${p === 'Hefner' ? ' 👑' : ''}</span>
+                    ${p !== 'Hefner' ? `<button onclick="adminRemovePlayer('${p}')" class="admin-remove-btn">Ta bort</button>` : '<span style="font-size: 0.8em; color: #999;">Admin – kan ej tas bort</span>'}
+                </div>`).join('');
+        }
+
+        window.adminAddPlayer = async function() {
+            if (currentUser !== 'Hefner') return;
+            const input = document.getElementById('newPlayerNameInput');
+            const name = input?.value.trim();
+            if (!name) { alert('Ange ett spelarnamn.'); return; }
+            if (PLAYERS.includes(name)) { alert(`${name} finns redan.`); return; }
+            const newPlayers = [...PLAYERS, name];
+            await set(ref(database, 'players'), newPlayers);
+            await logActivity('ADD_PLAYER', `Lade till spelare: ${name}`);
+            if (input) input.value = '';
+        };
+
+        window.adminRemovePlayer = async function(playerName) {
+            if (currentUser !== 'Hefner') return;
+            if (playerName === 'Hefner') { alert('Kan inte ta bort admin.'); return; }
+            if (!confirm(`Ta bort ${playerName}?\n\nDeras tippningar och lösenord raderas.`)) return;
+            const newPlayers = PLAYERS.filter(p => p !== playerName);
+            await set(ref(database, 'players'), newPlayers);
+            const newPasswords = { ...passwords };
+            delete newPasswords[playerName];
+            await set(ref(database, 'passwords'), newPasswords);
+            await logActivity('REMOVE_PLAYER', `Tog bort spelare: ${playerName}`);
+        };
+
         // SHOW TAB
         function handleTab(e) {
             const tabName = e.target.dataset.tab;
@@ -2346,13 +2761,14 @@
 
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            
+
             document.getElementById(tabName).classList.add('active');
             e.target.classList.add('active');
 
             if (tabName === 'leaderboard') renderLeaderboard();
             if (tabName === 'predict') renderPredictions();
-            if (tabName === 'admin' && currentUser === 'Hefner') renderActivityLog();
+            if (tabName === 'historik') renderHistory();
+            if (tabName === 'admin' && currentUser === 'Hefner') { renderActivityLog(); renderAdminPlayers(); }
         }
 
         // EVENT LISTENERS
@@ -2411,6 +2827,7 @@
                 });
             }
 
+            updateRoundsVisibility();
             console.log('All event listeners set up successfully');
         });
     </script>

@@ -1,5 +1,20 @@
 # Ändringslogg
 
+## 2026-03-02 (kodoptimering #2 – buggfixar & refaktorering)
+### Buggfixar
+- **Total Reset fungerade aldrig** – bekräftelselogiken var trasig (`!confirm() !== null` är alltid true). Bytt till `prompt()`-baserad bekräftelse där man måste skriva "RESET"
+- **Bonustext visade +25 istället för +50** – UI-texten i matchvyn stämde inte med den faktiska poängberäkningen (50p). Korrigerat till ⭐+50
+- **Oanvänd variabel** – tog bort `deadlinesRef` i `adminSaveDeadline()` som skapades men aldrig användes
+
+### Prestanda
+- **Match-Map för O(1) lookups** – alla `matches.find(m => m.id === matchId)` (5+ ställen) ersatta med en `matchMap` som byggs en gång per render-cykel. Lookup går från O(n) till O(1)
+- **Cachad `getFirstMatch()`** – resultatet cachas och invalideras bara när matcher ändras från Firebase, istället för att skapa nya Date-objekt varje gång
+
+### Kodkvalitet
+- **`requireAdmin()`-helper** – admin-guarden som upprepades i 8+ funktioner är nu en delad funktion
+- **Datumformateringshelpers** – `formatDateTime()` och `formatDateTimeFull()` ersätter 7+ upprepade `toLocaleString()`-anrop
+- **XSS-skydd i `showStatus()`** – bytt från `innerHTML` till `textContent` via `createElement()` för att förhindra potentiell HTML-injektion
+
 ## 2026-03-02 (kodoptimering)
 - Debounced rendering – alla render-anrop samlas ihop till en enda DOM-uppdatering per bildruta (istället för upp till 9)
 - Extraherade duplicerad inloggningslogik till `activateSession()` (3 kopior → 1 funktion)

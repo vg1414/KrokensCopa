@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Krokens Copa – Premier League tipping game for a group of friends. Swedish-language UI. Single `index.html` with all CSS and JS embedded. No build system – open directly in browser.
 
 ## Architecture
-**Single-file app** (`index.html`, ~2835 lines). No framework, no bundler.
+**Single-file app** (`index.html`, ~3000 lines). No framework, no bundler.
 
 **Firebase Realtime Database** (hardcoded config in file) with these data paths:
 - `matches` – array of match objects (`id`, `homeTeam`, `awayTeam`, `league`, `date`, `actualOutcome`, `actualScore`, `apiMatchId`)
@@ -32,10 +32,18 @@ Krokens Copa – Premier League tipping game for a group of friends. Swedish-lan
 
 **Performance patterns:**
 - `scheduleRender()` – debounced rendering via `requestAnimationFrame`. Firebase listeners call this instead of individual render functions, so multiple data updates in the same frame only trigger one DOM update.
+- `matchMap` / `getMatch(matchId)` – O(1) match lookup map, rebuilt each render cycle in `rebuildMatchMap()`. Use `getMatch()` instead of `matches.find()`.
 - `pointsCache` / `getCachedPoints(matchId, player)` – points are calculated once per render cycle in `rebuildPointsCache()`, then read from cache. Never call `calculatePoints()` directly in render loops.
+- `cachedFirstMatch` – cached result of `getFirstMatch()`, invalidated when matches change from Firebase.
 - `getStandings()` – shared function for calculating sorted player standings. Used by both `renderLeaderboard()` and `saveSeasonToHistory()`.
 - `activateSession(player)` – shared login activation (hides login screen, shows app, sets admin tab, starts auto-fetch). Used by all three login paths.
 - `fetchResults()` groups API calls by date+competition (one call per group instead of one per match) and saves all results in a single Firebase write.
+
+**Helper functions:**
+- `requireAdmin()` – shared admin guard, returns false and shows alert if not Hefner. Use: `if (!requireAdmin()) return;`
+- `formatDateTime(dateStr)` – formats date as "3 mar. 15:30" (sv-SE locale)
+- `formatDateTimeFull(dateStr)` – same but includes seconds
+- `showStatus(message, type)` – uses `textContent` (not innerHTML) for XSS safety
 
 **Competition support:**
 - PL (Premier League) – matchday-based grouping
@@ -72,7 +80,9 @@ points = Math.round(100 * (totalPlayers - samePredCount) / (totalPlayers - 1))
 - `currentUser` – logged-in player name (string)
 - `autoFetchInterval` – auto-result fetch state
 - `passwordsLoaded` – flag to prevent login race condition
+- `matchMap` – O(1) match lookup by ID, rebuilt each render cycle
 - `pointsCache` – cached points per match/player, rebuilt each render cycle
+- `cachedFirstMatch` – cached earliest match, invalidated on match data change
 - `renderScheduled` – debounce flag for `scheduleRender()`
 
 ## Players
@@ -84,4 +94,7 @@ Dynamic list managed via Firebase `players` path. Default: `['Hefner', 'Majscht'
 - `renderAdminPlayers()` is called both from the `players` onValue listener and from `handleTab()` when admin tab is opened
 - Firebase listeners should call `scheduleRender()` instead of individual render functions
 - Use `getCachedPoints()` instead of `calculatePoints()` in render/display code
+- Use `getMatch(matchId)` instead of `matches.find(m => m.id === matchId)` for O(1) lookups
+- Use `requireAdmin()` as guard in all admin functions instead of inline checks
+- Use `formatDateTime()` / `formatDateTimeFull()` instead of inline `toLocaleString()` calls
 - Admin panel CSS uses `.admin-section`, `.admin-terminal`, `.admin-select`, `.admin-flex-row` etc. instead of inline styles

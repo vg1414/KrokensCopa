@@ -663,7 +663,37 @@
         .admin-section {
             border-radius: 10px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 12px;
+        }
+
+        .admin-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .admin-section-header h3 { margin: 0; }
+
+        .admin-chevron {
+            font-size: 0.85em;
+            color: #888;
+            transition: transform 0.2s;
+        }
+
+        .admin-collapsible {
+            overflow: hidden;
+            max-height: 3000px;
+            transition: max-height 0.3s ease, opacity 0.2s ease, margin-top 0.2s;
+            opacity: 1;
+            margin-top: 15px;
+        }
+
+        .admin-collapsible.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
         }
 
         .admin-section-blue {
@@ -989,71 +1019,58 @@
             <div class="card">
                 <h2 class="section-title">⚙️ Admin-panel (Hefner)</h2>
                 
-                <!-- Activity Log -->
-                <div style="margin-bottom: 30px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="color: #1e40af;">📊 Aktivitetslogg</h3>
-                        <button class="btn btn-secondary" onclick="refreshActivityLog()" style="padding: 8px 16px;">🔄 Uppdatera</button>
-                    </div>
-                    <div id="activityLog" class="admin-terminal">
-                        Laddar aktivitetslogg...
-                    </div>
-                </div>
-
-                <!-- Player Management -->
+                <!-- Aktivitetslogg -->
                 <div class="admin-section admin-section-blue">
-                    <h3 style="color: #1e40af; margin-bottom: 15px;">👥 Hantera spelare</h3>
-                    <div id="adminPlayersList" style="margin-bottom: 15px;"></div>
-                    <div class="admin-flex-row">
-                        <input type="text" id="newPlayerNameInput" placeholder="Nytt spelarnamn"
-                            class="admin-input" style="border: 2px solid #3b82f6;">
-                        <button class="btn" onclick="adminAddPlayer()" style="background: #3b82f6;">
-                            ➕ Lägg till
-                        </button>
+                    <div class="admin-section-header" onclick="adminToggleSection('sec-log')">
+                        <h3 style="color: #1e40af;">📊 Aktivitetslogg</h3>
+                        <span id="chevron-sec-log" class="admin-chevron" style="transform: rotate(90deg);">▶</span>
+                    </div>
+                    <div id="sec-log" class="admin-collapsible">
+                        <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                            <button class="btn btn-secondary" onclick="refreshActivityLog()" style="padding: 8px 16px;">🔄 Uppdatera</button>
+                        </div>
+                        <div id="activityLog" class="admin-terminal">Laddar aktivitetslogg...</div>
                     </div>
                 </div>
 
-                <!-- API Configuration -->
-                <div class="admin-section admin-section-green">
-                    <h3 style="color: #15803d;">⚽ Auto-rättning</h3>
-                    <p>
-                        Hämtar automatiskt PL-resultat från football-data.org API. Aktivera för att slippa sätta resultat manuellt.
-                    </p>
-                    <div class="admin-flex-row">
-                        <button class="btn btn-secondary" onclick="manualFetchResults()">🔄 Hämta resultat nu</button>
+                <!-- Hantera spelare -->
+                <div class="admin-section admin-section-blue">
+                    <div class="admin-section-header" onclick="adminToggleSection('sec-players')">
+                        <h3 style="color: #1e40af;">👥 Hantera spelare</h3>
+                        <span id="chevron-sec-players" class="admin-chevron">▶</span>
                     </div>
-                    <div id="fetchLog" class="admin-terminal admin-terminal-small"></div>
-                </div>
-
-                <!-- Spara säsong till historik -->
-                <div class="admin-section admin-section-green">
-                    <h3 style="color: #15803d;">📜 Spara säsong till historik</h3>
-                    <p>
-                        Sparar den aktuella tabellen permanent i Historik-fliken. Gör detta <strong>innan</strong> du nollställer inför ny omgång!
-                    </p>
-                    <div class="admin-flex-row">
-                        <input type="text" id="seasonNameInput" placeholder='T.ex. Premier League 2024-25'
-                            class="admin-input" style="border: 2px solid #22c55e; min-width: 200px;">
-                        <button class="btn btn-success" onclick="saveSeasonToHistory()">
-                            📜 Spara till historik
-                        </button>
+                    <div id="sec-players" class="admin-collapsible collapsed">
+                        <div id="adminPlayersList" style="margin-bottom: 15px;"></div>
+                        <div class="admin-flex-row">
+                            <input type="text" id="newPlayerNameInput" placeholder="Nytt spelarnamn"
+                                class="admin-input" style="border: 2px solid #3b82f6;">
+                            <button class="btn" onclick="adminAddPlayer()" style="background: #3b82f6;">➕ Lägg till</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="admin-section admin-section-red">
-                    <h3 style="color: #ef4444;">⚠️ Farliga åtgärder</h3>
-                    <p>Dessa knappar påverkar ALLA spelare. Var försiktig!</p>
+                <!-- Spelstopp -->
+                <div class="admin-section admin-section-blue">
+                    <div class="admin-section-header" onclick="adminToggleSection('sec-deadlines')">
+                        <h3 style="color: #1e40af;">⏰ Spelstopp</h3>
+                        <span id="chevron-sec-deadlines" class="admin-chevron">▶</span>
+                    </div>
+                    <div id="sec-deadlines" class="admin-collapsible collapsed">
+                        <p style="color: #555; font-size: 0.9em; margin-bottom: 15px;">Sätt datum och tid för när tippning stänger per liga/omgång. Lämna utan spelstopp = alltid öppen.</p>
+                        <div id="adminDeadlinesList"></div>
+                    </div>
                 </div>
 
-                <div style="display: grid; gap: 20px;">
-                    <!-- Load Matches -->
-                    <div class="admin-subsection" style="background: #f0f9ff;">
-                        <h3 style="color: #1e40af;">🔄 Ladda in matcher</h3>
-                        <p style="color: #666; margin-bottom: 10px; font-size: 0.9em;">
-                            Hämtar kommande omgångar från vald liga via API. Välj liga och hur många omgångar som ska tippas samtidigt.
-                        </p>
+                <!-- Ladda matcher -->
+                <div class="admin-section admin-section-blue">
+                    <div class="admin-section-header" onclick="adminToggleSection('sec-load')">
+                        <h3 style="color: #1e40af;">📥 Ladda in matcher</h3>
+                        <span id="chevron-sec-load" class="admin-chevron">▶</span>
+                    </div>
+                    <div id="sec-load" class="admin-collapsible collapsed">
+                        <p style="color: #666; margin-bottom: 10px; font-size: 0.9em;">Hämtar kommande omgångar från vald liga via API.</p>
                         <p style="color: #f59e0b; margin-bottom: 15px; font-size: 0.85em; background: #fef3c7; padding: 8px; border-radius: 5px;">
-                            ℹ️ Använder CORS proxy (corsproxy.io) för att nå API:et. Om det inte fungerar, prova igen om några minuter.
+                            ℹ️ Använder CORS proxy (corsproxy.io). Om det inte fungerar, prova igen om några minuter.
                         </p>
                         <div class="admin-flex-row" style="margin-bottom: 10px;">
                             <label for="competitionSelect" class="admin-label">Liga:</label>
@@ -1097,46 +1114,70 @@
                                 <option value="6">6 omgångar</option>
                             </select>
                         </div>
-                        <button class="btn btn-success" onclick="adminLoadMatches()">
-                            📥 Hämta valda omgångar
-                        </button>
-                    </div>
-
-                    <!-- Reset Predictions -->
-                    <div class="admin-subsection admin-subsection-red">
-                        <h3 style="color: #dc2626;">🗑️ Nollställ tippningar</h3>
-                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
-                            Raderar ALLA spelares tippningar. Matcher och resultat behålls. Alla kan börja tippa från början.
-                        </p>
-                        <button class="btn" style="background: #ef4444;" onclick="adminResetPredictions()">
-                            🗑️ Nollställ ALLA tippningar
-                        </button>
-                    </div>
-
-                    <!-- Reset Results -->
-                    <div class="admin-subsection admin-subsection-red">
-                        <h3 style="color: #dc2626;">🔄 Nollställ resultat</h3>
-                        <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">
-                            Raderar alla matchresultat. Tippningar behålls. Bra om fel resultat satts.
-                        </p>
-                        <button class="btn" style="background: #ef4444;" onclick="adminResetResults()">
-                            🔄 Nollställ alla resultat
-                        </button>
-                    </div>
-
-                    <!-- Full Reset -->
-                    <div class="admin-subsection admin-section-danger">
-                        <h3 style="color: #fca5a5;">💣 TOTAL RESET</h3>
-                        <p style="color: #fca5a5; margin-bottom: 15px; font-size: 0.9em;">
-                            Raderar ALLT: matcher, tippningar, resultat. Börja om från scratch. (Lösenord och historik behålls)
-                        </p>
-                        <button class="btn" style="background: #7f1d1d; color: white;" onclick="adminFullReset()">
-                            💣 TOTAL RESET - Radera allt
-                        </button>
+                        <button class="btn btn-success" onclick="adminLoadMatches()">📥 Hämta valda omgångar</button>
                     </div>
                 </div>
 
-                <div id="adminOutput" class="admin-terminal" style="margin-top: 30px; max-height: 300px; display: none;"></div>
+                <!-- Auto-rättning -->
+                <div class="admin-section admin-section-green">
+                    <div class="admin-section-header" onclick="adminToggleSection('sec-fetch')">
+                        <h3 style="color: #15803d;">⚽ Auto-rättning</h3>
+                        <span id="chevron-sec-fetch" class="admin-chevron">▶</span>
+                    </div>
+                    <div id="sec-fetch" class="admin-collapsible collapsed">
+                        <p>Hämtar automatiskt resultat från API. Aktivera för att slippa sätta resultat manuellt.</p>
+                        <div class="admin-flex-row">
+                            <button class="btn btn-secondary" onclick="manualFetchResults()">🔄 Hämta resultat nu</button>
+                        </div>
+                        <div id="fetchLog" class="admin-terminal admin-terminal-small"></div>
+                    </div>
+                </div>
+
+                <!-- Spara säsong -->
+                <div class="admin-section admin-section-green">
+                    <div class="admin-section-header" onclick="adminToggleSection('sec-season')">
+                        <h3 style="color: #15803d;">📜 Spara säsong till historik</h3>
+                        <span id="chevron-sec-season" class="admin-chevron">▶</span>
+                    </div>
+                    <div id="sec-season" class="admin-collapsible collapsed">
+                        <p>Sparar den aktuella tabellen permanent i Historik-fliken. Gör detta <strong>innan</strong> du nollställer inför ny omgång!</p>
+                        <div class="admin-flex-row">
+                            <input type="text" id="seasonNameInput" placeholder="T.ex. Premier League 2024-25"
+                                class="admin-input" style="border: 2px solid #22c55e; min-width: 200px;">
+                            <button class="btn btn-success" onclick="saveSeasonToHistory()">📜 Spara till historik</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Farliga åtgärder -->
+                <div class="admin-section admin-section-red">
+                    <div class="admin-section-header" onclick="adminToggleSection('sec-danger')">
+                        <h3 style="color: #ef4444;">⚠️ Farliga åtgärder</h3>
+                        <span id="chevron-sec-danger" class="admin-chevron">▶</span>
+                    </div>
+                    <div id="sec-danger" class="admin-collapsible collapsed">
+                        <p style="margin-bottom: 20px;">Dessa knappar påverkar ALLA spelare. Var försiktig!</p>
+                        <div style="display: grid; gap: 15px;">
+                            <div class="admin-subsection" style="background: #f0f9ff;">
+                                <h3 style="color: #1e40af;">🗑️ Nollställ tippningar</h3>
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Raderar ALLA spelares tippningar. Matcher och resultat behålls.</p>
+                                <button class="btn" style="background: #ef4444;" onclick="adminResetPredictions()">🗑️ Nollställ ALLA tippningar</button>
+                            </div>
+                            <div class="admin-subsection admin-subsection-red">
+                                <h3 style="color: #dc2626;">🔄 Nollställ resultat</h3>
+                                <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Raderar alla matchresultat. Tippningar behålls.</p>
+                                <button class="btn" style="background: #ef4444;" onclick="adminResetResults()">🔄 Nollställ alla resultat</button>
+                            </div>
+                            <div class="admin-subsection admin-section-danger">
+                                <h3 style="color: #fca5a5;">💣 TOTAL RESET</h3>
+                                <p style="color: #fca5a5; margin-bottom: 15px; font-size: 0.9em;">Raderar ALLT: matcher, tippningar, resultat. (Lösenord och historik behålls)</p>
+                                <button class="btn" style="background: #7f1d1d; color: white;" onclick="adminFullReset()">💣 TOTAL RESET - Radera allt</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="adminOutput" class="admin-terminal" style="margin-top: 20px; max-height: 300px; display: none;"></div>
             </div>
         </div>
     </div>
@@ -1167,6 +1208,7 @@
         let passwords = {};
         let activityLog = [];
         let seasonHistory = [];
+        let deadlines = {};
         let activityLogLoaded = false;
         let passwordsLoaded = false;
         let currentUser = null;
@@ -1206,6 +1248,19 @@
             localStorage.removeItem('krokens_session');
         }
         
+        // Date formatting helpers
+        function formatDateTime(dateStr) {
+            return new Date(dateStr).toLocaleString('sv-SE', {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function formatDateTimeFull(dateStr) {
+            return new Date(dateStr).toLocaleString('sv-SE', {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
         // Activity logging
         async function logActivity(action, details = '') {
             // Don't log if we haven't loaded the activity log yet
@@ -1235,6 +1290,16 @@
             }
         }
 
+        // Match lookup map – rebuilt each render cycle for O(1) lookups
+        let matchMap = {};
+        function rebuildMatchMap() {
+            matchMap = {};
+            matches.forEach(match => { matchMap[match.id] = match; });
+        }
+        function getMatch(matchId) {
+            return matchMap[matchId] || matches.find(m => m.id === matchId);
+        }
+
         // Points cache – recalculated once per render cycle
         let pointsCache = {};
         function rebuildPointsCache() {
@@ -1259,6 +1324,7 @@
             renderScheduled = true;
             requestAnimationFrame(() => {
                 renderScheduled = false;
+                rebuildMatchMap();
                 rebuildPointsCache();
                 renderMatches();
                 renderPredictions();
@@ -1293,7 +1359,11 @@
         function showStatus(message, type = 'info') {
             const container = document.getElementById('statusContainer');
             if (container) {
-                container.innerHTML = `<div class="status status-${type}">${message}</div>`;
+                const div = document.createElement('div');
+                div.className = `status status-${type}`;
+                div.textContent = message;
+                container.innerHTML = '';
+                container.appendChild(div);
                 setTimeout(() => { container.innerHTML = ''; }, 4000);
             }
         }
@@ -1304,11 +1374,14 @@
             return now >= matchTime;
         }
 
+        let cachedFirstMatch = null;
         function getFirstMatch() {
             if (!matches || matches.length === 0) return null;
-            return matches.reduce((earliest, m) =>
+            if (cachedFirstMatch) return cachedFirstMatch;
+            cachedFirstMatch = matches.reduce((earliest, m) =>
                 new Date(m.date) < new Date(earliest.date) ? m : earliest
             );
+            return cachedFirstMatch;
         }
 
         function isFirstMatchStarted() {
@@ -1330,6 +1403,7 @@
                 const data = snapshot.val();
                 if (data) {
                     matches = Array.isArray(data) ? data : Object.values(data);
+                    cachedFirstMatch = null; // Invalidera cache
                     console.log('Matches loaded:', matches.length);
                     scheduleRender();
                 }
@@ -1370,8 +1444,7 @@
             onValue(lastFetchRef, (snapshot) => {
                 const ts = snapshot.val();
                 if (ts) {
-                    const time = new Date(ts).toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    updateLastFetchStatus(`🔄 Senast hämtat: ${time}`);
+                    updateLastFetchStatus(`🔄 Senast hämtat: ${formatDateTime(ts)}`);
                 } else {
                     updateLastFetchStatus('🔄 Ej hämtat ännu');
                 }
@@ -1398,6 +1471,13 @@
                 }
                 scheduleRender();
                 renderHistory();
+            });
+
+            const deadlinesRef = ref(database, 'deadlines');
+            onValue(deadlinesRef, (snapshot) => {
+                deadlines = snapshot.val() || {};
+                scheduleRender();
+                if (currentUser === 'Hefner') renderAdminDeadlines();
             });
 
             const activityLogRef = ref(database, 'activityLog');
@@ -1514,6 +1594,14 @@
         }
 
         // ADMIN FUNCTIONS (Hefner only)
+        function requireAdmin() {
+            if (currentUser !== 'Hefner') {
+                alert('⛔ Endast Hefner kan använda admin-funktioner!');
+                return false;
+            }
+            return true;
+        }
+
         function adminLog(msg, type = 'info') {
             const output = document.getElementById('adminOutput');
             if (!output) return;
@@ -1549,11 +1637,37 @@
             'FINAL': 'Final'
         };
 
+        const DEADLINE_LABELS = {
+            'PL': 'Premier League',
+            'CL_LEAGUE_PHASE': 'CL – Ligafas',
+            'CL_KNOCKOUT_ROUND_PLAY_OFF': 'CL – Playoff',
+            'CL_LAST_16': 'CL – Åttondelsfinaler',
+            'CL_ROUND_OF_16': 'CL – Åttondelsfinaler',
+            'CL_QUARTER_FINALS': 'CL – Kvartsfinaler',
+            'CL_SEMI_FINALS': 'CL – Semifinaler',
+            'CL_FINAL': 'CL – Final',
+            'WC': 'VM'
+        };
+
+        function getDeadlineKey(match) {
+            const comp = match.competition || (
+                match.id.startsWith('pl_') ? 'PL' :
+                match.id.startsWith('wc_') ? 'WC' : 'CL'
+            );
+            if (comp === 'PL') return 'PL';
+            if (comp === 'WC') return 'WC';
+            return match.stage ? `CL_${match.stage}` : 'CL';
+        }
+
+        function isMatchLocked(match) {
+            const key = getDeadlineKey(match);
+            const deadline = deadlines[key];
+            if (!deadline) return false;
+            return new Date() >= new Date(deadline);
+        }
+
         window.adminLoadMatches = async function() {
-            if (currentUser !== 'Hefner') {
-                alert('⛔ Endast Hefner kan använda admin-funktioner!');
-                return;
-            }
+            if (!requireAdmin()) return;
 
             const competition = document.getElementById('competitionSelect')?.value || 'PL';
             const plRoundsToLoad = parseInt(document.getElementById('plRoundsToLoad')?.value || 2);
@@ -1625,7 +1739,9 @@
                             date: `${dp.year}-${dp.month}-${dp.day}T${dp.hour}:${dp.minute}`,
                             actualOutcome: null,
                             actualScore: null,
-                            apiMatchId: m.id
+                            apiMatchId: m.id,
+                            competition: code,
+                            stage: m.stage || null
                         });
                     });
                 });
@@ -1691,10 +1807,7 @@
         };
 
         window.adminResetPredictions = async function() {
-            if (currentUser !== 'Hefner') {
-                alert('⛔ Endast Hefner kan använda admin-funktioner!');
-                return;
-            }
+            if (!requireAdmin()) return;
             
             if (!confirm('⚠️ NOLLSTÄLL ALLA TIPPNINGAR?\n\nDetta raderar alla spelares tippningar!\nMatcher och resultat behålls.\n\nFortsätta?')) return;
             if (!confirm('⚠️ SISTA VARNINGEN!\n\nAlla tippningar raderas permanent!\n\nÄr du HELT säker?')) return;
@@ -1716,10 +1829,7 @@
         };
 
         window.adminResetResults = async function() {
-            if (currentUser !== 'Hefner') {
-                alert('⛔ Endast Hefner kan använda admin-funktioner!');
-                return;
-            }
+            if (!requireAdmin()) return;
             
             if (!confirm('⚠️ NOLLSTÄLL ALLA RESULTAT?\n\nDetta raderar alla matchresultat!\nTippningar behålls.\n\nFortsätta?')) return;
             
@@ -1744,14 +1854,12 @@
         };
 
         window.adminFullReset = async function() {
-            if (currentUser !== 'Hefner') {
-                alert('⛔ Endast Hefner kan använda admin-funktioner!');
-                return;
-            }
+            if (!requireAdmin()) return;
             
             if (!confirm('💣 TOTAL RESET?\n\nDetta raderar:\n- Alla matcher\n- Alla tippningar\n- Alla resultat\n\nLösenord och historik behålls.\n\nFortsätta?')) return;
             if (!confirm('💣💣💣 SISTA VARNINGEN! 💣💣💣\n\nALLT kommer raderas!\n\nÄr du 100% säker?')) return;
-            if (!confirm('Skriv OK för att bekräfta total reset (detta kan inte ångras!)') !== null) return;
+            const resetConfirm = prompt('Skriv RESET för att bekräfta total reset (detta kan inte ångras!):');
+            if (resetConfirm !== 'RESET') { alert('Avbrutet – du skrev inte RESET.'); return; }
             
             adminLog('💣 TOTAL RESET påbörjad...', 'error');
             try {
@@ -1818,14 +1926,7 @@
             // Reverse so oldest is first, newest is last (bottom)
             const reversedLog = [...activityLog].reverse();
             reversedLog.forEach((entry, index) => {
-                const date = new Date(entry.timestamp);
-                const timeStr = date.toLocaleString('sv-SE', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+                const timeStr = formatDateTimeFull(entry.timestamp);
                 
                 const icon = actionIcons[entry.action] || '📌';
                 const color = actionColors[entry.action] || '#10b981';
@@ -1841,10 +1942,7 @@
         }
         
         window.refreshActivityLog = function() {
-            if (currentUser !== 'Hefner') {
-                alert('⛔ Endast Hefner kan se aktivitetsloggen!');
-                return;
-            }
+            if (!requireAdmin()) return;
             renderActivityLog();
         };
 
@@ -1896,8 +1994,7 @@
 
             if (pendingMatches.length === 0) {
                 fetchLog('ℹ️ Inga matcher att kolla just nu', 'info');
-                const time = new Date().toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                updateLastFetchStatus(`🔄 Senast hämtat: ${time}`);
+                updateLastFetchStatus(`🔄 Senast hämtat: ${formatDateTime(new Date().toISOString())}`);
                 try { await set(ref(database, 'lastAutoFetch'), new Date().toISOString()); } catch (e) {}
                 return;
             }
@@ -1998,14 +2095,13 @@
             }
 
             fetchLog(`✅ Klar! ${foundResults} nya resultat av ${pendingMatches.length} kollade`, 'success');
-            const time = new Date().toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-            updateLastFetchStatus(`🔄 Senast hämtat: ${time}`);
+            updateLastFetchStatus(`🔄 Senast hämtat: ${formatDateTime(new Date().toISOString())}`);
             try { await set(ref(database, 'lastAutoFetch'), new Date().toISOString()); } catch (e) {}
         }
 
         // RESULT MODAL (Anyone can use after match starts)
         window.openResultModal = function(matchId) {
-            const match = matches.find(m => m.id === matchId);
+            const match = getMatch(matchId);
             if (!match) return;
 
             currentModalMatchId = matchId;
@@ -2128,10 +2224,8 @@
             }
 
             list.innerHTML = matches.map(m => {
-                const dateStr = new Date(m.date).toLocaleString('sv-SE', {
-                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-                
+                const dateStr = formatDateTime(m.date);
+
                 const started = isMatchStarted(m.date);
                 const scoreStr = m.actualScore ? ` (${m.actualScore})` : '';
                 const outcomeText = {
@@ -2200,7 +2294,7 @@
                             const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
                             const icon = isCorrect ? '✅' : '❌';
                             const color = isCorrect ? '#10b981' : '#ef4444';
-                            const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+25' : ''}` : '';
+                            const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+50' : ''}` : '';
                             const pts = getCachedPoints(m.id, player);
                             const ptsTag = ` <span style="background: ${isCorrect ? '#10b981' : '#e5e7eb'}; color: ${isCorrect ? 'white' : '#6b7280'}; padding: 1px 6px; border-radius: 10px; font-size: 0.82em; font-weight: 600;">${pts}p</span>`;
 
@@ -2247,30 +2341,20 @@
                 return;
             }
 
-            const tippingClosed = isFirstMatchStarted();
-            const firstMatch = getFirstMatch();
+            // Group matches by deadline key
+            const groups = {};
+            const groupOrder = [];
+            matches.forEach(m => {
+                const key = getDeadlineKey(m);
+                if (!groups[key]) { groups[key] = []; groupOrder.push(key); }
+                groups[key].push(m);
+            });
 
-            let deadlineBanner = '';
-            if (!tippingClosed && firstMatch) {
-                const deadlineStr = new Date(firstMatch.date).toLocaleString('sv-SE', {
-                    weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-                deadlineBanner = `<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #92400e; font-weight: 600; text-align: center;">
-                    ⏰ Tippa klart innan <span style="color: #b45309;">${deadlineStr}</span> – då stänger tippningen för ALLA matcher!
-                </div>`;
-            } else if (tippingClosed) {
-                deadlineBanner = `<div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #991b1b; font-weight: 700; text-align: center; font-size: 1.1em;">
-                    🔒 Tippning stängd – inga ändringar tillåtna
-                </div>`;
-            }
-
-            list.innerHTML = deadlineBanner + matches.map(m => {
+            function renderMatchCard(m, locked) {
                 const myPred = predictions[m.id]?.[currentUser];
                 const myExact = exactPredictions[m.id]?.[currentUser];
                 const matchActuallyStarted = isMatchStarted(m.date);
-                const dateStr = new Date(m.date).toLocaleString('sv-SE', {
-                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
+                const dateStr = formatDateTime(m.date);
 
                 let predictionsHtml = '';
                 if (matchActuallyStarted) {
@@ -2297,11 +2381,11 @@
                 }
 
                 return `
-                    <div class="prediction-match ${tippingClosed ? 'locked' : ''}">
+                    <div class="prediction-match ${locked ? 'locked' : ''}">
                         <div style="text-align: center; color: #666; font-size: 0.8em; margin-bottom: 10px;">
                             ${m.league} • ${dateStr}
                         </div>
-                        ${tippingClosed ? `
+                        ${locked ? `
                             <div style="text-align: center; font-size: 1.1em; font-weight: 700; color: #333; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
                                 ${m.homeTeam} <span style="color: #667eea;">vs</span> ${m.awayTeam}
                             </div>
@@ -2342,7 +2426,32 @@
                         `}
                     </div>
                 `;
-            }).join('');
+            }
+
+            let html = '';
+            groupOrder.forEach(key => {
+                const groupMatches = groups[key];
+                const deadline = deadlines[key];
+                const isLocked = deadline && new Date() >= new Date(deadline);
+                const label = DEADLINE_LABELS[key] || key;
+
+                if (isLocked) {
+                    html += `<div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #991b1b; font-weight: 700; text-align: center; font-size: 1.05em;">
+                        🔒 Tippning stängd – ${label}
+                    </div>`;
+                } else if (deadline) {
+                    const deadlineStr = new Date(deadline).toLocaleString('sv-SE', {
+                        weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                    html += `<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #92400e; font-weight: 600; text-align: center;">
+                        ⏰ <strong>${label}</strong> – Tippa klart innan <span style="color: #b45309;">${deadlineStr}</span>
+                    </div>`;
+                }
+
+                html += groupMatches.map(m => renderMatchCard(m, isLocked)).join('');
+            });
+
+            list.innerHTML = html;
         }
 
         // Live-uppdatering av 1X2-label när man skriver in siffror
@@ -2350,7 +2459,7 @@
             const homeVal = document.getElementById(`exact-home-${matchId}`)?.value;
             const awayVal = document.getElementById(`exact-away-${matchId}`)?.value;
             const label = document.getElementById(`prediction-label-${matchId}`);
-            const match = matches.find(m => m.id === matchId);
+            const match = getMatch(matchId);
             if (!label || !match) return;
 
             if (homeVal === '' || awayVal === '') {
@@ -2369,9 +2478,9 @@
         window.saveScorePrediction = async function(matchId) {
             if (!currentUser) { alert('Du måste vara inloggad!'); return; }
 
-            const match = matches.find(m => m.id === matchId);
-            if (isFirstMatchStarted()) {
-                alert('Tippningen är stängd! Första matchen har redan startat – inga ändringar tillåtna.');
+            const match = getMatch(matchId);
+            if (isMatchLocked(match)) {
+                alert('Tippningen är stängd för denna omgång – inga ändringar tillåtna.');
                 return;
             }
 
@@ -2406,7 +2515,7 @@
             }
         };
         function calculatePoints(matchId, player) {
-            const match = matches.find(m => m.id === matchId);
+            const match = getMatch(matchId);
             if (!match || !match.actualOutcome) return 0;
             
             // If match is postponed, everyone gets 0 points
@@ -2720,6 +2829,19 @@
                 PLAYERS.map(p => `<option value="${p}"${p === current ? ' selected' : ''}>${p}</option>`).join('');
         }
 
+        window.adminToggleSection = function(id) {
+            const content = document.getElementById(id);
+            const chevron = document.getElementById('chevron-' + id);
+            if (!content) return;
+            const collapsed = content.classList.toggle('collapsed');
+            if (chevron) chevron.style.transform = collapsed ? '' : 'rotate(90deg)';
+            if (!collapsed) {
+                if (id === 'sec-log') renderActivityLog();
+                if (id === 'sec-players') renderAdminPlayers();
+                if (id === 'sec-deadlines') renderAdminDeadlines();
+            }
+        };
+
         function renderAdminPlayers() {
             const container = document.getElementById('adminPlayersList');
             if (!container) return;
@@ -2730,8 +2852,63 @@
                 </div>`).join('');
         }
 
+        function renderAdminDeadlines() {
+            const container = document.getElementById('adminDeadlinesList');
+            if (!container) return;
+
+            const keysInMatches = new Set(matches.map(getDeadlineKey));
+            const activeKeys = Object.keys(DEADLINE_LABELS);
+
+            // Find the latest set deadline as suggestion for empty inputs
+            const setDeadlines = Object.values(deadlines).filter(Boolean);
+            const suggestion = setDeadlines.length > 0 ? setDeadlines.sort().at(-1) : '';
+
+            container.innerHTML = activeKeys.map(key => {
+                const label = DEADLINE_LABELS[key];
+                const current = deadlines[key] || '';
+                const inputValue = current || suggestion;
+                const isLocked = current && new Date() >= new Date(current);
+                const statusColor = isLocked ? '#dc2626' : current ? '#15803d' : '#888';
+                const statusText = isLocked ? '🔒 Stängt' : current ? '✅ Aktivt' : '⭕ Ej satt';
+                return `
+                    <div style="background: white; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; border: 1px solid #dbeafe;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                            <strong style="color: #1e40af;">${label}</strong>
+                            <span style="font-size: 0.82em; color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                        </div>
+                        <div class="admin-flex-row">
+                            <input type="datetime-local" id="deadline-input-${key}"
+                                value="${inputValue}"
+                                class="admin-input" style="border: 1px solid #93c5fd; flex: 1;">
+                            <button class="btn" onclick="adminSaveDeadline('${key}')" style="background: #3b82f6; padding: 8px 14px; font-size: 0.85em;">Spara</button>
+                            ${current ? `<button class="btn" onclick="adminClearDeadline('${key}')" style="background: #9ca3af; padding: 8px 14px; font-size: 0.85em;">Ta bort</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.adminSaveDeadline = async function(key) {
+            if (!requireAdmin()) return;
+            const input = document.getElementById(`deadline-input-${key}`);
+            const value = input?.value;
+            if (!value) { alert('Välj datum och tid.'); return; }
+            await set(ref(database, `deadlines/${key}`), value);
+            await logActivity('SET_DEADLINE', `Spelstopp satt: ${DEADLINE_LABELS[key] || key} → ${value}`);
+            renderAdminDeadlines();
+            alert(`✅ Spelstopp sparat för ${DEADLINE_LABELS[key] || key}`);
+        };
+
+        window.adminClearDeadline = async function(key) {
+            if (!requireAdmin()) return;
+            if (!confirm(`Ta bort spelstopp för ${DEADLINE_LABELS[key] || key}?`)) return;
+            await set(ref(database, `deadlines/${key}`), null);
+            await logActivity('CLEAR_DEADLINE', `Spelstopp borttaget: ${DEADLINE_LABELS[key] || key}`);
+            renderAdminDeadlines();
+        };
+
         window.adminAddPlayer = async function() {
-            if (currentUser !== 'Hefner') return;
+            if (!requireAdmin()) return;
             const input = document.getElementById('newPlayerNameInput');
             const name = input?.value.trim();
             if (!name) { alert('Ange ett spelarnamn.'); return; }
@@ -2743,7 +2920,7 @@
         };
 
         window.adminRemovePlayer = async function(playerName) {
-            if (currentUser !== 'Hefner') return;
+            if (!requireAdmin()) return;
             if (playerName === 'Hefner') { alert('Kan inte ta bort admin.'); return; }
             if (!confirm(`Ta bort ${playerName}?\n\nDeras tippningar och lösenord raderas.`)) return;
             const newPlayers = PLAYERS.filter(p => p !== playerName);
@@ -2768,7 +2945,7 @@
             if (tabName === 'leaderboard') renderLeaderboard();
             if (tabName === 'predict') renderPredictions();
             if (tabName === 'historik') renderHistory();
-            if (tabName === 'admin' && currentUser === 'Hefner') { renderActivityLog(); renderAdminPlayers(); }
+            if (tabName === 'admin' && currentUser === 'Hefner') { /* sections render on expand */ }
         }
 
         // EVENT LISTENERS

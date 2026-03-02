@@ -1,5 +1,9 @@
 # Ändringslogg
 
+## 2026-03-02 (mobilfix: synliga tippningar & Historik-flik)
+- Andras tippningar i Matcher-fliken visas nu bara när deadline passerat (inte längre när enskild match startat)
+- Flikmenyn på mobil är nu horisontellt scrollbar – alla flikar syns och kan nås med svep
+
 ## 2026-03-02 (dölj tips tills tippning stängd)
 - Andras tips visas inte längre medan tippning är öppen – man ser bara om folk tippat, inte vad
 - Tips avslöjas först när deadline passerat eller matchen startat (gäller båda Matcher- och Tips-fliken)

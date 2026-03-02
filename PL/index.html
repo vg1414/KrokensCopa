@@ -416,6 +416,16 @@
             color: #667eea;
         }
 
+        .leaderboard-table-sm th,
+        .leaderboard-table-sm td {
+            padding: 9px 12px;
+            font-size: 0.9em;
+        }
+
+        .leaderboard-table-sm .rank {
+            font-size: 1.1em;
+        }
+
         .rank {
             font-size: 1.5em;
             font-weight: bold;
@@ -943,6 +953,38 @@
                         </div>
                     </div>
 
+                    <!-- Ligans Nostradamus-tabell -->
+                    <div id="nostradamusTableSection" style="margin-top: 25px; display: none;">
+                        <h3 style="font-size: 1em; font-weight: 700; color: #0ea5e9; margin: 0 0 10px 0;">🔮 Ligans Nostradamus</h3>
+                        <p style="font-size: 0.82em; color: #888; margin: 0 0 10px 0;">Antal korrekta exakta resultat (t.ex. 2–1)</p>
+                        <table class="leaderboard-table leaderboard-table-sm">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Spelare</th>
+                                    <th>Exakta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="nostradamusTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Ligans Sniper-tabell -->
+                    <div id="sniperTableSection" style="margin-top: 20px; display: none;">
+                        <h3 style="font-size: 1em; font-weight: 700; color: #8B5CF6; margin: 0 0 10px 0;">🎯 Ligans Sniper</h3>
+                        <p style="font-size: 0.82em; color: #888; margin: 0 0 10px 0;">Antal gånger man var ensam om att gissa rätt 1X2</p>
+                        <table class="leaderboard-table leaderboard-table-sm">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Spelare</th>
+                                    <th>Solo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sniperTableBody"></tbody>
+                        </table>
+                    </div>
+
                     <!-- Special titles for bottom positions -->
                     <div id="specialTitles" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
                         <div style="display: grid; gap: 15px;">
@@ -1261,6 +1303,17 @@
             localStorage.removeItem('krokens_session');
         }
         
+        // Returns trophy/star HTML for a player based on season wins
+        function getPlayerTrophyHTML(player) {
+            let wins = 0;
+            (seasonHistory || []).forEach(s => { if (s.winner === player) wins++; });
+            if (wins === 0) return '';
+            const stars = Math.floor(wins / 5);
+            const trophies = wins % 5;
+            const icons = '⭐'.repeat(stars) + '🏆'.repeat(trophies);
+            return `<span style="color: #FFD700; font-size: 0.8em;" title="${wins} säsongsvinst${wins > 1 ? 'er' : ''}">${icons}</span>`;
+        }
+
         // Date formatting helpers
         function formatDateTime(dateStr) {
             return new Date(dateStr).toLocaleString('sv-SE', {
@@ -2269,23 +2322,27 @@
                         allPlayers.forEach(function(player) {
                             const pred = matchPredictions[player];
                             const exact = matchExactPreds[player];
+                            const trophy = getPlayerTrophyHTML(player);
+                            const pName = player + (trophy ? ' ' + trophy : '');
                             if (!pred) {
-                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">❌ ' + player + ': Tippade inte</div>';
+                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">❌ ' + pName + ': Tippade inte</div>';
                             } else {
                                 const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
                                 const scoreDisplay = exact
                                     ? '<strong>' + exact.replace('-', ' \u2013 ') + '</strong> <span style="color: #888; font-size: 0.85em;">(' + label + ')</span>'
                                     : '<strong>' + label + '</strong>';
-                                predsHtml += '<div style="color: #333; padding: 3px 0;">🎯 ' + player + ': ' + scoreDisplay + '</div>';
+                                predsHtml += '<div style="color: #333; padding: 3px 0;">🎯 ' + pName + ': ' + scoreDisplay + '</div>';
                             }
                         });
                     } else {
                         // Tippning öppen – visa bara vem som tippat, inte vad
                         allPlayers.forEach(function(player) {
+                            const trophy = getPlayerTrophyHTML(player);
+                            const pName = player + (trophy ? ' ' + trophy : '');
                             if (matchPredictions[player]) {
-                                predsHtml += '<div style="color: #059669; padding: 3px 0;">✅ ' + player + ': Har tippat</div>';
+                                predsHtml += '<div style="color: #059669; padding: 3px 0;">✅ ' + pName + ': Har tippat</div>';
                             } else {
-                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">⏳ ' + player + ': Har inte tippat än</div>';
+                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">⏳ ' + pName + ': Har inte tippat än</div>';
                             }
                         });
                     }
@@ -2305,17 +2362,19 @@
                                 'X': 'Oavgjort',
                                 '2': m.awayTeam
                             };
-                            
+                            const trophy = getPlayerTrophyHTML(player);
+                            const pName = player + (trophy ? ' ' + trophy : '');
+
                             if (!playerPrediction) {
-                                return `<div style="color: #6b7280; padding: 3px 0;">❌ ${player}: Tippade inte</div>`;
+                                return `<div style="color: #6b7280; padding: 3px 0;">❌ ${pName}: Tippade inte</div>`;
                             }
-                            
+
                             // For postponed matches, show neutral color (everyone gets 0 points)
                             if (m.actualOutcome === 'POSTPONED') {
                                 const exactTag = playerExact ? ` [${playerExact}]` : '';
-                                return `<div style="color: #f59e0b; padding: 3px 0;">⚠️ ${player}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
+                                return `<div style="color: #f59e0b; padding: 3px 0;">⚠️ ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
                             }
-                            
+
                             const isCorrect = playerPrediction === m.actualOutcome;
                             const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
                             const icon = isCorrect ? '✅' : '❌';
@@ -2324,7 +2383,7 @@
                             const pts = getCachedPoints(m.id, player);
                             const ptsTag = ` <span style="background: ${isCorrect ? '#10b981' : '#e5e7eb'}; color: ${isCorrect ? 'white' : '#6b7280'}; padding: 1px 6px; border-radius: 10px; font-size: 0.82em; font-weight: 600;">${pts}p</span>`;
 
-                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${player}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
+                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
                         }).join('')}
                     </div>
                 ` : '';
@@ -2393,9 +2452,10 @@
                                 <h4>Alla tippningar:</h4>
                                 ${Object.entries(matchPreds).map(([player, pred]) => {
                                     const playerExact = matchExactPreds[player];
+                                    const trophy = getPlayerTrophyHTML(player);
                                     return `
                                     <div class="prediction-row">
-                                        <span><strong>${player}</strong></span>
+                                        <span><strong>${player}</strong>${trophy ? ' ' + trophy : ''}</span>
                                         <span style="font-weight: 600; color: #667eea;">
                                             ${playerExact ? playerExact.replace('-', ' – ') : pred}
                                             <span style="color: #aaa; font-weight: 400; font-size: 0.85em;">(${pred})</span>
@@ -2622,32 +2682,16 @@
 
             const scores = getStandings();
 
-            // Count season wins per player from history
-            const seasonWins = {};
-            PLAYERS.forEach(p => { seasonWins[p] = 0; });
-            seasonHistory.forEach(season => {
-                if (season.winner && seasonWins[season.winner] !== undefined) {
-                    seasonWins[season.winner]++;
-                }
-            });
-
             tbody.innerHTML = scores.map((s, i) => {
                 const rankClass = i < 5 ? `rank-${i + 1}` : '';
                 const bonusDisplay = s.bonusCount > 0
                     ? `<span style="color: #667eea; font-weight: 600;">${s.bonusCount}</span>`
                     : '<span style="color: #ccc;">0</span>';
-                const wins = seasonWins[s.player] || 0;
-                let winsDisplay = '';
-                if (wins > 0) {
-                    const stars = Math.floor(wins / 5);
-                    const trophies = wins % 5;
-                    const icons = '⭐'.repeat(stars) + '🏆'.repeat(trophies);
-                    winsDisplay = ` <span style="color: #FFD700; font-size: 0.85em;" title="${wins} säsongsvinst${wins > 1 ? 'er' : ''}">${icons}</span>`;
-                }
+                const trophy = getPlayerTrophyHTML(s.player);
                 return `
                     <tr>
                         <td><span class="rank ${rankClass}">${i + 1}</span></td>
-                        <td><strong>${s.player}</strong>${winsDisplay}</td>
+                        <td><strong>${s.player}</strong>${trophy ? ' ' + trophy : ''}</td>
                         <td><strong>${s.totalPoints}</strong></td>
                         <td>${s.correctPreds}</td>
                         <td>${bonusDisplay}</td>
@@ -2665,9 +2709,14 @@
             const sousChefName = document.getElementById('sousChefName');
             const chefName = document.getElementById('chefName');
 
+            function nameWithTrophy(player) {
+                const t = getPlayerTrophyHTML(player);
+                return player + (t ? ' ' + t : '');
+            }
+
             // Show Mästare (1st place)
             if (scores.length >= 1) {
-                masterName.textContent = scores[0].player;
+                masterName.innerHTML = nameWithTrophy(scores[0].player);
                 masterSection.style.display = 'block';
             } else {
                 masterSection.style.display = 'none';
@@ -2675,7 +2724,7 @@
 
             // Show Sous-chef (4th place)
             if (scores.length >= 4) {
-                sousChefName.textContent = scores[3].player;
+                sousChefName.innerHTML = nameWithTrophy(scores[3].player);
                 sousChefSection.style.display = 'block';
             } else {
                 sousChefSection.style.display = 'none';
@@ -2683,41 +2732,43 @@
 
             // Show Chef (5th place)
             if (scores.length >= 5) {
-                chefName.textContent = scores[4].player;
+                chefName.innerHTML = nameWithTrophy(scores[4].player);
                 chefSection.style.display = 'block';
             } else {
                 chefSection.style.display = 'none';
             }
 
-            // Show Ligans Sniper (most solo correct predictions = 100p matches)
+            // Show Ligans Sniper highlight box
             const sniperSection = document.getElementById('sniperSection');
             const sniperName = document.getElementById('sniperName');
             const sniperDetails = document.getElementById('sniperDetails');
-            
+
+            // Sniper = was the ONLY player to get 1X2 correct (regardless of exact score bonus)
             const sniperCounts = PLAYERS.map(player => {
                 let soloCorrect = 0;
                 matches.forEach(match => {
-                    if (match.actualOutcome && getCachedPoints(match.id, player) === 100) {
-                        soloCorrect++;
-                    }
+                    if (!match.actualOutcome || match.actualOutcome === 'POSTPONED') return;
+                    const playerPred = predictions[match.id]?.[player];
+                    if (!playerPred || playerPred !== match.actualOutcome) return;
+                    const correctCount = Object.values(predictions[match.id] || {})
+                        .filter(p => p === match.actualOutcome).length;
+                    if (correctCount === 1) soloCorrect++;
                 });
                 return { player, soloCorrect };
             }).sort((a, b) => b.soloCorrect - a.soloCorrect);
-            
+
             if (sniperCounts[0] && sniperCounts[0].soloCorrect > 0) {
-                const topSniperScore = sniperCounts[0].soloCorrect;
-                const sniperLeaders = sniperCounts.filter(p => p.soloCorrect === topSniperScore);
-                sniperName.textContent = sniperLeaders.map(p => p.player).join(' & ');
-                sniperDetails.textContent = `${topSniperScore} st 100-poängare`;
+                const topScore = sniperCounts[0].soloCorrect;
+                const leaders = sniperCounts.filter(p => p.soloCorrect === topScore);
+                sniperName.innerHTML = leaders.map(p => nameWithTrophy(p.player)).join(' &amp; ');
+                sniperDetails.textContent = `${topScore} st soloträff${topScore > 1 ? 'ar' : ''}`;
                 sniperSection.style.display = 'block';
             } else {
                 sniperSection.style.display = 'none';
             }
 
-            // Show Ligans Nostradamus (1p per correct exact score, independent of 1X2)
+            // Nostradamus = correct exact score
             const nostradamusSection = document.getElementById('nostradamusSection');
-            const nostradamusBody = document.getElementById('nostradamusBody');
-
             const nostradamusCounts = PLAYERS.map(player => {
                 let correctExact = 0;
                 matches.forEach(match => {
@@ -2735,16 +2786,49 @@
 
             if (withPoints.length > 0) {
                 const topNostradamusScore = withPoints[0].correctExact;
-                const nostradamusLeaders = withPoints.filter(p => p.correctExact === topNostradamusScore);
-                const nostradamusOthers = withPoints.filter(p => p.correctExact < topNostradamusScore);
-                nostradamusLeader.textContent = nostradamusLeaders.map(p => p.player).join(' & ');
-                nostradamusLeaderDetail.textContent = `${topNostradamusScore} st korrekt resultat`;
-                nostradamusRest.textContent = nostradamusOthers.length > 0
-                    ? nostradamusOthers.map(p => `${p.player} – ${p.correctExact} st`).join(', ')
+                const nostLeaders = withPoints.filter(p => p.correctExact === topNostradamusScore);
+                const nostOthers = withPoints.filter(p => p.correctExact < topNostradamusScore);
+                nostradamusLeader.innerHTML = nostLeaders.map(p => nameWithTrophy(p.player)).join(' &amp; ');
+                nostradamusLeaderDetail.textContent = `${topNostradamusScore} st korrekt exakt resultat`;
+                nostradamusRest.innerHTML = nostOthers.length > 0
+                    ? nostOthers.map(p => `${nameWithTrophy(p.player)} – ${p.correctExact} st`).join(', ')
                     : '';
                 nostradamusSection.style.display = 'block';
             } else {
                 nostradamusSection.style.display = 'none';
+            }
+
+            // Render Nostradamus table
+            const nostradamusTableSection = document.getElementById('nostradamusTableSection');
+            const nostradamusTableBody = document.getElementById('nostradamusTableBody');
+            if (withPoints.length > 0) {
+                nostradamusTableBody.innerHTML = withPoints.map((p, i) => `
+                    <tr>
+                        <td><span class="rank">${i + 1}</span></td>
+                        <td>${nameWithTrophy(p.player)}</td>
+                        <td><strong>${p.correctExact}</strong></td>
+                    </tr>
+                `).join('');
+                nostradamusTableSection.style.display = 'block';
+            } else {
+                nostradamusTableSection.style.display = 'none';
+            }
+
+            // Render Sniper table
+            const sniperTableSection = document.getElementById('sniperTableSection');
+            const sniperTableBody = document.getElementById('sniperTableBody');
+            const sniperWithData = sniperCounts.filter(p => p.soloCorrect > 0);
+            if (sniperWithData.length > 0) {
+                sniperTableBody.innerHTML = sniperWithData.map((p, i) => `
+                    <tr>
+                        <td><span class="rank">${i + 1}</span></td>
+                        <td>${nameWithTrophy(p.player)}</td>
+                        <td><strong>${p.soloCorrect}</strong></td>
+                    </tr>
+                `).join('');
+                sniperTableSection.style.display = 'block';
+            } else {
+                sniperTableSection.style.display = 'none';
             }
 
             // Show the titles section if we have at least position 1

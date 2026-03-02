@@ -1,5 +1,11 @@
 # Ändringslogg
 
+## 2026-03-02 (pokaler överallt + Nostradamus- och Sniper-tabeller)
+- Trofé-ikoner (🏆/⭐) visas nu bredvid spelarnamn överallt i appen
+- Ny tabell: Ligans Nostradamus – antal gånger man tippat exakt rätt resultat
+- Ny tabell: Ligans Sniper – antal gånger man var ensam om att gissa rätt 1X2
+- Tabellerna visas under topplistan och döljs om ingen har >0
+
 ## 2026-03-02 (mobilfix: synliga tippningar & Historik-flik)
 - Andras tippningar i Matcher-fliken visas nu bara när deadline passerat (inte längre när enskild match startat)
 - Flikmenyn på mobil är nu horisontellt scrollbar – alla flikar syns och kan nås med svep

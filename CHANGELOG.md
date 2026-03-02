@@ -1,5 +1,9 @@
 # Ändringslogg
 
+## 2026-03-02 (dölj tips tills tippning stängd)
+- Andras tips visas inte längre medan tippning är öppen – man ser bara om folk tippat, inte vad
+- Tips avslöjas först när deadline passerat eller matchen startat (gäller båda Matcher- och Tips-fliken)
+
 ## 2026-03-02 (kodoptimering #2 – buggfixar & refaktorering)
 ### Buggfixar
 - **Total Reset fungerade aldrig** – bekräftelselogiken var trasig (`!confirm() !== null` är alltid true). Bytt till `prompt()`-baserad bekräftelse där man måste skriva "RESET"

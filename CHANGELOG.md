@@ -1,5 +1,14 @@
 # Ändringslogg
 
+## 2026-03-03 (mobiloptimering + UX-förbättringar)
+- Mobilanpassning: mindre banner, döljer sidfiskar, kompaktare knappar och modal på små skärmar
+- Omgångar under Matcher-fliken är nu kollapsibara – klicka på rubrik för att expandera/minimera
+- Favicon för iPhone (apple-touch-icon.png) med KC-logotyp
+- Rubrik "Premier League Matcher" → "Matcher" (matchar nu blandat innehåll)
+- Undertexten "Premier League Tippning" borttagen från headern
+- Aktivitetsloggen visar nyaste posten längst ner och börjar scrollad dit
+- Favicon.svg återställd med KC-bokstäver på blå-lila gradient
+
 ## 2026-03-02 (pokaler överallt + Nostradamus- och Sniper-tabeller)
 - Trofé-ikoner (🏆/⭐) visas nu bredvid spelarnamn överallt i appen
 - Ny tabell: Ligans Nostradamus – antal gånger man tippat exakt rätt resultat

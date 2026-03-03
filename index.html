@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krokens Copa - Premier League</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="apple-touch-icon" href="favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="apple-touch-icon.png">
     <meta name="theme-color" content="#0f172a">
     <style>
         * {
@@ -443,6 +444,56 @@
             color: #666;
         }
 
+        .round-group {
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .round-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .round-header:hover {
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+        }
+
+        .round-toggle {
+            font-size: 1.1em;
+            transition: transform 0.25s ease;
+        }
+
+        .round-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .round-body {
+            background: white;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .round-body.collapsed {
+            display: none;
+        }
+
+        .round-meta {
+            font-size: 0.8em;
+            opacity: 0.85;
+            margin-left: 8px;
+            font-weight: 400;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -617,34 +668,107 @@
 
         @media (max-width: 768px) {
             body {
-                padding: 10px;
+                padding: 8px;
+            }
+
+            /* --- Banner --- */
+            .banner-content {
+                padding: 20px 15px;
+            }
+
+            .banner-fish {
+                display: none;
+            }
+
+            .logo-container {
+                gap: 10px;
+                margin-bottom: 8px;
+            }
+
+            .fishing-hook {
+                font-size: 2.5em;
             }
 
             h1 {
                 font-size: 1.8em;
+                letter-spacing: 1px;
             }
 
+            .subtitle {
+                font-size: 1em;
+                margin-top: 6px;
+            }
+
+            header {
+                margin-bottom: 15px;
+                border-radius: 12px;
+            }
+
+            /* --- Login --- */
+            .login-container {
+                padding: 20px 15px;
+            }
+
+            /* --- Tabs --- */
             .tabs {
                 flex-wrap: nowrap;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
                 gap: 6px;
                 padding-bottom: 4px;
+                margin-bottom: 15px;
             }
 
             .tab {
                 flex-shrink: 0;
                 flex: 0 0 auto;
                 min-width: unset;
-                padding: 12px 14px;
-                font-size: 0.88em;
+                padding: 10px 12px;
+                font-size: 0.85em;
                 white-space: nowrap;
+                border-radius: 8px;
             }
 
+            /* --- Cards --- */
             .card {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .section-title {
+                font-size: 1.2em;
+                margin-bottom: 12px;
+            }
+
+            /* --- Match items --- */
+            .match-item {
                 padding: 12px;
             }
 
+            .match-teams {
+                font-size: 1.05em;
+            }
+
+            /* --- Round header --- */
+            .round-header {
+                padding: 12px 14px;
+                font-size: 0.9em;
+            }
+
+            .round-meta {
+                display: block;
+                font-size: 0.75em;
+                margin-left: 0;
+                margin-top: 2px;
+                opacity: 0.8;
+            }
+
+            .round-header > span:first-child {
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* --- Prediction (Tippa) --- */
             .prediction-match {
                 padding: 12px;
             }
@@ -661,10 +785,63 @@
                 gap: 4px;
             }
 
-            .outcome-buttons {
-                flex-direction: column;
+            .score-input {
+                width: 34px;
+                padding: 5px 2px;
             }
 
+            .outcome-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .outcome-btn {
+                padding: 12px;
+                font-size: 1.1em;
+            }
+
+            /* --- Buttons --- */
+            .btn {
+                padding: 11px 20px;
+                font-size: 0.95em;
+            }
+
+            /* --- Modal (Sätt resultat) --- */
+            .modal-content {
+                padding: 18px;
+                max-height: 92vh;
+                overflow-y: auto;
+                border-radius: 12px;
+            }
+
+            .modal-header {
+                font-size: 1.1em;
+                margin-bottom: 12px;
+            }
+
+            .modal-match-info {
+                font-size: 0.95em;
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+
+            .modal-outcome-buttons {
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+
+            .modal-outcome-btn {
+                padding: 14px 8px;
+                font-size: 1.2em;
+            }
+
+            .modal-outcome-label {
+                font-size: 0.55em;
+                margin-top: 4px;
+            }
+
+            /* --- Leaderboard --- */
             .leaderboard-table th,
             .leaderboard-table td {
                 padding: 10px 6px;
@@ -679,6 +856,40 @@
 
             .rank {
                 font-size: 1.2em;
+            }
+
+            /* --- User badge row --- */
+            .user-badge {
+                padding: 8px 14px;
+                font-size: 0.9em;
+            }
+
+            /* --- Modal score section team names --- */
+            #modalScoreHome, #modalScoreAway {
+                max-width: 70px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-size: 0.85em;
+            }
+
+            #modalHomeScore, #modalAwayScore {
+                width: 46px;
+                padding: 7px 4px;
+                font-size: 1.1em;
+            }
+
+            /* --- Admin terminal --- */
+            .admin-terminal {
+                font-size: 0.78em;
+                padding: 12px;
+            }
+
+            /* --- Deadline banners --- */
+            .card > div[style*="fee2e2"],
+            .card > div[style*="fef3c7"] {
+                font-size: 0.9em !important;
+                padding: 10px 12px !important;
             }
         }
 
@@ -769,6 +980,8 @@
             max-height: 400px;
             overflow-y: auto;
             border: 1px solid #333;
+            display: flex;
+            flex-direction: column-reverse;
         }
 
         .admin-terminal-small {
@@ -846,7 +1059,6 @@
                     <span class="fishing-hook">🎣</span>
                     <h1>Krokens Copa</h1>
                 </div>
-                <p class="subtitle">Premier League Tippning ⚽</p>
             </div>
         </header>
 
@@ -898,7 +1110,7 @@
 
             <div id="setup" class="content active">
                 <div class="card">
-                    <h2 class="section-title">⚽ Premier League Matcher</h2>
+                    <h2 class="section-title">⚽ Matcher</h2>
                     <div id="lastFetchStatus" style="font-size: 0.85em; color: #888; margin-bottom: 15px;"></div>
                     <div class="matches-list" id="matchesList">
                         <div class="empty-state">Väntar på att matcher laddas in...</div>
@@ -1989,22 +2201,18 @@
             };
             
             let html = '';
-            // Reverse so oldest is first, newest is last (bottom)
-            const reversedLog = [...activityLog].reverse();
-            reversedLog.forEach((entry, index) => {
+            // Newest first (activityLog uses unshift so index 0 = newest)
+            activityLog.forEach((entry) => {
                 const timeStr = formatDateTimeFull(entry.timestamp);
-                
                 const icon = actionIcons[entry.action] || '📌';
                 const color = actionColors[entry.action] || '#10b981';
                 const user = entry.user || 'System';
-                
                 html += `<div style="color: ${color}; margin-bottom: 4px;">`;
                 html += `[${timeStr}] ${icon} ${user}: ${entry.details}`;
                 html += `</div>`;
             });
-            
+
             logDiv.innerHTML = html;
-            logDiv.scrollTop = logDiv.scrollHeight; // Scroll to bottom (newest entries)
         }
         
         window.refreshActivityLog = function() {
@@ -2279,7 +2487,7 @@
         function renderMatches() {
             const list = document.getElementById('matchesList');
             if (!list) return;
-            
+
             if (!matches || matches.length === 0) {
                 if (currentUser === 'Hefner') {
                     list.innerHTML = '<div class="empty-state">Gå till Admin-panelen, välj antal omgångar och klicka "Hämta valda PL-omgångar" för att starta tävlingen</div>';
@@ -2289,9 +2497,17 @@
                 return;
             }
 
-            list.innerHTML = matches.map(m => {
-                const dateStr = formatDateTime(m.date);
+            // Group matches by league/round
+            const roundGroups = {};
+            const roundOrder = [];
+            matches.forEach(m => {
+                const key = m.league || 'Okänd omgång';
+                if (!roundGroups[key]) { roundGroups[key] = []; roundOrder.push(key); }
+                roundGroups[key].push(m);
+            });
 
+            function renderMatchCard(m) {
+                const dateStr = formatDateTime(m.date);
                 const started = isMatchStarted(m.date);
                 const scoreStr = m.actualScore ? ` (${m.actualScore})` : '';
                 const outcomeText = {
@@ -2301,24 +2517,19 @@
                     'POSTPONED': '⚠️ Match inställd - Alla får 0 poäng'
                 };
                 const setByText = m.setBy ? ` (inlagt av ${m.setBy})` : '';
-                const status = m.actualOutcome ? outcomeText[m.actualOutcome] + setByText : 
+                const status = m.actualOutcome ? outcomeText[m.actualOutcome] + setByText :
                               (started ? '⏳ Väntar på resultat...' : '📅 Ej startad');
 
-                // Check who has predicted for this match
                 const matchPredictions = predictions[m.id] || {};
                 const matchExactPreds = exactPredictions[m.id] || {};
                 const allPlayers = PLAYERS;
-                const predicted = allPlayers.filter(p => matchPredictions[p]);
-                const notPredicted = allPlayers.filter(p => !matchPredictions[p]);
-                
-                // Show predictions BEFORE result is set
+
                 let predictionStatusBefore = '';
                 if (!m.actualOutcome) {
                     const matchLocked = isMatchLocked(m);
                     let predsHtml = '<div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">';
                     predsHtml += '<div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>';
                     if (matchLocked) {
-                        // Tippning stängd – visa vad alla tippat
                         allPlayers.forEach(function(player) {
                             const pred = matchPredictions[player];
                             const exact = matchExactPreds[player];
@@ -2335,7 +2546,6 @@
                             }
                         });
                     } else {
-                        // Tippning öppen – visa bara vem som tippat, inte vad
                         allPlayers.forEach(function(player) {
                             const trophy = getPlayerTrophyHTML(player);
                             const pName = player + (trophy ? ' ' + trophy : '');
@@ -2350,31 +2560,20 @@
                     predictionStatusBefore = predsHtml;
                 }
 
-                // Show predictions AFTER result is set (what everyone tipped)
                 const predictionStatusAfter = m.actualOutcome ? `
                     <div style="margin-top: 10px; padding: 10px; background: ${m.actualOutcome === 'POSTPONED' ? '#fef3c7' : '#f0f9ff'}; border-radius: 5px; font-size: 0.9em;">
                         <div style="font-weight: 600; margin-bottom: 8px; color: ${m.actualOutcome === 'POSTPONED' ? '#f59e0b' : '#1e40af'};">📊 Alla tippningar${m.actualOutcome === 'POSTPONED' ? ' (Match inställd - alla 0p)' : ''}:</div>
                         ${allPlayers.map(player => {
                             const playerPrediction = matchPredictions[player];
                             const playerExact = matchExactPreds[player];
-                            const outcomeLabels = {
-                                '1': m.homeTeam,
-                                'X': 'Oavgjort',
-                                '2': m.awayTeam
-                            };
+                            const outcomeLabels = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam };
                             const trophy = getPlayerTrophyHTML(player);
                             const pName = player + (trophy ? ' ' + trophy : '');
-
-                            if (!playerPrediction) {
-                                return `<div style="color: #6b7280; padding: 3px 0;">❌ ${pName}: Tippade inte</div>`;
-                            }
-
-                            // For postponed matches, show neutral color (everyone gets 0 points)
+                            if (!playerPrediction) return `<div style="color: #6b7280; padding: 3px 0;">❌ ${pName}: Tippade inte</div>`;
                             if (m.actualOutcome === 'POSTPONED') {
                                 const exactTag = playerExact ? ` [${playerExact}]` : '';
                                 return `<div style="color: #f59e0b; padding: 3px 0;">⚠️ ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
                             }
-
                             const isCorrect = playerPrediction === m.actualOutcome;
                             const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
                             const icon = isCorrect ? '✅' : '❌';
@@ -2382,13 +2581,11 @@
                             const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+50' : ''}` : '';
                             const pts = getCachedPoints(m.id, player);
                             const ptsTag = ` <span style="background: ${isCorrect ? '#10b981' : '#e5e7eb'}; color: ${isCorrect ? 'white' : '#6b7280'}; padding: 1px 6px; border-radius: 10px; font-size: 0.82em; font-weight: 600;">${pts}p</span>`;
-
                             return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
                         }).join('')}
                     </div>
                 ` : '';
 
-                // Anyone can set results after match has started
                 const canSetResult = started;
                 const resultControls = canSetResult ? `
                     <div class="match-actions">
@@ -2401,15 +2598,50 @@
                 return `
                     <div class="match-item">
                         <div class="match-teams">${m.homeTeam} vs ${m.awayTeam}</div>
-                        <div class="match-details">${m.league} • ${dateStr} • ${status}</div>
+                        <div class="match-details">${dateStr} • ${status}</div>
                         ${started && !m.actualOutcome ? '<div class="match-locked">🔒 Matchen startad - Vem som helst kan sätta resultat</div>' : ''}
                         ${predictionStatusBefore}
                         ${predictionStatusAfter}
                         ${resultControls}
                     </div>
                 `;
+            }
+
+            list.innerHTML = roundOrder.map((roundName, idx) => {
+                const roundMatches = roundGroups[roundName];
+                const totalMatches = roundMatches.length;
+                const played = roundMatches.filter(m => m.actualOutcome).length;
+                const metaText = played === totalMatches
+                    ? `${totalMatches} matcher • Klar`
+                    : played > 0
+                        ? `${totalMatches} matcher • ${played}/${totalMatches} spelade`
+                        : `${totalMatches} matcher`;
+
+                // First round expanded by default, rest collapsed
+                const isCollapsed = idx > 0;
+                const bodyClass = isCollapsed ? 'round-body collapsed' : 'round-body';
+                const toggleClass = isCollapsed ? 'round-toggle collapsed' : 'round-toggle';
+
+                return `
+                    <div class="round-group">
+                        <div class="round-header" onclick="toggleRound(this)">
+                            <span>⚽ ${roundName}<span class="round-meta">${metaText}</span></span>
+                            <span class="${toggleClass}">▼</span>
+                        </div>
+                        <div class="${bodyClass}">
+                            ${roundMatches.map(m => renderMatchCard(m)).join('')}
+                        </div>
+                    </div>
+                `;
             }).join('');
         }
+
+        window.toggleRound = function(headerEl) {
+            const body = headerEl.nextElementSibling;
+            const toggle = headerEl.querySelector('.round-toggle');
+            body.classList.toggle('collapsed');
+            toggle.classList.toggle('collapsed');
+        };
 
         // RENDER PREDICTIONS
         function renderPredictions() {

@@ -1,5 +1,8 @@
 # Ändringslogg
 
+## 2026-03-03 (ny iPhone-favicon)
+- Uppdaterad apple-touch-icon.png med Canvas-renderad KC-logotyp utan pixlar
+
 ## 2026-03-03 (mobiloptimering + UX-förbättringar)
 - Mobilanpassning: mindre banner, döljer sidfiskar, kompaktare knappar och modal på små skärmar
 - Omgångar under Matcher-fliken är nu kollapsibara – klicka på rubrik för att expandera/minimera

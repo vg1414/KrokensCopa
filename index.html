@@ -443,8 +443,8 @@
         }
 
         .rank-1 { color: #FFD700; }
-        .rank-2 { color: #333; }
-        .rank-3 { color: #333; }
+        .rank-2 { color: #A8A9AD; }
+        .rank-3 { color: #CD7F32; }
         .rank-4 { color: #FF8C00; }
         .rank-5 { color: #DC3545; }
 
@@ -1150,6 +1150,21 @@
             color: #92400e;
         }
 
+        .deadline-countdown {
+            margin-top: 6px;
+            font-size: 1.15em;
+            font-weight: 800;
+            color: #b45309;
+            letter-spacing: 0.5px;
+        }
+
+        .deadline-date {
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-top: 2px;
+            opacity: 0.85;
+        }
+
         /* --- Prediction card locked header --- */
         .pred-card-header {
             text-align: center;
@@ -1172,6 +1187,18 @@
             font-weight: 600;
             margin-top: 6px;
             font-size: 0.85em;
+        }
+
+        /* --- Save flash animation --- */
+        @keyframes saveFlash {
+            0%   { background: #f8f9fa; box-shadow: none; }
+            25%  { background: #d1fae5; box-shadow: 0 0 0 3px #10b981; }
+            60%  { background: #d1fae5; box-shadow: 0 0 0 3px #10b981; }
+            100% { background: #f8f9fa; box-shadow: none; }
+        }
+
+        .pred-save-flash {
+            animation: saveFlash 0.9s ease forwards;
         }
 
         /* --- Leaderboard special sections --- */
@@ -1468,23 +1495,6 @@
                         </table>
                     </div>
 
-                    <!-- Special titles for bottom positions -->
-                    <div id="specialTitles" class="special-titles-container" style="margin-top: 30px; display: none;">
-                        <div style="display: grid; gap: 15px;">
-                            <div id="masterSection" class="special-title-card" style="display: none; border-left: 4px solid #FFD700;">
-                                <div class="special-title-label" style="color: #FFD700;">👑 Mästare</div>
-                                <div id="masterName" class="special-title-name"></div>
-                            </div>
-                            <div id="sousChefSection" class="special-title-card" style="display: none; border-left: 4px solid #FF8C00;">
-                                <div class="special-title-label" style="color: #FF8C00;">🍳 Sous-chef</div>
-                                <div id="sousChefName" class="special-title-name"></div>
-                            </div>
-                            <div id="chefSection" class="special-title-card" style="display: none; border-left: 4px solid #DC3545;">
-                                <div class="special-title-label" style="color: #DC3545;">👨‍🍳 Chef</div>
-                                <div id="chefName" class="special-title-name"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1800,6 +1810,34 @@
         function getPlayerTrophyHTML(player) {
             return trophyCache[player] ?? '';
         }
+
+        // Countdown helpers
+        function formatCountdown(deadlineStr) {
+            const diff = new Date(deadlineStr) - new Date();
+            if (diff <= 0) return null;
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            if (d > 0) return `${d}d ${h}h ${m}m kvar`;
+            if (h > 0) return `${h}h ${m}m kvar`;
+            return `${m}m kvar`;
+        }
+
+        function updateCountdownSpans() {
+            document.querySelectorAll('[data-countdown]').forEach(el => {
+                const deadlineStr = el.dataset.countdown;
+                const text = formatCountdown(deadlineStr);
+                if (text) {
+                    el.textContent = text;
+                } else {
+                    // Deadline precis passerat – rendera om
+                    scheduleRender();
+                }
+            });
+        }
+
+        // Starts once, keeps running in background
+        setInterval(updateCountdownSpans, 60000);
 
         // Date formatting helpers
         function formatDateTime(dateStr) {
@@ -2960,7 +2998,7 @@ passwords[player] = hashedPassword;
                 }
 
                 return `
-                    <div class="prediction-match ${locked ? 'locked' : ''}">
+                    <div class="prediction-match ${locked ? 'locked' : ''}" data-match-id="${m.id}">
                         <div style="text-align: center; color: #666; font-size: 0.8em; margin-bottom: 10px;">
                             ${m.league} • ${dateStr}
                         </div>
@@ -3016,15 +3054,22 @@ passwords[player] = hashedPassword;
                 const label = DEADLINE_LABELS[key] || key;
 
                 if (isLocked) {
+                    const lockedStr = new Date(deadline).toLocaleString('sv-SE', {
+                        weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
                     banners.set(key, `<div class="deadline-banner deadline-banner-locked">
                         🔒 Tippning stängd – ${label}
+                        <div class="deadline-date">Stängde ${lockedStr}</div>
                     </div>`);
                 } else if (deadline) {
                     const deadlineStr = new Date(deadline).toLocaleString('sv-SE', {
                         weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
+                    const countdown = formatCountdown(deadline);
                     banners.set(key, `<div class="deadline-banner deadline-banner-open">
-                        ⏰ <strong>${label}</strong> – Tippa klart innan <span style="color: #b45309;">${deadlineStr}</span>
+                        ⏰ <strong>${label}</strong>
+                        <div class="deadline-date">Tippa klart innan ${deadlineStr}</div>
+                        ${countdown ? `<div class="deadline-countdown" data-countdown="${deadline}">${countdown}</div>` : ''}
                     </div>`);
                 }
             });
@@ -3094,6 +3139,16 @@ passwords[player] = hashedPassword;
 
                 renderPredictions();
                 renderMatches();
+
+                // Flash animation on the saved card
+                requestAnimationFrame(() => {
+                    const card = document.querySelector(`[data-match-id="${matchId}"]`);
+                    if (card) {
+                        card.classList.remove('pred-save-flash');
+                        void card.offsetWidth; // force reflow so animation restarts
+                        card.classList.add('pred-save-flash');
+                    }
+                });
             } catch (error) {
                 console.error('Save error:', error);
                 alert('❌ Fel: ' + error.message);
@@ -3192,42 +3247,9 @@ passwords[player] = hashedPassword;
                 `;
             }).join('');
 
-            // Show special titles for positions 1, 4 and 5
-            const specialTitlesDiv = document.getElementById('specialTitles');
-            const masterSection = document.getElementById('masterSection');
-            const sousChefSection = document.getElementById('sousChefSection');
-            const chefSection = document.getElementById('chefSection');
-            const masterName = document.getElementById('masterName');
-            const sousChefName = document.getElementById('sousChefName');
-            const chefName = document.getElementById('chefName');
-
             function nameWithTrophy(player) {
                 const t = getPlayerTrophyHTML(player);
                 return player + (t ? ' ' + t : '');
-            }
-
-            // Show Mästare (1st place)
-            if (scores.length >= 1) {
-                masterName.innerHTML = nameWithTrophy(scores[0].player);
-                masterSection.style.display = 'block';
-            } else {
-                masterSection.style.display = 'none';
-            }
-
-            // Show Sous-chef (4th place)
-            if (scores.length >= 4) {
-                sousChefName.innerHTML = nameWithTrophy(scores[3].player);
-                sousChefSection.style.display = 'block';
-            } else {
-                sousChefSection.style.display = 'none';
-            }
-
-            // Show Chef (5th place)
-            if (scores.length >= 5) {
-                chefName.innerHTML = nameWithTrophy(scores[4].player);
-                chefSection.style.display = 'block';
-            } else {
-                chefSection.style.display = 'none';
             }
 
             // Show Ligans Sniper highlight box
@@ -3323,12 +3345,6 @@ passwords[player] = hashedPassword;
                 sniperTableSection.style.display = 'none';
             }
 
-            // Show the titles section if we have at least position 1
-            if (scores.length >= 1) {
-                specialTitlesDiv.style.display = 'block';
-            } else {
-                specialTitlesDiv.style.display = 'none';
-            }
         }
 
         // SAVE SEASON TO HISTORY

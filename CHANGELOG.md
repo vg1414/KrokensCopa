@@ -1,5 +1,12 @@
 # Ändringslogg
 
+## 2026-03-03 (nya funktioner + förbättringar)
+- Live-nedräkning i deadline-bannern (t.ex. "2d 4h 12m kvar"), uppdateras varje minut
+- Deadline-datum visas tydligt i bannern för både öppna och stängda ligor
+- Grön flash-animation på matchkortet när man sparar ett tips
+- Silver för 2:a plats och brons för 3:a plats i topplistan
+- Tog bort Mästare/Sous-chef/Chef-sektionen under topplistan
+
 ## 2026-03-03 (kodoptimering #3)
 ### Buggfixar
 - **adminResetResults rensade inte actualScore** – gamla poängresultat (t.ex. "2-1") kunde ligga kvar efter nollställning

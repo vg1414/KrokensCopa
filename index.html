@@ -74,15 +74,25 @@
             right: 30px;
             top: 50%;
             transform: translateY(-50%) rotate(20deg);
+            animation-name: swimRight;
             animation-delay: 2s;
         }
 
         @keyframes swim {
-            0%, 100% { 
-                transform: translateY(-50%) translateX(0) rotate(-20deg); 
+            0%, 100% {
+                transform: translateY(-50%) translateX(0) rotate(-20deg);
             }
-            50% { 
-                transform: translateY(-55%) translateX(5px) rotate(-15deg); 
+            50% {
+                transform: translateY(-55%) translateX(5px) rotate(-15deg);
+            }
+        }
+
+        @keyframes swimRight {
+            0%, 100% {
+                transform: translateY(-50%) translateX(0) rotate(20deg);
+            }
+            50% {
+                transform: translateY(-55%) translateX(-5px) rotate(15deg);
             }
         }
 
@@ -886,10 +896,9 @@
             }
 
             /* --- Deadline banners --- */
-            .card > div[style*="fee2e2"],
-            .card > div[style*="fef3c7"] {
-                font-size: 0.9em !important;
-                padding: 10px 12px !important;
+            .deadline-banner {
+                font-size: 0.9em;
+                padding: 10px 12px;
             }
         }
 
@@ -1046,6 +1055,268 @@
             cursor: pointer;
             font-size: 0.85em;
         }
+        /* --- Prediction status boxes --- */
+        .pred-status-box {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .pred-status-box-before {
+            background: #f0f9ff;
+        }
+
+        .pred-status-box-after {
+            background: #f0f9ff;
+        }
+
+        .pred-status-box-postponed {
+            background: #fef3c7;
+        }
+
+        .pred-status-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e40af;
+        }
+
+        .pred-status-header-postponed {
+            color: #f59e0b;
+        }
+
+        .pred-row {
+            padding: 3px 0;
+        }
+
+        .pred-row-correct {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .pred-row-wrong {
+            color: #ef4444;
+        }
+
+        .pred-row-pending {
+            color: #059669;
+        }
+
+        .pred-row-waiting {
+            color: #6b7280;
+        }
+
+        .pred-row-postponed {
+            color: #f59e0b;
+        }
+
+        .pts-badge {
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 0.82em;
+            font-weight: 600;
+        }
+
+        .pts-badge-correct {
+            background: #10b981;
+            color: white;
+        }
+
+        .pts-badge-wrong {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        /* --- Deadline banners --- */
+        .deadline-banner {
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .deadline-banner-locked {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+            font-weight: 700;
+            font-size: 1.05em;
+        }
+
+        .deadline-banner-open {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            color: #92400e;
+        }
+
+        /* --- Prediction card locked header --- */
+        .pred-card-header {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .pred-card-header-vs {
+            color: #667eea;
+        }
+
+        /* --- Score saved confirmation --- */
+        .score-saved-msg {
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 6px;
+            font-size: 0.85em;
+        }
+
+        /* --- Leaderboard special sections --- */
+        .special-titles-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .special-title-card {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .special-title-label {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .special-title-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .special-title-detail {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* --- History season card --- */
+        .history-card {
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .history-card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-card-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: white;
+        }
+
+        .history-card-meta {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.8);
+            margin-top: 3px;
+        }
+
+        .history-card-winner-label {
+            font-size: 0.8em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .history-card-winner {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #FFD700;
+        }
+
+        /* --- Small table section headers --- */
+        .sub-table-header {
+            font-size: 1em;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+        }
+
+        .sub-table-desc {
+            font-size: 0.82em;
+            color: #888;
+            margin: 0 0 10px 0;
+        }
+
+        /* --- Deadline admin row --- */
+        .deadline-admin-row {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border: 1px solid #dbeafe;
+        }
+
+        .deadline-admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* --- Modal score section --- */
+        .modal-score-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .modal-score-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .modal-score-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-score-team {
+            font-weight: 600;
+        }
+
+        .modal-score-input {
+            width: 55px;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .modal-score-dash {
+            font-weight: bold;
+            font-size: 1.3em;
+        }
     </style>
 </head>
 <body>
@@ -1143,32 +1414,32 @@
                     </table>
                     
                     <!-- Sniper title -->
-                    <div id="sniperSection" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px; display: none;">
-                        <div style="padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                            <div style="font-size: 1.1em; font-weight: 600; color: #8B5CF6; margin-bottom: 5px;">
+                    <div id="sniperSection" class="special-titles-container" style="margin-top: 20px; display: none;">
+                        <div class="special-title-card" style="border-left: 4px solid #8B5CF6;">
+                            <div class="special-title-label" style="color: #8B5CF6;">
                                 🎯 Ligans Sniper
                             </div>
-                            <div id="sniperName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
-                            <div id="sniperDetails" style="font-size: 0.9em; color: #666; margin-top: 4px;"></div>
+                            <div id="sniperName" class="special-title-name"></div>
+                            <div id="sniperDetails" class="special-title-detail"></div>
                         </div>
                     </div>
-                    
+
                     <!-- Nostradamus section -->
-                    <div id="nostradamusSection" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; display: none;">
-                        <div style="padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #0ea5e9;">
-                            <div style="font-size: 1.1em; font-weight: 600; color: #0ea5e9; margin-bottom: 5px;">
+                    <div id="nostradamusSection" class="special-titles-container" style="margin-top: 15px; display: none;">
+                        <div class="special-title-card" style="border-left: 4px solid #0ea5e9;">
+                            <div class="special-title-label" style="color: #0ea5e9;">
                                 🔮 Ligans Nostradamus
                             </div>
-                            <div id="nostradamusLeader" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
-                            <div id="nostradamusLeaderDetail" style="font-size: 0.9em; color: #666; margin-top: 4px;"></div>
-                            <div id="nostradamusRest" style="font-size: 0.9em; color: #666; margin-top: 6px;"></div>
+                            <div id="nostradamusLeader" class="special-title-name"></div>
+                            <div id="nostradamusLeaderDetail" class="special-title-detail"></div>
+                            <div id="nostradamusRest" class="special-title-detail" style="margin-top: 6px;"></div>
                         </div>
                     </div>
 
                     <!-- Ligans Nostradamus-tabell -->
                     <div id="nostradamusTableSection" style="margin-top: 25px; display: none;">
-                        <h3 style="font-size: 1em; font-weight: 700; color: #0ea5e9; margin: 0 0 10px 0;">🔮 Ligans Nostradamus</h3>
-                        <p style="font-size: 0.82em; color: #888; margin: 0 0 10px 0;">Antal korrekta exakta resultat (t.ex. 2–1)</p>
+                        <h3 class="sub-table-header" style="color: #0ea5e9;">🔮 Ligans Nostradamus</h3>
+                        <p class="sub-table-desc">Antal korrekta exakta resultat (t.ex. 2–1)</p>
                         <table class="leaderboard-table leaderboard-table-sm">
                             <thead>
                                 <tr>
@@ -1183,8 +1454,8 @@
 
                     <!-- Ligans Sniper-tabell -->
                     <div id="sniperTableSection" style="margin-top: 20px; display: none;">
-                        <h3 style="font-size: 1em; font-weight: 700; color: #8B5CF6; margin: 0 0 10px 0;">🎯 Ligans Sniper</h3>
-                        <p style="font-size: 0.82em; color: #888; margin: 0 0 10px 0;">Antal gånger man var ensam om att gissa rätt 1X2</p>
+                        <h3 class="sub-table-header" style="color: #8B5CF6;">🎯 Ligans Sniper</h3>
+                        <p class="sub-table-desc">Antal gånger man var ensam om att gissa rätt 1X2</p>
                         <table class="leaderboard-table leaderboard-table-sm">
                             <thead>
                                 <tr>
@@ -1198,27 +1469,19 @@
                     </div>
 
                     <!-- Special titles for bottom positions -->
-                    <div id="specialTitles" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
+                    <div id="specialTitles" class="special-titles-container" style="margin-top: 30px; display: none;">
                         <div style="display: grid; gap: 15px;">
-                            <div id="masterSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #FFD700;">
-                                <div style="font-size: 1.1em; font-weight: 600; color: #FFD700; margin-bottom: 5px;">
-                                    👑 Mästare
-                                </div>
-                                <div id="masterName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            <div id="masterSection" class="special-title-card" style="display: none; border-left: 4px solid #FFD700;">
+                                <div class="special-title-label" style="color: #FFD700;">👑 Mästare</div>
+                                <div id="masterName" class="special-title-name"></div>
                             </div>
-                            
-                            <div id="sousChefSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #FF8C00;">
-                                <div style="font-size: 1.1em; font-weight: 600; color: #FF8C00; margin-bottom: 5px;">
-                                    🍳 Sous-chef
-                                </div>
-                                <div id="sousChefName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            <div id="sousChefSection" class="special-title-card" style="display: none; border-left: 4px solid #FF8C00;">
+                                <div class="special-title-label" style="color: #FF8C00;">🍳 Sous-chef</div>
+                                <div id="sousChefName" class="special-title-name"></div>
                             </div>
-                            
-                            <div id="chefSection" style="display: none; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #DC3545;">
-                                <div style="font-size: 1.1em; font-weight: 600; color: #DC3545; margin-bottom: 5px;">
-                                    👨‍🍳 Chef
-                                </div>
-                                <div id="chefName" style="font-size: 1.3em; font-weight: bold; color: #333;"></div>
+                            <div id="chefSection" class="special-title-card" style="display: none; border-left: 4px solid #DC3545;">
+                                <div class="special-title-label" style="color: #DC3545;">👨‍🍳 Chef</div>
+                                <div id="chefName" class="special-title-name"></div>
                             </div>
                         </div>
                     </div>
@@ -1264,14 +1527,14 @@
                         <span class="modal-outcome-label">Rensa</span>
                     </button>
                 </div>
-                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                    <div style="font-size: 0.9em; font-weight: 600; color: #667eea; margin-bottom: 10px; text-align: center;">⭐ Exakt resultat (för resultatbonus)</div>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <span id="modalScoreHome" style="font-weight: 600;">Hemma</span>
-                        <input type="number" min="0" max="99" id="modalHomeScore" style="width: 55px; padding: 10px; text-align: center; font-size: 1.3em; font-weight: bold; border: 2px solid #e0e0e0; border-radius: 8px;" placeholder="-">
-                        <span style="font-weight: bold; font-size: 1.3em;">-</span>
-                        <input type="number" min="0" max="99" id="modalAwayScore" style="width: 55px; padding: 10px; text-align: center; font-size: 1.3em; font-weight: bold; border: 2px solid #e0e0e0; border-radius: 8px;" placeholder="-">
-                        <span id="modalScoreAway" style="font-weight: 600;">Borta</span>
+                <div class="modal-score-section">
+                    <div class="modal-score-label">⭐ Exakt resultat (för resultatbonus)</div>
+                    <div class="modal-score-row">
+                        <span id="modalScoreHome" class="modal-score-team">Hemma</span>
+                        <input type="number" min="0" max="99" id="modalHomeScore" class="modal-score-input" placeholder="-">
+                        <span class="modal-score-dash">-</span>
+                        <input type="number" min="0" max="99" id="modalAwayScore" class="modal-score-input" placeholder="-">
+                        <span id="modalScoreAway" class="modal-score-team">Borta</span>
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -1497,33 +1760,45 @@
         }
         
         function loadSession() {
-            const sessionData = localStorage.getItem('krokens_session');
-            if (!sessionData) return null;
-            
-            const session = JSON.parse(sessionData);
-            const age = Date.now() - session.timestamp;
-            
-            if (age > SESSION_DURATION) {
+            try {
+                const sessionData = localStorage.getItem('krokens_session');
+                if (!sessionData) return null;
+
+                const session = JSON.parse(sessionData);
+                const age = Date.now() - session.timestamp;
+
+                if (age > SESSION_DURATION) {
+                    localStorage.removeItem('krokens_session');
+                    return null;
+                }
+
+                return session.player;
+            } catch (e) {
                 localStorage.removeItem('krokens_session');
                 return null;
             }
-            
-            return session.player;
         }
         
         function clearSession() {
             localStorage.removeItem('krokens_session');
         }
         
-        // Returns trophy/star HTML for a player based on season wins
+        // Returns trophy/star HTML for a player based on season wins (cached per render cycle)
+        let trophyCache = {};
+        function rebuildTrophyCache() {
+            trophyCache = {};
+            PLAYERS.forEach(player => {
+                let wins = 0;
+                (seasonHistory || []).forEach(s => { if (s.winner === player) wins++; });
+                if (wins === 0) { trophyCache[player] = ''; return; }
+                const stars = Math.floor(wins / 5);
+                const trophies = wins % 5;
+                const icons = '⭐'.repeat(stars) + '🏆'.repeat(trophies);
+                trophyCache[player] = `<span style="color: #FFD700; font-size: 0.8em;" title="${wins} säsongsvinst${wins > 1 ? 'er' : ''}">${icons}</span>`;
+            });
+        }
         function getPlayerTrophyHTML(player) {
-            let wins = 0;
-            (seasonHistory || []).forEach(s => { if (s.winner === player) wins++; });
-            if (wins === 0) return '';
-            const stars = Math.floor(wins / 5);
-            const trophies = wins % 5;
-            const icons = '⭐'.repeat(stars) + '🏆'.repeat(trophies);
-            return `<span style="color: #FFD700; font-size: 0.8em;" title="${wins} säsongsvinst${wins > 1 ? 'er' : ''}">${icons}</span>`;
+            return trophyCache[player] ?? '';
         }
 
         // Date formatting helpers
@@ -1603,6 +1878,7 @@
             requestAnimationFrame(() => {
                 renderScheduled = false;
                 rebuildMatchMap();
+                rebuildTrophyCache();
                 rebuildPointsCache();
                 renderMatches();
                 renderPredictions();
@@ -1669,12 +1945,10 @@
         }
 
         // Initialize Firebase
-        console.log('Initializing Firebase...');
+        // Initialize Firebase
         try {
             app = initializeApp(firebaseConfig);
             database = getDatabase(app);
-            console.log('Firebase initialized successfully');
-            
             // Start listeners
             const matchesRef = ref(database, 'matches');
             onValue(matchesRef, (snapshot) => {
@@ -1682,37 +1956,31 @@
                 if (data) {
                     matches = Array.isArray(data) ? data : Object.values(data);
                     cachedFirstMatch = null; // Invalidera cache
-                    console.log('Matches loaded:', matches.length);
-                    scheduleRender();
+scheduleRender();
                 }
             });
 
             const predictionsRef = ref(database, 'predictions');
             onValue(predictionsRef, (snapshot) => {
                 predictions = snapshot.val() || {};
-                console.log('Predictions loaded');
-                scheduleRender();
+scheduleRender();
             });
 
             const exactPredictionsRef = ref(database, 'exactPredictions');
             onValue(exactPredictionsRef, (snapshot) => {
                 exactPredictions = snapshot.val() || {};
-                console.log('Exact predictions loaded');
-                scheduleRender();
+scheduleRender();
             });
 
             const passwordsRef = ref(database, 'passwords');
             onValue(passwordsRef, (snapshot) => {
                 passwords = snapshot.val() || {};
                 passwordsLoaded = true;
-                console.log('Passwords loaded');
-                
                 // Check for existing session on first load
                 if (!currentUser) {
                     const sessionPlayer = loadSession();
                     if (sessionPlayer && passwords[sessionPlayer]) {
-                        console.log('Auto-login from session:', sessionPlayer);
-                        activateSession(sessionPlayer);
+activateSession(sessionPlayer);
                         logActivity('AUTO_LOGIN', 'Automatisk inloggning från session');
                     }
                 }
@@ -1769,8 +2037,7 @@
                     activityLog = [];
                 }
                 activityLogLoaded = true;
-                console.log('Activity log loaded:', activityLog.length, 'entries');
-                if (currentUser === 'Hefner') {
+if (currentUser === 'Hefner') {
                     renderActivityLog();
                 }
             });
@@ -1782,9 +2049,8 @@
 
         // LOGIN FUNCTION
         async function handleLogin() {
-            console.log('Login button clicked');
 
-            if (!passwordsLoaded) {
+if (!passwordsLoaded) {
                 showStatus('⏳ Appen laddar fortfarande, försök igen om ett ögonblick...', 'error');
                 return;
             }
@@ -1792,9 +2058,8 @@
             const player = document.getElementById('playerSelect').value;
             const password = document.getElementById('passwordInput').value;
 
-            console.log('Player:', player, 'Password length:', password.length);
 
-            if (!player) {
+if (!player) {
                 showStatus('❌ Välj en spelare!', 'error');
                 return;
             }
@@ -1806,22 +2071,18 @@
 
             try {
                 const hashedPassword = await hashPassword(password);
-                console.log('Password hashed');
 
-                if (passwords[player]) {
+if (passwords[player]) {
                     // Verify password
                     if (passwords[player] === hashedPassword) {
-                        console.log('Password correct, logging in...');
-                        activateSession(player);
+activateSession(player);
                         await logActivity('LOGIN', 'Loggade in');
                     } else {
-                        console.log('Wrong password');
-                        showStatus('❌ Fel lösenord!', 'error');
+showStatus('❌ Fel lösenord!', 'error');
                     }
                 } else {
                     // First time - set password
-                    console.log('First time login, saving password...');
-                    passwords[player] = hashedPassword;
+passwords[player] = hashedPassword;
                     await set(ref(database, 'passwords'), passwords);
                     activateSession(player);
                     await logActivity('FIRST_LOGIN', 'Skapade konto och loggade in');
@@ -1849,8 +2110,6 @@
 
         // LOGOUT FUNCTION
         async function handleLogout() {
-            console.log('Logging out...');
-            
             // Log activity before clearing session
             if (currentUser) {
                 await logActivity('LOGOUT', 'Loggade ut');
@@ -2116,6 +2375,7 @@
                 const cleanMatches = matches.map(m => ({
                     ...m,
                     actualOutcome: null,
+                    actualScore: null,
                     setBy: null,
                     setAt: null
                 }));
@@ -2527,8 +2787,8 @@
                 let predictionStatusBefore = '';
                 if (!m.actualOutcome) {
                     const matchLocked = isMatchLocked(m);
-                    let predsHtml = '<div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 5px; font-size: 0.9em;">';
-                    predsHtml += '<div style="font-weight: 600; margin-bottom: 8px; color: #1e40af;">📊 Tippningar:</div>';
+                    let predsHtml = '<div class="pred-status-box pred-status-box-before">';
+                    predsHtml += '<div class="pred-status-header">📊 Tippningar:</div>';
                     if (matchLocked) {
                         allPlayers.forEach(function(player) {
                             const pred = matchPredictions[player];
@@ -2536,13 +2796,13 @@
                             const trophy = getPlayerTrophyHTML(player);
                             const pName = player + (trophy ? ' ' + trophy : '');
                             if (!pred) {
-                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">❌ ' + pName + ': Tippade inte</div>';
+                                predsHtml += '<div class="pred-row pred-row-waiting">❌ ' + pName + ': Tippade inte</div>';
                             } else {
                                 const label = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam }[pred] || pred;
                                 const scoreDisplay = exact
                                     ? '<strong>' + exact.replace('-', ' \u2013 ') + '</strong> <span style="color: #888; font-size: 0.85em;">(' + label + ')</span>'
                                     : '<strong>' + label + '</strong>';
-                                predsHtml += '<div style="color: #333; padding: 3px 0;">🎯 ' + pName + ': ' + scoreDisplay + '</div>';
+                                predsHtml += '<div class="pred-row" style="color: #333;">🎯 ' + pName + ': ' + scoreDisplay + '</div>';
                             }
                         });
                     } else {
@@ -2550,9 +2810,9 @@
                             const trophy = getPlayerTrophyHTML(player);
                             const pName = player + (trophy ? ' ' + trophy : '');
                             if (matchPredictions[player]) {
-                                predsHtml += '<div style="color: #059669; padding: 3px 0;">✅ ' + pName + ': Har tippat</div>';
+                                predsHtml += '<div class="pred-row pred-row-pending">✅ ' + pName + ': Har tippat</div>';
                             } else {
-                                predsHtml += '<div style="color: #6b7280; padding: 3px 0;">⏳ ' + pName + ': Har inte tippat än</div>';
+                                predsHtml += '<div class="pred-row pred-row-waiting">⏳ ' + pName + ': Har inte tippat än</div>';
                             }
                         });
                     }
@@ -2560,28 +2820,28 @@
                     predictionStatusBefore = predsHtml;
                 }
 
+                const isPostponed = m.actualOutcome === 'POSTPONED';
                 const predictionStatusAfter = m.actualOutcome ? `
-                    <div style="margin-top: 10px; padding: 10px; background: ${m.actualOutcome === 'POSTPONED' ? '#fef3c7' : '#f0f9ff'}; border-radius: 5px; font-size: 0.9em;">
-                        <div style="font-weight: 600; margin-bottom: 8px; color: ${m.actualOutcome === 'POSTPONED' ? '#f59e0b' : '#1e40af'};">📊 Alla tippningar${m.actualOutcome === 'POSTPONED' ? ' (Match inställd - alla 0p)' : ''}:</div>
+                    <div class="pred-status-box ${isPostponed ? 'pred-status-box-postponed' : 'pred-status-box-after'}">
+                        <div class="pred-status-header ${isPostponed ? 'pred-status-header-postponed' : ''}">📊 Alla tippningar${isPostponed ? ' (Match inställd - alla 0p)' : ''}:</div>
                         ${allPlayers.map(player => {
                             const playerPrediction = matchPredictions[player];
                             const playerExact = matchExactPreds[player];
                             const outcomeLabels = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam };
                             const trophy = getPlayerTrophyHTML(player);
                             const pName = player + (trophy ? ' ' + trophy : '');
-                            if (!playerPrediction) return `<div style="color: #6b7280; padding: 3px 0;">❌ ${pName}: Tippade inte</div>`;
-                            if (m.actualOutcome === 'POSTPONED') {
+                            if (!playerPrediction) return `<div class="pred-row pred-row-waiting">❌ ${pName}: Tippade inte</div>`;
+                            if (isPostponed) {
                                 const exactTag = playerExact ? ` [${playerExact}]` : '';
-                                return `<div style="color: #f59e0b; padding: 3px 0;">⚠️ ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
+                                return `<div class="pred-row pred-row-postponed">⚠️ ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
                             }
                             const isCorrect = playerPrediction === m.actualOutcome;
                             const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
                             const icon = isCorrect ? '✅' : '❌';
-                            const color = isCorrect ? '#10b981' : '#ef4444';
                             const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+50' : ''}` : '';
                             const pts = getCachedPoints(m.id, player);
-                            const ptsTag = ` <span style="background: ${isCorrect ? '#10b981' : '#e5e7eb'}; color: ${isCorrect ? 'white' : '#6b7280'}; padding: 1px 6px; border-radius: 10px; font-size: 0.82em; font-weight: 600;">${pts}p</span>`;
-                            return `<div style="color: ${color}; padding: 3px 0; font-weight: ${isCorrect ? '600' : 'normal'};">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
+                            const ptsTag = ` <span class="pts-badge ${isCorrect ? 'pts-badge-correct' : 'pts-badge-wrong'}">${pts}p</span>`;
+                            return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
                         }).join('')}
                     </div>
                 ` : '';
@@ -2705,8 +2965,8 @@
                             ${m.league} • ${dateStr}
                         </div>
                         ${locked ? `
-                            <div style="text-align: center; font-size: 1.1em; font-weight: 700; color: #333; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;">
-                                ${m.homeTeam} <span style="color: #667eea;">vs</span> ${m.awayTeam}
+                            <div class="pred-card-header">
+                                ${m.homeTeam} <span class="pred-card-header-vs">vs</span> ${m.awayTeam}
                             </div>
                             <div class="locked-overlay">
                                 🔒 Tippning stängd
@@ -2741,7 +3001,7 @@
                                     <button class="btn" style="padding: 8px 24px; font-size: 0.9em;" onclick="saveScorePrediction('${m.id}')">Spara tips</button>
                                 </div>
                             </div>
-                            ${myExact ? '<div style="text-align: center; color: #667eea; font-weight: 600; margin-top: 6px; font-size: 0.85em;">✓ Sparat: ' + myExact.replace('-', ' – ') + '</div>' : ''}
+                            ${myExact ? '<div class="score-saved-msg">✓ Sparat: ' + myExact.replace('-', ' – ') + '</div>' : ''}
                         `}
                     </div>
                 `;
@@ -2756,14 +3016,14 @@
                 const label = DEADLINE_LABELS[key] || key;
 
                 if (isLocked) {
-                    banners.set(key, `<div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #991b1b; font-weight: 700; text-align: center; font-size: 1.05em;">
+                    banners.set(key, `<div class="deadline-banner deadline-banner-locked">
                         🔒 Tippning stängd – ${label}
                     </div>`);
                 } else if (deadline) {
                     const deadlineStr = new Date(deadline).toLocaleString('sv-SE', {
                         weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
-                    banners.set(key, `<div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #92400e; font-weight: 600; text-align: center;">
+                    banners.set(key, `<div class="deadline-banner deadline-banner-open">
                         ⏰ <strong>${label}</strong> – Tippa klart innan <span style="color: #b45309;">${deadlineStr}</span>
                     </div>`);
                 }
@@ -3141,15 +3401,15 @@
                 }).join('');
 
                 return `
-                    <div style="margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden;">
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="history-card">
+                        <div class="history-card-header">
                             <div>
-                                <div style="font-size: 1.1em; font-weight: 700; color: white;">🏆 ${season.seasonName}</div>
-                                <div style="font-size: 0.85em; color: rgba(255,255,255,0.8); margin-top: 3px;">Sparad: ${season.savedAt} &nbsp;·&nbsp; ${season.matchCount} matcher</div>
+                                <div class="history-card-title">🏆 ${season.seasonName}</div>
+                                <div class="history-card-meta">Sparad: ${season.savedAt} &nbsp;·&nbsp; ${season.matchCount} matcher</div>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-size: 0.8em; color: rgba(255,255,255,0.7);">Vinnare</div>
-                                <div style="font-size: 1.1em; font-weight: 700; color: #FFD700;">🏆 ${season.winner}</div>
+                                <div class="history-card-winner-label">Vinnare</div>
+                                <div class="history-card-winner">🏆 ${season.winner}</div>
                             </div>
                         </div>
                         <table class="leaderboard-table" style="margin: 0;">
@@ -3220,8 +3480,8 @@
                 const statusColor = isLocked ? '#dc2626' : current ? '#15803d' : '#888';
                 const statusText = isLocked ? '🔒 Stängt' : current ? '✅ Aktivt' : '⭕ Ej satt';
                 return `
-                    <div style="background: white; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; border: 1px solid #dbeafe;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                    <div class="deadline-admin-row">
+                        <div class="deadline-admin-header">
                             <strong style="color: #1e40af;">${label}</strong>
                             <span style="font-size: 0.82em; color: ${statusColor}; font-weight: 600;">${statusText}</span>
                         </div>
@@ -3242,18 +3502,28 @@
             const input = document.getElementById(`deadline-input-${key}`);
             const value = input?.value;
             if (!value) { alert('Välj datum och tid.'); return; }
-            await set(ref(database, `deadlines/${key}`), value);
-            await logActivity('SET_DEADLINE', `Spelstopp satt: ${DEADLINE_LABELS[key] || key} → ${value}`);
-            renderAdminDeadlines();
-            alert(`✅ Spelstopp sparat för ${DEADLINE_LABELS[key] || key}`);
+            try {
+                await set(ref(database, `deadlines/${key}`), value);
+                await logActivity('SET_DEADLINE', `Spelstopp satt: ${DEADLINE_LABELS[key] || key} → ${value}`);
+                renderAdminDeadlines();
+                alert(`✅ Spelstopp sparat för ${DEADLINE_LABELS[key] || key}`);
+            } catch (error) {
+                console.error('Save deadline error:', error);
+                alert('❌ Fel: ' + error.message);
+            }
         };
 
         window.adminClearDeadline = async function(key) {
             if (!requireAdmin()) return;
             if (!confirm(`Ta bort spelstopp för ${DEADLINE_LABELS[key] || key}?`)) return;
-            await set(ref(database, `deadlines/${key}`), null);
-            await logActivity('CLEAR_DEADLINE', `Spelstopp borttaget: ${DEADLINE_LABELS[key] || key}`);
-            renderAdminDeadlines();
+            try {
+                await set(ref(database, `deadlines/${key}`), null);
+                await logActivity('CLEAR_DEADLINE', `Spelstopp borttaget: ${DEADLINE_LABELS[key] || key}`);
+                renderAdminDeadlines();
+            } catch (error) {
+                console.error('Clear deadline error:', error);
+                alert('❌ Fel: ' + error.message);
+            }
         };
 
         window.adminAddPlayer = async function() {
@@ -3262,22 +3532,32 @@
             const name = input?.value.trim();
             if (!name) { alert('Ange ett spelarnamn.'); return; }
             if (PLAYERS.includes(name)) { alert(`${name} finns redan.`); return; }
-            const newPlayers = [...PLAYERS, name];
-            await set(ref(database, 'players'), newPlayers);
-            await logActivity('ADD_PLAYER', `Lade till spelare: ${name}`);
-            if (input) input.value = '';
+            try {
+                const newPlayers = [...PLAYERS, name];
+                await set(ref(database, 'players'), newPlayers);
+                await logActivity('ADD_PLAYER', `Lade till spelare: ${name}`);
+                if (input) input.value = '';
+            } catch (error) {
+                console.error('Add player error:', error);
+                alert('❌ Fel: ' + error.message);
+            }
         };
 
         window.adminRemovePlayer = async function(playerName) {
             if (!requireAdmin()) return;
             if (playerName === 'Hefner') { alert('Kan inte ta bort admin.'); return; }
             if (!confirm(`Ta bort ${playerName}?\n\nDeras tippningar och lösenord raderas.`)) return;
-            const newPlayers = PLAYERS.filter(p => p !== playerName);
-            await set(ref(database, 'players'), newPlayers);
-            const newPasswords = { ...passwords };
-            delete newPasswords[playerName];
-            await set(ref(database, 'passwords'), newPasswords);
-            await logActivity('REMOVE_PLAYER', `Tog bort spelare: ${playerName}`);
+            try {
+                const newPlayers = PLAYERS.filter(p => p !== playerName);
+                await set(ref(database, 'players'), newPlayers);
+                const newPasswords = { ...passwords };
+                delete newPasswords[playerName];
+                await set(ref(database, 'passwords'), newPasswords);
+                await logActivity('REMOVE_PLAYER', `Tog bort spelare: ${playerName}`);
+            } catch (error) {
+                console.error('Remove player error:', error);
+                alert('❌ Fel: ' + error.message);
+            }
         };
 
         // SHOW TAB
@@ -3299,20 +3579,16 @@
 
         // EVENT LISTENERS
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, setting up event listeners...');
-            
             // Login
             const loginBtn = document.getElementById('loginButton');
             if (loginBtn) {
                 loginBtn.addEventListener('click', handleLogin);
-                console.log('Login button listener added');
             }
 
             // Logout
             const logoutBtn = document.getElementById('logoutButton');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', handleLogout);
-                console.log('Logout button listener added');
             }
 
             // Password enter key
@@ -3321,14 +3597,12 @@
                 passwordInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') handleLogin();
                 });
-                console.log('Password enter key listener added');
             }
 
             // Tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', handleTab);
             });
-            console.log('Tab listeners added');
 
             // Admin modal (for Hefner)
             const modalOutcomeButtons = document.getElementById('modalOutcomeButtons');
@@ -3354,7 +3628,6 @@
             }
 
             updateRoundsVisibility();
-            console.log('All event listeners set up successfully');
         });
     </script>
 </body>

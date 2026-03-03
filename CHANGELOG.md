@@ -1,5 +1,21 @@
 # Ändringslogg
 
+## 2026-03-03 (kodoptimering #3)
+### Buggfixar
+- **adminResetResults rensade inte actualScore** – gamla poängresultat (t.ex. "2-1") kunde ligga kvar efter nollställning
+- **loadSession kraschade vid korrupt localStorage** – JSON.parse wrappat i try/catch
+- **Höger fisk-animation** – ny swimRight keyframe så att högra fisken rör sig åt rätt håll
+
+### Prestanda
+- **Pokalräkning cachad** – `getPlayerTrophyHTML()` loopade genom all historik vid varje anrop; nu cachad via `rebuildTrophyCache()` en gång per render-cykel
+
+### Robusthet
+- **Felhantering i admin-funktioner** – try/catch tillagt i adminSaveDeadline, adminClearDeadline, adminAddPlayer och adminRemovePlayer
+
+### Kodkvalitet
+- **21 console.log borttagna** från produktionskod (console.error/warn behålls)
+- **~30 nya CSS-klasser** ersätter inline-stilar i template-literals (utseendet oförändrat, koden mer läsbar)
+
 ## 2026-03-03 (ny iPhone-favicon)
 - Uppdaterad apple-touch-icon.png med Canvas-renderad KC-logotyp utan pixlar
 

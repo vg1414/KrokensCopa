@@ -1419,6 +1419,7 @@
             <div id="predict" class="content">
                 <div class="card">
                     <h2 class="section-title">🎯 Tippa matcher</h2>
+                    <p id="tippCountLabel" style="margin: -4px 0 10px 0;"></p>
                     <div class="prediction-section" id="predictionsList"></div>
                 </div>
             </div>
@@ -1459,25 +1460,9 @@
                             </div>
                             <div id="nostradamusLeader" class="special-title-name"></div>
                             <div id="nostradamusLeaderDetail" class="special-title-detail"></div>
-                            <div id="nostradamusRest" class="special-title-detail" style="margin-top: 6px;"></div>
                         </div>
                     </div>
 
-                    <!-- Ligans Nostradamus-tabell -->
-                    <div id="nostradamusTableSection" style="margin-top: 25px; display: none;">
-                        <h3 class="sub-table-header" style="color: #0ea5e9;">🔮 Ligans Nostradamus</h3>
-                        <p class="sub-table-desc">Antal korrekta exakta resultat (t.ex. 2–1)</p>
-                        <table class="leaderboard-table leaderboard-table-sm">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Spelare</th>
-                                    <th>Exakta</th>
-                                </tr>
-                            </thead>
-                            <tbody id="nostradamusTableBody"></tbody>
-                        </table>
-                    </div>
 
                     <!-- Ligans Sniper-tabell -->
                     <div id="sniperTableSection" style="margin-top: 20px; display: none;">
@@ -2956,6 +2941,14 @@ passwords[player] = hashedPassword;
                 return;
             }
 
+            const tippCountLabel = document.getElementById('tippCountLabel');
+            if (tippCountLabel) {
+                const tippade = matches.filter(m => exactPredictions[m.id]?.[currentUser]).length;
+                const allTipped = tippade === matches.length;
+                tippCountLabel.textContent = `${tippade}/${matches.length} tippade matcher`;
+                tippCountLabel.style.cssText = `margin: -4px 0 10px 0; font-size: 0.9em; font-weight: 600; color: ${allTipped ? '#16a34a' : '#dc2626'};`;
+            }
+
             // Group matches by deadline key
             const groups = {};
             const groupOrder = [];
@@ -3127,13 +3120,16 @@ passwords[player] = hashedPassword;
             const scoreStr = `${h}-${a}`;
 
             try {
+                // Update local state immediately (for re-render + flash animation)
                 if (!predictions[matchId]) predictions[matchId] = {};
                 predictions[matchId][currentUser] = outcome;
                 if (!exactPredictions[matchId]) exactPredictions[matchId] = {};
                 exactPredictions[matchId][currentUser] = scoreStr;
 
-                await set(ref(database, 'predictions'), predictions);
-                await set(ref(database, 'exactPredictions'), exactPredictions);
+                // Write only this player's specific path – prevents race conditions
+                // when multiple players tip at the same time
+                await set(ref(database, `predictions/${matchId}/${currentUser}`), outcome);
+                await set(ref(database, `exactPredictions/${matchId}/${currentUser}`), scoreStr);
 
                 await logActivity('PREDICT', `Tippade på ${match.homeTeam} vs ${match.awayTeam}`);
 
@@ -3295,37 +3291,19 @@ passwords[player] = hashedPassword;
 
             const nostradamusLeader = document.getElementById('nostradamusLeader');
             const nostradamusLeaderDetail = document.getElementById('nostradamusLeaderDetail');
-            const nostradamusRest = document.getElementById('nostradamusRest');
             const withPoints = nostradamusCounts.filter(p => p.correctExact > 0);
 
             if (withPoints.length > 0) {
                 const topNostradamusScore = withPoints[0].correctExact;
                 const nostLeaders = withPoints.filter(p => p.correctExact === topNostradamusScore);
-                const nostOthers = withPoints.filter(p => p.correctExact < topNostradamusScore);
-                nostradamusLeader.innerHTML = nostLeaders.map(p => nameWithTrophy(p.player)).join(' &amp; ');
+                const leaderNames = nostLeaders.map(p => nameWithTrophy(p.player));
+                nostradamusLeader.innerHTML = leaderNames.length === 1
+                    ? leaderNames[0]
+                    : leaderNames.slice(0, -1).join(', ') + ' &amp; ' + leaderNames[leaderNames.length - 1];
                 nostradamusLeaderDetail.textContent = `${topNostradamusScore} st korrekt exakt resultat`;
-                nostradamusRest.innerHTML = nostOthers.length > 0
-                    ? nostOthers.map(p => `${nameWithTrophy(p.player)} – ${p.correctExact} st`).join(', ')
-                    : '';
                 nostradamusSection.style.display = 'block';
             } else {
                 nostradamusSection.style.display = 'none';
-            }
-
-            // Render Nostradamus table
-            const nostradamusTableSection = document.getElementById('nostradamusTableSection');
-            const nostradamusTableBody = document.getElementById('nostradamusTableBody');
-            if (withPoints.length > 0) {
-                nostradamusTableBody.innerHTML = withPoints.map((p, i) => `
-                    <tr>
-                        <td><span class="rank">${i + 1}</span></td>
-                        <td>${nameWithTrophy(p.player)}</td>
-                        <td><strong>${p.correctExact}</strong></td>
-                    </tr>
-                `).join('');
-                nostradamusTableSection.style.display = 'block';
-            } else {
-                nostradamusTableSection.style.display = 'none';
             }
 
             // Render Sniper table

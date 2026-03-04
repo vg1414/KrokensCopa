@@ -1,5 +1,8 @@
 # Ändringslogg
 
+## 2026-03-04 (städning)
+- Ta bort Lennart från hårdkodad spelarlista i login-dropdownen
+
 ## 2026-03-04 (buggfix + UI)
 - Fixar kritisk race condition: tips skrevs över om flera tippade samtidigt – nu skrivs varje tips till sin egen sökväg i Firebase
 - Tar bort Nostradamus-tabellen, behåller textkortet med ledare i a, b & c-format

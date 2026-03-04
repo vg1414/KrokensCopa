@@ -2087,11 +2087,11 @@
                     <div id="statusContainer"></div>
                     <div class="login-field">
                         <label for="playerSelect">Spelare</label>
-                        <select id="playerSelect">
+                        <select id="playerSelect" onchange="togglePasswordField()">
                             <option value="">Välj spelare…</option>
                         </select>
                     </div>
-                    <div class="login-field">
+                    <div class="login-field" id="passwordField">
                         <label for="passwordInput">Lösenord</label>
                         <input type="password" id="passwordInput" placeholder="Skriv lösenordet">
                         <span class="login-hint">Första gången? Välj ett lösenord du kommer ihåg.</span>
@@ -2533,8 +2533,22 @@
             });
         }
 
+        // Hämta klientens IP-adress (cachas efter första anropet)
+        let clientIP = null;
+        async function fetchClientIP() {
+            if (clientIP) return clientIP;
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                clientIP = data.ip;
+            } catch (e) {
+                clientIP = 'okänd';
+            }
+            return clientIP;
+        }
+
         // Activity logging
-        async function logActivity(action, details = '') {
+        async function logActivity(action, details = '', ip = null) {
             // Don't log if we haven't loaded the activity log yet
             if (!activityLogLoaded) {
                 console.warn('Activity log not loaded yet, skipping log entry');
@@ -2547,6 +2561,7 @@
                 action: action,
                 details: details
             };
+            if (ip) entry.ip = ip;
             
             activityLog.unshift(entry); // Add to beginning
             
@@ -2698,9 +2713,9 @@ scheduleRender();
                 // Check for existing session on first load
                 if (!currentUser) {
                     const sessionPlayer = loadSession();
-                    if (sessionPlayer && passwords[sessionPlayer]) {
+                    if (sessionPlayer && (passwords[sessionPlayer] || sessionPlayer === 'Åskådare')) {
 activateSession(sessionPlayer);
-                        logActivity('AUTO_LOGIN', 'Automatisk inloggning från session');
+                        fetchClientIP().then(ip => logActivity('AUTO_LOGIN', 'Automatisk inloggning från session', ip));
                     }
                 }
             });
@@ -2766,6 +2781,15 @@ if (currentUser === 'Hefner') {
             alert('Firebase-fel: ' + error.message);
         }
 
+        // Toggle password field visibility based on selected player
+        window.togglePasswordField = function() {
+            const player = document.getElementById('playerSelect').value;
+            const pwField = document.getElementById('passwordField');
+            if (pwField) {
+                pwField.style.display = player === 'Åskådare' ? 'none' : '';
+            }
+        };
+
         // LOGIN FUNCTION
         async function handleLogin() {
 
@@ -2783,6 +2807,14 @@ if (!player) {
                 return;
             }
 
+            // Åskådare – inget lösenord krävs
+            if (player === 'Åskådare') {
+                activateSession('Åskådare');
+                const ipViewer = await fetchClientIP();
+                await logActivity('LOGIN', 'Loggade in', ipViewer);
+                return;
+            }
+
             if (!password) {
                 showStatus('❌ Skriv ett lösenord!', 'error');
                 return;
@@ -2790,12 +2822,13 @@ if (!player) {
 
             try {
                 const hashedPassword = await hashPassword(password);
+                const ip = await fetchClientIP();
 
 if (passwords[player]) {
                     // Verify password
                     if (passwords[player] === hashedPassword) {
 activateSession(player);
-                        await logActivity('LOGIN', 'Loggade in');
+                        await logActivity('LOGIN', 'Loggade in', ip);
                     } else {
 showStatus('❌ Fel lösenord!', 'error');
                     }
@@ -2804,7 +2837,7 @@ showStatus('❌ Fel lösenord!', 'error');
 passwords[player] = hashedPassword;
                     await set(ref(database, 'passwords'), passwords);
                     activateSession(player);
-                    await logActivity('FIRST_LOGIN', 'Skapade konto och loggade in');
+                    await logActivity('FIRST_LOGIN', 'Skapade konto och loggade in', ip);
                     alert('✅ Lösenord sparat! Välkommen!');
                 }
             } catch (error) {
@@ -3186,8 +3219,9 @@ passwords[player] = hashedPassword;
                 const icon = actionIcons[entry.action] || '📌';
                 const color = actionColors[entry.action] || '#10b981';
                 const user = entry.user || 'System';
+                const ipTag = entry.ip ? ` <span style="color: #6b7280; font-size: 0.85em;">(${entry.ip})</span>` : '';
                 html += `<div style="color: ${color}; margin-bottom: 4px;">`;
-                html += `[${timeStr}] ${icon} ${user}: ${entry.details}`;
+                html += `[${timeStr}] ${icon} ${user}${ipTag}: ${entry.details}`;
                 html += `</div>`;
             });
 
@@ -3352,8 +3386,9 @@ passwords[player] = hashedPassword;
             try { await set(ref(database, 'lastAutoFetch'), new Date().toISOString()); } catch (e) {}
         }
 
-        // RESULT MODAL (Anyone can use after match starts)
+        // RESULT MODAL (alla spelare utom åskådare)
         window.openResultModal = function(matchId) {
+            if (currentUser === 'Åskådare') { alert('👁 Åskådare kan inte ändra resultat – bara spelare kan göra det.'); return; }
             const match = getMatch(matchId);
             if (!match) return;
 
@@ -3411,6 +3446,7 @@ passwords[player] = hashedPassword;
         };
 
         async function saveModalResult() {
+            if (currentUser === 'Åskådare') { alert('👁 Åskådare kan inte ändra resultat – bara spelare kan göra det.'); return; }
             if (currentModalMatchId === null) return;
 
             if (currentModalOutcome === 'derive') {
@@ -3635,7 +3671,7 @@ passwords[player] = hashedPassword;
         function renderPredictions() {
             const list = document.getElementById('predictionsList');
             if (!list) return;
-            
+
             if (!currentUser) {
                 list.innerHTML = '<div class="empty-state">Logga in för att tippa</div>';
                 return;
@@ -3647,7 +3683,12 @@ passwords[player] = hashedPassword;
             }
 
             const tippCountLabel = document.getElementById('tippCountLabel');
-            if (tippCountLabel) {
+            if (currentUser === 'Åskådare') {
+                if (tippCountLabel) {
+                    tippCountLabel.textContent = '👁 Åskådarläge – du kan se tippningarna men inte tippa själv';
+                    tippCountLabel.style.cssText = 'margin: -4px 0 10px 0; font-size: 0.9em; font-weight: 600; color: #667eea;';
+                }
+            } else if (tippCountLabel) {
                 const tippade = matches.filter(m => exactPredictions[m.id]?.[currentUser]).length;
                 const allTipped = tippade === matches.length;
                 tippCountLabel.textContent = `${tippade}/${matches.length} tippade matcher`;
@@ -3664,14 +3705,15 @@ passwords[player] = hashedPassword;
             });
 
             function renderMatchCard(m, locked) {
+                const isViewer = currentUser === 'Åskådare';
                 const myPred = predictions[m.id]?.[currentUser];
                 const myExact = exactPredictions[m.id]?.[currentUser];
                 const matchActuallyStarted = isMatchStarted(m.date);
                 const dateStr = formatDateTime(m.date);
 
                 let predictionsHtml = '';
-                if (locked || matchActuallyStarted) {
-                    // Tippning stängd – visa alla spelares tips
+                if (locked || matchActuallyStarted || isViewer) {
+                    // Tippning stängd ELLER åskådarläge – visa alla spelares tips
                     const matchPreds = predictions[m.id] || {};
                     const matchExactPreds = exactPredictions[m.id] || {};
                     if (Object.keys(matchPreds).length > 0) {
@@ -3692,6 +3734,8 @@ passwords[player] = hashedPassword;
                                 `}).join('')}
                             </div>
                         `;
+                    } else if (isViewer && !locked && !matchActuallyStarted) {
+                        predictionsHtml = `<div style="text-align:center; color:#aaa; font-size:0.85em; padding: 8px 0;">Inga tippningar ännu</div>`;
                     }
                 }
 
@@ -3700,13 +3744,15 @@ passwords[player] = hashedPassword;
                         <div style="text-align: center; color: #666; font-size: 0.8em; margin-bottom: 10px;">
                             ${m.league} • ${dateStr}
                         </div>
-                        ${locked ? `
+                        ${(locked || isViewer) ? `
                             <div class="pred-card-header">
                                 ${m.homeTeam} <span class="pred-card-header-vs">vs</span> ${m.awayTeam}
                             </div>
                             <div class="pred-locked-status">
-                                <span>${myExact ? `Din tipp: <strong>${myExact.replace('-', ' – ')}</strong>` : 'Du tippade inte denna match'}</span>
-                                <span class="pred-locked-chip">STÄNGD</span>
+                                ${isViewer && !locked
+                                    ? `<span style="color:#667eea;">👁 Åskådarläge</span><span class="pred-locked-chip" style="background:#667eea;">LÄSLÄGE</span>`
+                                    : `<span>${myExact ? `Din tipp: <strong>${myExact.replace('-', ' – ')}</strong>` : 'Du tippade inte denna match'}</span><span class="pred-locked-chip">STÄNGD</span>`
+                                }
                             </div>
                             ${predictionsHtml}
                         ` : `
@@ -3809,6 +3855,7 @@ passwords[player] = hashedPassword;
         // Spara resultat + automatisk 1X2
         window.saveScorePrediction = async function(matchId) {
             if (!currentUser) { alert('Du måste vara inloggad!'); return; }
+            if (currentUser === 'Åskådare') { alert('👁 Du är åskådare och kan inte tippa!'); return; }
 
             const match = getMatch(matchId);
             if (isMatchLocked(match)) {
@@ -4138,7 +4185,9 @@ passwords[player] = hashedPassword;
             if (!select) return;
             const current = select.value;
             select.innerHTML = '<option value="">Välj spelare...</option>' +
-                PLAYERS.map(p => `<option value="${p}"${p === current ? ' selected' : ''}>${p}</option>`).join('');
+                PLAYERS.map(p => `<option value="${p}"${p === current ? ' selected' : ''}>${p}</option>`).join('') +
+                `<option value="Åskådare"${current === 'Åskådare' ? ' selected' : ''}>👁 Åskådare (inget lösenord)</option>`;
+            togglePasswordField();
         }
 
         window.adminToggleSection = function(id) {

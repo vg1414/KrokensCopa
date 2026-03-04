@@ -8,6 +8,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="apple-touch-icon.png">
     <meta name="theme-color" content="#0f172a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -23,7 +25,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -133,46 +135,192 @@
             font-weight: 500;
         }
 
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 500px;
-            margin: 0 auto;
+        /* === Login overlay (Design A – Matchnight) === */
+        #loginScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #0a0c10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
 
-        .login-title {
-            font-size: 1.8em;
-            color: #667eea;
-            margin-bottom: 20px;
+        #loginScreen::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(240,180,41,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(240,180,41,.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        #loginScreen::after {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            background: radial-gradient(circle, rgba(240,180,41,.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .login-wrap {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            animation: loginRise .6s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        @keyframes loginRise {
+            from { opacity:0; transform: translateY(24px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .login-logo-block {
             text-align: center;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
+        .login-logo-fish {
+            font-size: 2.6em;
             margin-bottom: 8px;
-            color: #333;
+            display: block;
+            animation: swing 4s ease-in-out infinite;
         }
 
-        .form-group input,
-        .form-group select {
+        .login-logo-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4.4em;
+            color: #e8edf5;
+            letter-spacing: .05em;
+            line-height: 1;
+        }
+
+        .login-logo-title span {
+            color: #f0b429;
+        }
+
+        .login-card {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
+            background: #12161f;
+            border: 1px solid #1e2535;
+            border-radius: 16px;
+            padding: 36px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
+        .login-card-label {
+            font-size: .72em;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: #8896aa;
+            font-weight: 500;
+            margin-bottom: 4px;
+            text-align: center;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .login-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .login-field label {
+            font-size: .8em;
+            font-weight: 500;
+            color: #8896aa;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .login-field select,
+        .login-field input {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+            border-radius: 10px;
+            padding: 13px 16px;
+            color: #e8edf5;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1em;
             outline: none;
-            border-color: #667eea;
+            transition: border-color .2s, box-shadow .2s;
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+        }
+
+        .login-field select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238896aa' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        .login-field select option {
+            background: #1a1f2e;
+        }
+
+        .login-field select:focus,
+        .login-field input:focus {
+            border-color: #f0b429;
+            box-shadow: 0 0 0 3px rgba(240,180,41,.12);
+        }
+
+        .login-hint {
+            font-size: .78em;
+            color: #4a5568;
+            margin-top: -8px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #f0b429;
+            color: #0a0c10;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1em;
+            font-weight: 700;
+            letter-spacing: .04em;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s, background .15s;
+            margin-top: 4px;
+        }
+
+        .btn-login:hover {
+            background: #f7c84a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(240,180,41,.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .login-footer-note {
+            font-size: .75em;
+            color: #4a5568;
+            text-align: center;
+            font-family: 'DM Sans', sans-serif;
         }
 
         .user-badge {
@@ -715,8 +863,12 @@
             }
 
             /* --- Login --- */
-            .login-container {
-                padding: 20px 15px;
+            .login-card {
+                padding: 24px 20px;
+            }
+
+            .login-logo-title {
+                font-size: 3.4em;
             }
 
             /* --- Tabs --- */
@@ -1344,45 +1496,609 @@
             font-weight: bold;
             font-size: 1.3em;
         }
+
+        /* ═══════════════════════════════════════
+           DARK THEME OVERRIDES – Matchnight
+           ═══════════════════════════════════════ */
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0c10;
+            color: #e8edf5;
+        }
+
+        header {
+            background: #12161f;
+            border: 1px solid #1e2535;
+            box-shadow: none;
+        }
+
+        .banner-bg,
+        .banner-fish { display: none; }
+
+        .banner-content {
+            padding: 22px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .logo-container { margin-bottom: 0; gap: 12px; }
+
+        .fishing-hook {
+            font-size: 1.6em;
+            filter: none;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.4em;
+            font-weight: 400;
+            letter-spacing: .05em;
+            text-shadow: none;
+            color: #e8edf5;
+        }
+
+        h1 span { color: #f0b429; }
+
+        .user-badge {
+            background: #12161f;
+            border: 1px solid #1e2535;
+            color: #e8edf5;
+        }
+
+        .tabs {
+            gap: 0;
+            border-bottom: 1px solid #1e2535;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            background: transparent;
+            border-radius: 0;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            color: #8896aa;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            font-size: .9em;
+            padding: 14px 16px;
+            transition: color .2s, border-color .2s;
+        }
+
+        .tab:hover {
+            color: #e8edf5;
+            transform: none;
+            background: transparent;
+        }
+
+        .tab.active {
+            background: transparent;
+            color: #f0b429;
+            border-bottom-color: #f0b429;
+        }
+
+        .card {
+            background: #12161f;
+            border: 1px solid #1e2535;
+            box-shadow: none;
+        }
+
+        .section-title { color: #e8edf5; }
+
+        .btn {
+            background: #f0b429;
+            color: #0a0c10;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+        }
+
+        .btn:hover {
+            background: #f7c84a;
+            box-shadow: 0 4px 12px rgba(240,180,41,.3);
+        }
+
+        .btn-secondary { background: #1e2535; color: #e8edf5; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+
+        .match-item {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+        }
+
+        .match-teams { color: #e8edf5; }
+        .match-details { color: #8896aa; }
+
+        .match-locked {
+            background: rgba(240,180,41,.08);
+            border: 1px solid rgba(240,180,41,.25);
+            color: #f0b429;
+        }
+
+        .prediction-match {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+        }
+
+        .prediction-match.locked {
+            background: #0d1018;
+            border: 2px solid #252d40;
+        }
+
+        .locked-overlay {
+            background: rgba(240,180,41,.08);
+            border: 1px solid rgba(240,180,41,.2);
+            color: #f0b429;
+        }
+
+        .outcome-btn {
+            background: #0a0c10;
+            border: 2px solid #1e2535;
+            color: #e8edf5;
+        }
+
+        .outcome-btn:hover:not(:disabled) { border-color: #f0b429; }
+
+        .outcome-btn.selected {
+            background: #f0b429;
+            color: #0a0c10;
+            border-color: #f0b429;
+        }
+
+        .predictions-revealed {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+        }
+
+        .predictions-revealed h4 { color: #f0b429; }
+        .prediction-row { border-bottom-color: #1e2535; }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            border-bottom-color: #1e2535;
+            color: #e8edf5;
+        }
+
+        .leaderboard-table th {
+            background: #0a0c10;
+            color: #f0b429;
+        }
+
+        .round-group { border-color: #1e2535; }
+
+        .round-header {
+            background: #1e2535;
+            color: #e8edf5;
+        }
+
+        .round-header:hover { background: #252d40; }
+        .round-body { background: #12161f; }
+
+        .modal-content {
+            background: #12161f;
+            border: 1px solid #1e2535;
+            color: #e8edf5;
+        }
+
+        .modal-header { color: #e8edf5; }
+
+        .modal-match-info {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+            color: #f0b429;
+        }
+
+        .modal-outcome-btn {
+            background: #0a0c10;
+            border-color: #1e2535;
+            color: #e8edf5;
+        }
+
+        .modal-outcome-btn:hover { border-color: #f0b429; }
+
+        .modal-outcome-btn.selected {
+            background: #f0b429;
+            color: #0a0c10;
+            border-color: #f0b429;
+        }
+
+        .status-success {
+            background: rgba(16,185,129,.12);
+            color: #10b981;
+            border: 1px solid rgba(16,185,129,.3);
+        }
+
+        .status-error {
+            background: rgba(220,53,69,.12);
+            color: #ff6b7a;
+            border: 1px solid rgba(220,53,69,.3);
+        }
+
+        .status-info {
+            background: rgba(240,180,41,.1);
+            color: #f0b429;
+            border: 1px solid rgba(240,180,41,.2);
+        }
+
+        .score-input {
+            background: #0a0c10;
+            border-color: #1e2535;
+            color: #e8edf5;
+        }
+
+        .score-input:focus { border-color: #f0b429; }
+        .score-dash { color: #4a5568; }
+        .score-team { color: #e8edf5; }
+        .empty-state { color: #8896aa; }
+
+        .admin-section-blue {
+            background: rgba(59,130,246,.07);
+            border-color: rgba(59,130,246,.3);
+        }
+
+        .admin-section-green {
+            background: rgba(34,197,94,.07);
+            border-color: rgba(34,197,94,.3);
+        }
+
+        .admin-section-red {
+            background: rgba(239,68,68,.07);
+            border-color: rgba(239,68,68,.3);
+        }
+
+        .admin-section h3 { color: #e8edf5; }
+        .admin-section p { color: #8896aa; }
+
+        .admin-subsection {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+        }
+
+        .admin-subsection-red { background: rgba(220,53,69,.08); }
+
+        .admin-select {
+            background: #0a0c10;
+            color: #e8edf5;
+        }
+
+        .admin-label { color: #8896aa; }
+
+        .admin-input {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+            color: #e8edf5;
+        }
+
+        .admin-player-row {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+        }
+
+        .admin-player-name { color: #e8edf5; }
+
+        .pred-status-box-before,
+        .pred-status-box-after { background: rgba(240,180,41,.06); }
+
+        .pred-status-box-postponed { background: rgba(245,158,11,.08); }
+        .pred-status-header { color: #f0b429; }
+
+        .pts-badge-wrong {
+            background: #1e2535;
+            color: #8896aa;
+        }
+
+        .deadline-banner-locked {
+            background: rgba(239,68,68,.12);
+            border-color: rgba(239,68,68,.4);
+            color: #ff6b7a;
+        }
+
+        .deadline-banner-open {
+            background: rgba(240,180,41,.1);
+            border-color: rgba(240,180,41,.3);
+            color: #f0b429;
+        }
+
+        .deadline-countdown { color: #f0b429; }
+
+        .pred-card-header {
+            color: #e8edf5;
+            border-bottom-color: #1e2535;
+        }
+
+        .pred-card-header-vs { color: #f0b429; }
+        .score-saved-msg { color: #f0b429; }
+
+        @keyframes saveFlash {
+            0%   { background: #0a0c10; box-shadow: none; }
+            25%  { background: rgba(16,185,129,.15); box-shadow: 0 0 0 3px #10b981; }
+            60%  { background: rgba(16,185,129,.15); box-shadow: 0 0 0 3px #10b981; }
+            100% { background: #0a0c10; box-shadow: none; }
+        }
+
+        .special-titles-container {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+        }
+
+        .special-title-card {
+            background: #12161f;
+            border: 1px solid #1e2535;
+        }
+
+        .special-title-name { color: #e8edf5; }
+        .special-title-detail { color: #8896aa; }
+
+        .history-card { border-color: #1e2535; }
+        .history-card-header { background: #1e2535; }
+
+        .sub-table-header { color: #e8edf5; }
+        .sub-table-desc { color: #8896aa; }
+
+        .deadline-admin-row {
+            background: #0a0c10;
+            border-color: #1e2535;
+        }
+
+        .modal-score-section {
+            background: #0a0c10;
+            border: 1px solid #1e2535;
+        }
+
+        .modal-score-label { color: #f0b429; }
+        .modal-score-team { color: #e8edf5; }
+        .modal-score-dash { color: #8896aa; }
+
+        .modal-score-input {
+            background: #0a0c10;
+            border-color: #1e2535;
+            color: #e8edf5;
+        }
+
+        @media (max-width: 768px) {
+            .banner-content { padding: 16px 20px; gap: 10px; }
+            .fishing-hook { font-size: 1.3em; }
+            h1 { font-size: 1.9em; }
+            .tabs { flex-wrap: nowrap; overflow-x: auto; }
+            .tab { flex-shrink: 0; padding: 12px 14px; font-size: 0.82em; }
+        }
+
+        /* Raffinerade knappar */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.88em;
+            letter-spacing: .02em;
+        }
+
+        /* Matchen startad – subtil statusrad */
+        .match-locked {
+            background: transparent;
+            border: none;
+            padding: 4px 0;
+            color: #94a3b8;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        /* Deadline-chips (diskret) */
+        .deadline-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 0;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+
+        .deadline-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .deadline-chip-locked { color: #94a3b8; }
+        .deadline-chip-locked .deadline-dot { background: #cbd5e1; }
+
+        .deadline-chip-open { color: #059669; }
+        .deadline-chip-open .deadline-dot { background: #10b981; }
+        .deadline-chip-open .deadline-countdown { font-weight: 700; margin-left: 6px; }
+
+        .deadlines-row {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: -6px;
+        }
+        .deadlines-row .deadline-chip { margin-bottom: 0; }
+
+        /* Tippa-fliken: diskret låst-status */
+        .pred-locked-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0 12px;
+            font-size: 0.86em;
+            color: #64748b;
+            border-bottom: 1px solid #dde3ec;
+            margin-bottom: 10px;
+        }
+
+        .pred-locked-chip {
+            font-size: 0.72em;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: #94a3b8;
+            background: #f1f5f9;
+            padding: 2px 7px;
+            border-radius: 3px;
+        }
+
+        /* ═══════════════════════════════════════
+           LJUST TEMA – luftigt och lättläst
+           ═══════════════════════════════════════ */
+
+        body { background: #f0f4f8; color: #1e293b; }
+
+        header { background: #1e2535; border: none; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+        h1 { color: #e8edf5; }
+        h1 span { color: #f0b429; }
+
+        .user-badge { background: #1e2535; color: #e8edf5; border: none; }
+
+        .tabs { border-bottom-color: #dde3ec; }
+        .tab { color: #64748b; }
+        .tab:hover { color: #1e293b; background: transparent; }
+        .tab.active { color: #d4930a; border-bottom-color: #d4930a; }
+
+        .card { background: #ffffff; border: 1px solid #dde3ec; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+        .section-title { color: #1e293b; }
+
+        .btn { background: #f0b429; color: #0a0c10; }
+        .btn:hover { background: #f7c84a; box-shadow: 0 4px 12px rgba(240,180,41,.3); }
+        .btn-secondary { background: #e2e8f0; color: #1e293b; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+
+        .match-item { background: #f8fafc; border: 1px solid #dde3ec; }
+        .match-teams { color: #1e293b; }
+        .match-details { color: #64748b; }
+        .match-locked { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; }
+
+        .prediction-match { background: #f8fafc; border: 1px solid #dde3ec; color: #1e293b; }
+        .prediction-match.locked { background: #f1f5f9; border: 2px solid #cbd5e1; }
+        .locked-overlay { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; }
+
+        .outcome-btn { background: #ffffff; border: 2px solid #dde3ec; color: #1e293b; }
+        .outcome-btn:hover:not(:disabled) { border-color: #f0b429; }
+        .outcome-btn.selected { background: #f0b429; color: #0a0c10; border-color: #f0b429; }
+
+        .predictions-revealed { background: #f8fafc; border: 1px solid #dde3ec; color: #1e293b; }
+        .predictions-revealed h4 { color: #d4930a; }
+        .prediction-row { border-bottom-color: #dde3ec; }
+        .pred-row { color: #1e293b; }
+        .pred-row-waiting { color: #64748b; }
+
+        .leaderboard-table th,
+        .leaderboard-table td { border-bottom-color: #dde3ec; color: #1e293b; }
+        .leaderboard-table th { background: #f8fafc; color: #d4930a; }
+
+        .round-group { border-color: #dde3ec; }
+        .round-header { background: #1e2535; color: #e8edf5; }
+        .round-header:hover { background: #252d40; }
+        .round-body { background: #ffffff; }
+
+        .modal-content { background: #ffffff; border: 1px solid #dde3ec; color: #1e293b; }
+        .modal-header { color: #1e293b; }
+        .modal-match-info { background: #f8fafc; border: 1px solid #dde3ec; color: #1e293b; }
+        .modal-outcome-btn { background: #ffffff; border-color: #dde3ec; color: #1e293b; }
+        .modal-outcome-btn:hover { border-color: #f0b429; }
+        .modal-outcome-btn.selected { background: #f0b429; color: #0a0c10; border-color: #f0b429; }
+
+        .status-success { background: #d1fae5; color: #065f46; border: none; }
+        .status-error { background: #fee2e2; color: #991b1b; border: none; }
+        .status-info { background: #fef3c7; color: #92400e; border: none; }
+
+        .score-input { background: #ffffff; border-color: #dde3ec; color: #1e293b; }
+        .score-input:focus { border-color: #f0b429; }
+        .score-dash { color: #94a3b8; }
+        .score-team { color: #1e293b; }
+        .empty-state { color: #64748b; }
+
+        .admin-section-blue { background: #eff6ff; border-color: #3b82f6; }
+        .admin-section-green { background: #f0fdf4; border-color: #22c55e; }
+        .admin-section-red { background: #fff1f2; border-color: #ef4444; }
+        .admin-section h3 { color: #1e293b; }
+        .admin-section p { color: #64748b; }
+        .admin-subsection { background: #f8fafc; border: 1px solid #dde3ec; }
+        .admin-subsection-red { background: #fef2f2; }
+        .admin-select { background: #ffffff; color: #1e293b; border-color: #3b82f6; }
+        .admin-label { color: #334155; }
+        .admin-input { background: #ffffff; border: 1px solid #dde3ec; color: #1e293b; }
+        .admin-player-row { background: #ffffff; border: 1px solid #dde3ec; }
+        .admin-player-name { color: #1e293b; }
+
+        .pred-status-box-before,
+        .pred-status-box-after { background: #f0f9ff; }
+        .pred-status-box-postponed { background: #fef3c7; }
+        .pred-status-header { color: #1e40af; }
+        .pts-badge-wrong { background: #e5e7eb; color: #6b7280; }
+
+        .deadline-banner-locked { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+        .deadline-banner-open { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+        .deadline-countdown { color: #b45309; }
+
+        .pred-card-header { color: #1e293b; border-bottom-color: #dde3ec; }
+        .pred-card-header-vs { color: #d4930a; }
+        .score-saved-msg { color: #10b981; }
+
+        @keyframes saveFlash {
+            0%   { background: #f8fafc; box-shadow: none; }
+            25%  { background: #d1fae5; box-shadow: 0 0 0 3px #10b981; }
+            60%  { background: #d1fae5; box-shadow: 0 0 0 3px #10b981; }
+            100% { background: #f8fafc; box-shadow: none; }
+        }
+
+        .special-titles-container { background: #f8fafc; border: 1px solid #dde3ec; }
+        .special-title-card { background: #ffffff; border: 1px solid #dde3ec; }
+        .special-title-name { color: #1e293b; }
+        .special-title-detail { color: #64748b; }
+
+        .history-card { border-color: #dde3ec; }
+        .history-card-header { background: #1e2535; }
+
+        .sub-table-header { color: #1e293b; }
+        .sub-table-desc { color: #64748b; }
+
+        .deadline-admin-row { background: #ffffff; border-color: #dde3ec; }
+
+        .modal-score-section { background: #f8fafc; border: 1px solid #dde3ec; }
+        .modal-score-label { color: #1e40af; }
+        .modal-score-team { color: #1e293b; }
+        .modal-score-dash { color: #94a3b8; }
+        .modal-score-input { background: #ffffff; border-color: #dde3ec; color: #1e293b; text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="banner-bg"></div>
-            <div class="banner-fish banner-fish-left">🎣</div>
-            <div class="banner-fish banner-fish-right">🎣</div>
             <div class="banner-content">
                 <div class="logo-container">
                     <span class="fishing-hook">🎣</span>
-                    <h1>Krokens Copa</h1>
+                    <h1>Krokens<span>Copa</span></h1>
+                    <span class="fishing-hook" style="transform: scaleX(-1);">🐟</span>
                 </div>
             </div>
         </header>
 
         <div id="loginScreen">
-            <div class="login-container">
-                <h2 class="login-title">Välkommen! 🎣</h2>
-                <div id="statusContainer"></div>
-                <div class="form-group">
-                    <label for="playerSelect">Välj spelare:</label>
-                    <select id="playerSelect">
-                        <option value="">Välj spelare...</option>
-                        <option value="Hefner">Hefner</option>
-                        <option value="Majscht">Majscht</option>
-                        <option value="Olle">Olle</option>
-                        <option value="Dawod">Dawod</option>
-                        <option value="Ante">Ante</option>
-                    </select>
+            <div class="login-wrap">
+                <div class="login-logo-block">
+                    <div class="login-logo-fish">🎣</div>
+                    <div class="login-logo-title">Krokens<span>Copa</span></div>
                 </div>
-                <div class="form-group">
-                    <label for="passwordInput">Lösenord:</label>
-                    <input type="password" id="passwordInput" placeholder="Skriv ditt lösenord">
-                    <small style="color: #666; display: block; margin-top: 5px;">
-                        Första gången? Välj ett lösenord som du kommer ihåg!
-                    </small>
+                <div class="login-card">
+                    <div class="login-card-label">Logga in för att tippa</div>
+                    <div id="statusContainer"></div>
+                    <div class="login-field">
+                        <label for="playerSelect">Spelare</label>
+                        <select id="playerSelect">
+                            <option value="">Välj spelare…</option>
+                        </select>
+                    </div>
+                    <div class="login-field">
+                        <label for="passwordInput">Lösenord</label>
+                        <input type="password" id="passwordInput" placeholder="Skriv lösenordet">
+                        <span class="login-hint">Första gången? Välj ett lösenord du kommer ihåg.</span>
+                    </div>
+                    <button class="btn-login" id="loginButton">Logga in</button>
                 </div>
-                <button class="btn" id="loginButton" style="width: 100%;">Logga in</button>
+                <div class="login-footer-note">Made by: David Hefner</div>
             </div>
         </div>
 
@@ -1400,7 +2116,7 @@
             <div class="tabs">
                 <button class="tab active" data-tab="setup">📅 Matcher</button>
                 <button class="tab" data-tab="predict">🎯 Tippa</button>
-                <button class="tab" data-tab="leaderboard">🏆 Topplista</button>
+                <button class="tab" data-tab="leaderboard">🏆 Tabell</button>
                 <button class="tab" data-tab="historik">📜 Historik</button>
                 <button class="tab" id="adminTab" data-tab="admin" style="display: none;">⚙️ Admin</button>
             </div>
@@ -1425,7 +2141,7 @@
 
             <div id="leaderboard" class="content">
                 <div class="card">
-                    <h2 class="section-title">🏆 Topplista</h2>
+                    <h2 class="section-title">🏆 Tabell</h2>
                     <table class="leaderboard-table">
                         <thead>
                             <tr>
@@ -1499,40 +2215,21 @@
             <div class="modal-content">
                 <div class="modal-header">Sätt resultat</div>
                 <div class="modal-match-info" id="modalMatchInfo"></div>
-                <div class="modal-outcome-buttons" id="modalOutcomeButtons" style="grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
-                    <button class="modal-outcome-btn" data-outcome="1">
-                        1
-                        <span class="modal-outcome-label" id="modalHome">Hemma</span>
-                    </button>
-                    <button class="modal-outcome-btn" data-outcome="X">
-                        X
-                        <span class="modal-outcome-label">Oavgjort</span>
-                    </button>
-                    <button class="modal-outcome-btn" data-outcome="2">
-                        2
-                        <span class="modal-outcome-label" id="modalAway">Borta</span>
-                    </button>
-                    <button class="modal-outcome-btn" data-outcome="POSTPONED" style="background: #fef3c7; border-color: #f59e0b;">
-                        ⚠️
-                        <span class="modal-outcome-label">Inställd</span>
-                    </button>
-                    <button class="modal-outcome-btn" data-outcome="null" style="background: #f8f9fa;">
-                        🗑️
-                        <span class="modal-outcome-label">Rensa</span>
-                    </button>
-                </div>
                 <div class="modal-score-section">
-                    <div class="modal-score-label">⭐ Exakt resultat (för resultatbonus)</div>
+                    <div class="modal-score-label">Slutresultat</div>
                     <div class="modal-score-row">
                         <span id="modalScoreHome" class="modal-score-team">Hemma</span>
-                        <input type="number" min="0" max="99" id="modalHomeScore" class="modal-score-input" placeholder="-">
-                        <span class="modal-score-dash">-</span>
-                        <input type="number" min="0" max="99" id="modalAwayScore" class="modal-score-input" placeholder="-">
+                        <input type="number" min="0" max="99" id="modalHomeScore" class="modal-score-input" placeholder="0">
+                        <span class="modal-score-dash">–</span>
+                        <input type="number" min="0" max="99" id="modalAwayScore" class="modal-score-input" placeholder="0">
                         <span id="modalScoreAway" class="modal-score-team">Borta</span>
                     </div>
                 </div>
+                <div id="modalSpecialStatus" style="text-align:center; font-size:0.82em; min-height:18px; margin-bottom:4px;"></div>
                 <div class="modal-actions">
                     <button class="btn btn-secondary" id="modalCancelBtn">Avbryt</button>
+                    <button class="btn btn-secondary" onclick="setModalSpecial('POSTPONED')" style="font-size:0.82em; padding:6px 12px;">Inställd</button>
+                    <button class="btn btn-secondary" onclick="setModalSpecial(null)" style="font-size:0.82em; padding:6px 12px;">Rensa</button>
                     <button class="btn" id="modalSaveBtn">Spara</button>
                 </div>
             </div>
@@ -1568,7 +2265,7 @@
                         <div class="admin-flex-row">
                             <input type="text" id="newPlayerNameInput" placeholder="Nytt spelarnamn"
                                 class="admin-input" style="border: 2px solid #3b82f6;">
-                            <button class="btn" onclick="adminAddPlayer()" style="background: #3b82f6;">➕ Lägg till</button>
+                            <button class="btn" onclick="adminAddPlayer()" style="background: #3b82f6;">Lägg till</button>
                         </div>
                     </div>
                 </div>
@@ -1638,7 +2335,7 @@
                                 <option value="6">6 omgångar</option>
                             </select>
                         </div>
-                        <button class="btn btn-success" onclick="adminLoadMatches()">📥 Hämta valda omgångar</button>
+                        <button class="btn btn-success" onclick="adminLoadMatches()">Hämta omgångar</button>
                     </div>
                 </div>
 
@@ -1685,17 +2382,17 @@
                             <div class="admin-subsection" style="background: #f0f9ff;">
                                 <h3 style="color: #1e40af;">🗑️ Nollställ tippningar</h3>
                                 <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Raderar ALLA spelares tippningar. Matcher och resultat behålls.</p>
-                                <button class="btn" style="background: #ef4444;" onclick="adminResetPredictions()">🗑️ Nollställ ALLA tippningar</button>
+                                <button class="btn" style="background: #ef4444;" onclick="adminResetPredictions()">Nollställ alla tippningar</button>
                             </div>
                             <div class="admin-subsection admin-subsection-red">
                                 <h3 style="color: #dc2626;">🔄 Nollställ resultat</h3>
                                 <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Raderar alla matchresultat. Tippningar behålls.</p>
-                                <button class="btn" style="background: #ef4444;" onclick="adminResetResults()">🔄 Nollställ alla resultat</button>
+                                <button class="btn" style="background: #ef4444;" onclick="adminResetResults()">Nollställ alla resultat</button>
                             </div>
                             <div class="admin-subsection admin-section-danger">
                                 <h3 style="color: #fca5a5;">💣 TOTAL RESET</h3>
                                 <p style="color: #fca5a5; margin-bottom: 15px; font-size: 0.9em;">Raderar ALLT: matcher, tippningar, resultat. (Lösenord och historik behålls)</p>
-                                <button class="btn" style="background: #7f1d1d; color: white;" onclick="adminFullReset()">💣 TOTAL RESET - Radera allt</button>
+                                <button class="btn" style="background: #7f1d1d; color: white;" onclick="adminFullReset()">TOTAL RESET – Radera allt</button>
                             </div>
                         </div>
                     </div>
@@ -2140,7 +2837,7 @@ passwords[player] = hashedPassword;
             currentUser = null;
             stopAutoFetch();
             clearSession(); // Clear auto-login session
-            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
             document.getElementById('passwordInput').value = '';
             document.getElementById('playerSelect').value = '';
@@ -2661,15 +3358,12 @@ passwords[player] = hashedPassword;
             if (!match) return;
 
             currentModalMatchId = matchId;
-            currentModalOutcome = match.actualOutcome;
+            currentModalOutcome = 'derive';
 
             document.getElementById('modalMatchInfo').textContent = `${match.homeTeam} vs ${match.awayTeam}`;
-            document.getElementById('modalHome').textContent = match.homeTeam;
-            document.getElementById('modalAway').textContent = match.awayTeam;
             document.getElementById('modalScoreHome').textContent = match.homeTeam;
             document.getElementById('modalScoreAway').textContent = match.awayTeam;
 
-            // Populate exact score if exists
             if (match.actualScore) {
                 const parts = match.actualScore.split('-');
                 document.getElementById('modalHomeScore').value = parts[0];
@@ -2679,14 +3373,9 @@ passwords[player] = hashedPassword;
                 document.getElementById('modalAwayScore').value = '';
             }
 
-            document.querySelectorAll('.modal-outcome-btn').forEach(btn => {
-                btn.classList.remove('selected');
-                if (match.actualOutcome === null && btn.dataset.outcome === 'null') {
-                    btn.classList.add('selected');
-                } else if (btn.dataset.outcome === currentModalOutcome) {
-                    btn.classList.add('selected');
-                }
-            });
+            const statusEl = document.getElementById('modalSpecialStatus');
+            statusEl.textContent = '';
+            statusEl.style.color = '';
 
             document.getElementById('resultModal').classList.add('active');
         };
@@ -2709,10 +3398,27 @@ passwords[player] = hashedPassword;
             currentModalOutcome = null;
         }
 
+        window.setModalSpecial = function(outcome) {
+            currentModalOutcome = outcome;
+            const el = document.getElementById('modalSpecialStatus');
+            if (outcome === 'POSTPONED') {
+                el.textContent = 'Markeras som inställd vid sparning';
+                el.style.color = '#f59e0b';
+            } else if (outcome === null) {
+                el.textContent = 'Resultat rensas vid sparning';
+                el.style.color = '#ef4444';
+            }
+        };
+
         async function saveModalResult() {
-            if (currentModalMatchId === null || currentModalOutcome === undefined) {
-                alert('Välj ett alternativ först!');
-                return;
+            if (currentModalMatchId === null) return;
+
+            if (currentModalOutcome === 'derive') {
+                const hs = document.getElementById('modalHomeScore').value;
+                const as = document.getElementById('modalAwayScore').value;
+                if (hs === '' || as === '') { alert('Ange ett slutresultat!'); return; }
+                const h = parseInt(hs), a = parseInt(as);
+                currentModalOutcome = h > a ? '1' : h < a ? '2' : 'X';
             }
 
             try {
@@ -2872,7 +3578,7 @@ passwords[player] = hashedPassword;
                 const resultControls = canSetResult ? `
                     <div class="match-actions">
                         <button class="btn btn-secondary" onclick="openResultModal('${m.id}')">
-                            ${m.actualOutcome ? '✏️ Ändra' : '📝 Sätt'} resultat
+                            ${m.actualOutcome ? 'Ändra' : 'Sätt'} resultat
                         </button>
                     </div>
                 ` : '';
@@ -2881,7 +3587,7 @@ passwords[player] = hashedPassword;
                     <div class="match-item">
                         <div class="match-teams">${m.homeTeam} vs ${m.awayTeam}</div>
                         <div class="match-details">${dateStr} • ${status}</div>
-                        ${started && !m.actualOutcome ? '<div class="match-locked">🔒 Matchen startad - Vem som helst kan sätta resultat</div>' : ''}
+                        ${started && !m.actualOutcome ? '<div class="match-locked">Matchen har startat – sätt resultat när den är klar</div>' : ''}
                         ${predictionStatusBefore}
                         ${predictionStatusAfter}
                         ${resultControls}
@@ -2998,9 +3704,9 @@ passwords[player] = hashedPassword;
                             <div class="pred-card-header">
                                 ${m.homeTeam} <span class="pred-card-header-vs">vs</span> ${m.awayTeam}
                             </div>
-                            <div class="locked-overlay">
-                                🔒 Tippning stängd
-                                ${myExact ? `<div style="margin-top: 6px; font-size: 0.9em; color: #667eea;">Din tipp: ${myExact.replace('-', ' – ')}</div>` : '<div style="margin-top: 6px; font-size: 0.9em; color: #999;">Du tippade inte denna match</div>'}
+                            <div class="pred-locked-status">
+                                <span>${myExact ? `Din tipp: <strong>${myExact.replace('-', ' – ')}</strong>` : 'Du tippade inte denna match'}</span>
+                                <span class="pred-locked-chip">STÄNGD</span>
                             </div>
                             ${predictionsHtml}
                         ` : `
@@ -3049,25 +3755,29 @@ passwords[player] = hashedPassword;
                     const lockedStr = new Date(deadline).toLocaleString('sv-SE', {
                         weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
-                    banners.set(key, `<div class="deadline-banner deadline-banner-locked">
-                        🔒 Tippning stängd – ${label}
-                        <div class="deadline-date">Stängde ${lockedStr}</div>
+                    banners.set(key, `<div class="deadline-chip deadline-chip-locked">
+                        <span class="deadline-dot"></span>
+                        <span>Stängd · ${label} · Stängde ${lockedStr}</span>
                     </div>`);
                 } else if (deadline) {
                     const deadlineStr = new Date(deadline).toLocaleString('sv-SE', {
                         weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
                     const countdown = formatCountdown(deadline);
-                    banners.set(key, `<div class="deadline-banner deadline-banner-open">
-                        ⏰ <strong>${label}</strong>
-                        <div class="deadline-date">Tippa klart innan ${deadlineStr}</div>
-                        ${countdown ? `<div class="deadline-countdown" data-countdown="${deadline}">${countdown}</div>` : ''}
+                    banners.set(key, `<div class="deadline-chip deadline-chip-open">
+                        <span class="deadline-dot"></span>
+                        <span>Öppen · ${label} · Tippa klart innan ${deadlineStr}</span>
+                        ${countdown ? `<span class="deadline-countdown" data-countdown="${deadline}">${countdown}</span>` : ''}
                     </div>`);
                 }
             });
 
             // Show all deadline banners at the top
-            banners.forEach(banner => { html += banner; });
+            if (banners.size > 0) {
+                html += '<div class="deadlines-row">';
+                banners.forEach(banner => { html += banner; });
+                html += '</div>';
+            }
 
             // Sort all matches chronologically and render
             const sorted = [...matches].sort((a, b) => new Date(a.date) - new Date(b.date));

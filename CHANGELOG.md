@@ -1,5 +1,12 @@
 # Ändringslogg
 
+## 2026-03-04 (header & spelregler)
+- Fiskespöt i headern flippat och gjort 50% större
+- Fisken i headern gjord 30% mindre
+- Ligans Unicorn 🦄 tillagd (solo rätt utfall + exakt resultat)
+- IP-loggning fixad (okänd visas om tjänsten inte svarar rätt)
+- REGLER.md skapad med spelregler
+
 ## 2026-03-04 (ikoner)
 - Fiskespö 🎣 på inloggningssidan ovanför logotypen
 - Fisk 🐟 i headern till höger om KrokensCopa (spegelvänds mot mitten)

@@ -107,10 +107,15 @@
         }
 
         .fishing-hook {
-            font-size: 5em;
+            font-size: 6em;
             line-height: 1;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
             animation: swing 3s ease-in-out infinite;
+        }
+
+        @keyframes swingFlipped {
+            0%, 100% { transform: scaleX(-1) rotate(-5deg); }
+            50%       { transform: scaleX(-1) rotate(5deg); }
         }
 
         @keyframes swing {
@@ -844,7 +849,11 @@
             }
 
             .fishing-hook {
-                font-size: 2.5em;
+                font-size: 3em;
+            }
+
+            .fish-school {
+                display: none;
             }
 
             h1 {
@@ -1527,7 +1536,7 @@
         .logo-container { margin-bottom: 0; gap: 12px; }
 
         .fishing-hook {
-            font-size: 1.6em;
+            font-size: 2.4em;
             filter: none;
         }
 
@@ -1860,7 +1869,8 @@
 
         @media (max-width: 768px) {
             .banner-content { padding: 16px 20px; gap: 10px; }
-            .fishing-hook { font-size: 1.3em; }
+            .fishing-hook { font-size: 1.6em; }
+            .fish-school { display: none; }
             h1 { font-size: 1.9em; }
             .tabs { flex-wrap: nowrap; overflow-x: auto; }
             .tab { flex-shrink: 0; padding: 12px 14px; font-size: 0.82em; }
@@ -2069,9 +2079,9 @@
         <header>
             <div class="banner-content">
                 <div class="logo-container">
-                    <span class="fishing-hook">🎣</span>
+                    <span class="fishing-hook" style="animation-name:swingFlipped;">🎣</span>
                     <h1>Krokens<span>Copa</span></h1>
-                    <span class="fishing-hook" style="transform: scaleX(-1);">🐟</span>
+                    <span class="fishing-hook" style="font-size:1.68em;">🐟</span>
                 </div>
             </div>
         </header>
@@ -2178,6 +2188,17 @@
                         </div>
                     </div>
 
+
+                    <!-- Unicorn section -->
+                    <div id="unicornSection" class="special-titles-container" style="margin-top: 15px; display: none;">
+                        <div class="special-title-card" style="border-left: 4px solid #ec4899;">
+                            <div class="special-title-label" style="color: #ec4899;">
+                                🦄 Ligans Unicorn
+                            </div>
+                            <div id="unicornLeader" class="special-title-name"></div>
+                            <div id="unicornLeaderDetail" class="special-title-detail"></div>
+                        </div>
+                    </div>
 
                     <!-- Ligans Sniper-tabell -->
                     <div id="sniperTableSection" style="margin-top: 20px; display: none;">
@@ -2540,7 +2561,7 @@
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
-                clientIP = data.ip;
+                clientIP = data.ip || 'okänd';
             } catch (e) {
                 clientIP = 'okänd';
             }
@@ -4060,6 +4081,40 @@ passwords[player] = hashedPassword;
                 nostradamusSection.style.display = 'block';
             } else {
                 nostradamusSection.style.display = 'none';
+            }
+
+            // Unicorn = solo correct 1X2 AND correct exact score
+            const unicornSection = document.getElementById('unicornSection');
+            const unicornCounts = PLAYERS.map(player => {
+                let unicornCount = 0;
+                matches.forEach(match => {
+                    if (!match.actualOutcome || match.actualOutcome === 'POSTPONED' || !match.actualScore) return;
+                    // Must have correct exact score
+                    if (exactPredictions[match.id]?.[player] !== match.actualScore) return;
+                    // Must be the only player with correct 1X2
+                    const playerPred = predictions[match.id]?.[player];
+                    if (!playerPred || playerPred !== match.actualOutcome) return;
+                    const correctCount = Object.values(predictions[match.id] || {})
+                        .filter(p => p === match.actualOutcome).length;
+                    if (correctCount === 1) unicornCount++;
+                });
+                return { player, unicornCount };
+            }).sort((a, b) => b.unicornCount - a.unicornCount);
+
+            const unicornLeader = document.getElementById('unicornLeader');
+            const unicornLeaderDetail = document.getElementById('unicornLeaderDetail');
+            const withUnicorns = unicornCounts.filter(p => p.unicornCount > 0);
+            if (withUnicorns.length > 0) {
+                const topCount = withUnicorns[0].unicornCount;
+                const uLeaders = withUnicorns.filter(p => p.unicornCount === topCount);
+                const uNames = uLeaders.map(p => nameWithTrophy(p.player));
+                unicornLeader.innerHTML = uNames.length === 1
+                    ? uNames[0]
+                    : uNames.slice(0, -1).join(', ') + ' &amp; ' + uNames[uNames.length - 1];
+                unicornLeaderDetail.textContent = `${topCount} st unicorn-träff${topCount > 1 ? 'ar' : ''}`;
+                unicornSection.style.display = 'block';
+            } else {
+                unicornSection.style.display = 'none';
             }
 
             // Render Sniper table

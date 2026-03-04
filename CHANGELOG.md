@@ -1,5 +1,9 @@
 # Ändringslogg
 
+## 2026-03-04 (ikoner)
+- Fiskespö 🎣 på inloggningssidan ovanför logotypen
+- Fisk 🐟 i headern till höger om KrokensCopa (spegelvänds mot mitten)
+
 ## 2026-03-04 (redesign)
 - Ny mörk inloggningssida (Matchnight-stil) med Bebas Neue + DM Sans, guldaccenter
 - Ljust tema för huvudappen med mörk header som kontrast

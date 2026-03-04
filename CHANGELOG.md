@@ -1,5 +1,16 @@
 # Ändringslogg
 
+## 2026-03-04 (redesign)
+- Ny mörk inloggningssida (Matchnight-stil) med Bebas Neue + DM Sans, guldaccenter
+- Ljust tema för huvudappen med mörk header som kontrast
+- Tabbnavigation med guldstreck istället för klumpiga knappar
+- Kortbredd begränsad till 800px – ser bra ut på både mobil och dator
+- Deadlines ersatta med diskreta chip-rader (grön/grå punkt)
+- Knappar finslipade: mindre padding, inga emojis, skarpare hörn
+- "Tippning stängd"-overlay ersatt med inline-status och STÄNGD-chip
+- Sätt resultat-modal förenklad: 1/X/2 avgörs automatiskt från inskrivet resultat
+- Bugfix: inloggningssidan centrerades inte korrekt vid utloggning
+
 ## 2026-03-04 (städning)
 - Ta bort Lennart från hårdkodad spelarlista i login-dropdownen
 

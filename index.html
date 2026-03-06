@@ -2159,7 +2159,7 @@
                                 <th>Spelare</th>
                                 <th>Poäng</th>
                                 <th>Rätt</th>
-                                <th>⭐</th>
+                                <th>🔮</th>
                                 <th>Snitt</th>
                             </tr>
                         </thead>
@@ -3205,7 +3205,7 @@ passwords[player] = hashedPassword;
                 'AUTO_LOGIN': '⚡',
                 'FIRST_LOGIN': '✨',
                 'PREDICT': '🎯',
-                'PREDICT_EXACT': '⭐',
+                'PREDICT_EXACT': '🔮',
                 'SET_RESULT': '📝',
                 'CLEAR_RESULT': '🗑️',
                 'AUTO_RESULT': '⚽',
@@ -3290,7 +3290,8 @@ passwords[player] = hashedPassword;
             // Filter matches that need checking
             const now = new Date();
             const pendingMatches = matches.filter(match => {
-                if (match.actualOutcome) return false;
+                if (match.setBy === 'API') return false; // API har redan bekräftat – hoppa över
+                if (match.actualOutcome === 'POSTPONED') return false; // Manuellt inställd – hoppa över
                 if (!isMatchStarted(match.date)) return false;
                 const hoursSinceStart = (now - new Date(match.date)) / (1000 * 60 * 60);
                 if (hoursSinceStart < 100/60) {
@@ -3377,14 +3378,20 @@ passwords[player] = hashedPassword;
                         else outcome = 'X';
 
                         const matchIndex = matches.findIndex(m => m.id === match.id);
+                        const hadManualResult = match.actualOutcome && match.setBy !== 'API';
                         matches[matchIndex].actualOutcome = outcome;
                         matches[matchIndex].actualScore = `${homeGoals}-${awayGoals}`;
                         matches[matchIndex].setBy = 'API';
                         matches[matchIndex].setAt = new Date().toISOString();
 
                         foundResults++;
-                        fetchLog(`  ✅ ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`, 'success');
-                        await logActivity('AUTO_RESULT', `API: ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`);
+                        if (hadManualResult) {
+                            fetchLog(`  ✅ ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam} (korrigerade manuellt resultat)`, 'success');
+                            await logActivity('AUTO_RESULT', `API korrigerade: ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`);
+                        } else {
+                            fetchLog(`  ✅ ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`, 'success');
+                            await logActivity('AUTO_RESULT', `API: ${match.homeTeam} ${homeGoals}-${awayGoals} ${match.awayTeam}`);
+                        }
                     }
 
                     // Rate limit: wait 6s between group requests (free = 10/min)
@@ -3411,6 +3418,7 @@ passwords[player] = hashedPassword;
         window.openResultModal = function(matchId) {
             if (currentUser === 'Åskådare') { alert('👁 Åskådare kan inte ändra resultat – bara spelare kan göra det.'); return; }
             const match = getMatch(matchId);
+            if (match && match.setBy === 'API') { alert('⚽ Resultatet är hämtat av API och kan inte ändras manuellt.'); return; }
             if (!match) return;
 
             currentModalMatchId = matchId;
@@ -3623,7 +3631,7 @@ passwords[player] = hashedPassword;
                             const isCorrect = playerPrediction === m.actualOutcome;
                             const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
                             const icon = isCorrect ? '✅' : '❌';
-                            const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' ⭐+50' : ''}` : '';
+                            const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' 🔮+50' : ''}` : '';
                             const pts = getCachedPoints(m.id, player);
                             const ptsTag = ` <span class="pts-badge ${isCorrect ? 'pts-badge-correct' : 'pts-badge-wrong'}">${pts}p</span>`;
                             return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
@@ -3631,7 +3639,7 @@ passwords[player] = hashedPassword;
                     </div>
                 ` : '';
 
-                const canSetResult = started;
+                const canSetResult = started && m.setBy !== 'API';
                 const resultControls = canSetResult ? `
                     <div class="match-actions">
                         <button class="btn btn-secondary" onclick="openResultModal('${m.id}')">
@@ -3733,8 +3741,8 @@ passwords[player] = hashedPassword;
                 const dateStr = formatDateTime(m.date);
 
                 let predictionsHtml = '';
-                if (locked || matchActuallyStarted || isViewer) {
-                    // Tippning stängd ELLER åskådarläge – visa alla spelares tips
+                if (locked || matchActuallyStarted) {
+                    // Tippning stängd – visa alla spelares tips
                     const matchPreds = predictions[m.id] || {};
                     const matchExactPreds = exactPredictions[m.id] || {};
                     if (Object.keys(matchPreds).length > 0) {
@@ -3755,9 +3763,9 @@ passwords[player] = hashedPassword;
                                 `}).join('')}
                             </div>
                         `;
-                    } else if (isViewer && !locked && !matchActuallyStarted) {
-                        predictionsHtml = `<div style="text-align:center; color:#aaa; font-size:0.85em; padding: 8px 0;">Inga tippningar ännu</div>`;
                     }
+                } else if (isViewer) {
+                    predictionsHtml = `<div style="text-align:center; color:#aaa; font-size:0.85em; padding: 8px 0;">Tippningarna visas när omgången stänger</div>`;
                 }
 
                 return `
@@ -4224,7 +4232,7 @@ passwords[player] = hashedPassword;
                                     <th>Spelare</th>
                                     <th>Poäng</th>
                                     <th>Rätt</th>
-                                    <th>⭐</th>
+                                    <th>🔮</th>
                                     <th>Snitt</th>
                                 </tr>
                             </thead>

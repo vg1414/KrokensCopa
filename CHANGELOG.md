@@ -1,5 +1,17 @@
 # Ändringslogg
 
+## 2026-03-06 (API låser resultat)
+- API kontrollerar nu även matcher som en spelare satt manuellt – om API hittar ett resultat tar det över
+- "Sätt/Ändra resultat"-knappen döljs helt när API bekräftat ett resultat (setBy = 'API')
+- Säkerhetscheck i modalen blockerar manuell redigering av API-satta resultat
+- Aktivitetsloggen markerar när API korrigerat ett manuellt inlagt resultat
+- Inställda matcher (POSTPONED) påverkas inte av API-kontrollen
+
+## 2026-03-06 (buggfixar + spåkula)
+- **Bugg:** Åskådare såg andras tippningar innan deadline – nu visas tippningarna i Tippa-fliken först när omgången stängt (precis som för vanliga spelare)
+- Åskådarläge visar nu "Tippningarna visas när omgången stänger" tills deadline passerar
+- Exakt resultat-bonus: ⭐+50 bytt till 🔮+50 överallt (matchvy, topplista, historik, aktivitetslogg)
+
 ## 2026-03-04 (header & spelregler)
 - Fiskespöt i headern flippat och gjort 50% större
 - Fisken i headern gjord 30% mindre

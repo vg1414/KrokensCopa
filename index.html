@@ -3583,6 +3583,18 @@ passwords[player] = hashedPassword;
                     let predsHtml = '<div class="pred-status-box pred-status-box-before">';
                     predsHtml += '<div class="pred-status-header">📊 Tippningar:</div>';
                     if (matchLocked) {
+                        if (currentUser === 'Åskådare') {
+                            allPlayers.forEach(function(player) {
+                                const trophy = getPlayerTrophyHTML(player);
+                                const pName = player + (trophy ? ' ' + trophy : '');
+                                if (matchPredictions[player]) {
+                                    predsHtml += '<div class="pred-row pred-row-pending">✅ ' + pName + ': Har tippat</div>';
+                                } else {
+                                    predsHtml += '<div class="pred-row pred-row-waiting">⏳ ' + pName + ': Har inte tippat än</div>';
+                                }
+                            });
+                            predsHtml += '<div style="text-align:center; color:#aaa; font-size:0.85em; padding:6px 0 2px;">🔒 Logga in som spelare för att se tippningarna</div>';
+                        } else {
                         allPlayers.forEach(function(player) {
                             const pred = matchPredictions[player];
                             const exact = matchExactPreds[player];
@@ -3598,6 +3610,7 @@ passwords[player] = hashedPassword;
                                 predsHtml += '<div class="pred-row" style="color: #333;">🎯 ' + pName + ': ' + scoreDisplay + '</div>';
                             }
                         });
+                        }
                     } else {
                         allPlayers.forEach(function(player) {
                             const trophy = getPlayerTrophyHTML(player);
@@ -3617,25 +3630,39 @@ passwords[player] = hashedPassword;
                 const predictionStatusAfter = m.actualOutcome ? `
                     <div class="pred-status-box ${isPostponed ? 'pred-status-box-postponed' : 'pred-status-box-after'}">
                         <div class="pred-status-header ${isPostponed ? 'pred-status-header-postponed' : ''}">📊 Alla tippningar${isPostponed ? ' (Match inställd - alla 0p)' : ''}:</div>
-                        ${allPlayers.map(player => {
-                            const playerPrediction = matchPredictions[player];
-                            const playerExact = matchExactPreds[player];
-                            const outcomeLabels = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam };
-                            const trophy = getPlayerTrophyHTML(player);
-                            const pName = player + (trophy ? ' ' + trophy : '');
-                            if (!playerPrediction) return `<div class="pred-row pred-row-waiting">❌ ${pName}: Tippade inte</div>`;
-                            if (isPostponed) {
-                                const exactTag = playerExact ? ` [${playerExact}]` : '';
-                                return `<div class="pred-row pred-row-postponed">⚠️ ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
-                            }
-                            const isCorrect = playerPrediction === m.actualOutcome;
-                            const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
-                            const icon = isCorrect ? '✅' : '❌';
-                            const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' 🔮+50' : ''}` : '';
-                            const pts = getCachedPoints(m.id, player);
-                            const ptsTag = ` <span class="pts-badge ${isCorrect ? 'pts-badge-correct' : 'pts-badge-wrong'}">${pts}p</span>`;
-                            return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
-                        }).join('')}
+                        ${currentUser === 'Åskådare'
+                            ? allPlayers.map(player => {
+                                const playerPrediction = matchPredictions[player];
+                                const trophy = getPlayerTrophyHTML(player);
+                                const pName = player + (trophy ? ' ' + trophy : '');
+                                if (!playerPrediction) return `<div class="pred-row pred-row-waiting">❌ ${pName}: Tippade inte</div>`;
+                                if (isPostponed) return `<div class="pred-row pred-row-postponed">⚠️ ${pName}: 0p</div>`;
+                                const isCorrect = playerPrediction === m.actualOutcome;
+                                const icon = isCorrect ? '✅' : '❌';
+                                const pts = getCachedPoints(m.id, player);
+                                const ptsTag = ` <span class="pts-badge ${isCorrect ? 'pts-badge-correct' : 'pts-badge-wrong'}">${pts}p</span>`;
+                                return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}${ptsTag}</div>`;
+                            }).join('') + `<div style="text-align:center; color:#aaa; font-size:0.85em; padding:6px 0 2px;">🔒 Logga in som spelare för att se tippningarna</div>`
+                            : allPlayers.map(player => {
+                                const playerPrediction = matchPredictions[player];
+                                const playerExact = matchExactPreds[player];
+                                const outcomeLabels = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam };
+                                const trophy = getPlayerTrophyHTML(player);
+                                const pName = player + (trophy ? ' ' + trophy : '');
+                                if (!playerPrediction) return `<div class="pred-row pred-row-waiting">❌ ${pName}: Tippade inte</div>`;
+                                if (isPostponed) {
+                                    const exactTag = playerExact ? ` [${playerExact}]` : '';
+                                    return `<div class="pred-row pred-row-postponed">⚠️ ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}</div>`;
+                                }
+                                const isCorrect = playerPrediction === m.actualOutcome;
+                                const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
+                                const icon = isCorrect ? '✅' : '❌';
+                                const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' 🔮+50' : ''}` : '';
+                                const pts = getCachedPoints(m.id, player);
+                                const ptsTag = ` <span class="pts-badge ${isCorrect ? 'pts-badge-correct' : 'pts-badge-wrong'}">${pts}p</span>`;
+                                return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
+                            }).join('')
+                        }
                     </div>
                 ` : '';
 
@@ -3745,7 +3772,18 @@ passwords[player] = hashedPassword;
                     // Tippning stängd – visa alla spelares tips
                     const matchPreds = predictions[m.id] || {};
                     const matchExactPreds = exactPredictions[m.id] || {};
-                    if (Object.keys(matchPreds).length > 0) {
+                    if (isViewer) {
+                        // Åskådare ser inte vad spelarna tippat
+                        const tippedCount = Object.keys(matchPreds).length;
+                        predictionsHtml = `
+                            <div class="predictions-revealed" style="text-align:center;">
+                                ${tippedCount > 0
+                                    ? `<div style="color:#aaa; font-size:0.85em; padding:4px 0;">${tippedCount} av ${PLAYERS.length} har tippat</div>`
+                                    : ''}
+                                <div style="color:#aaa; font-size:0.85em; padding:4px 0;">🔒 Logga in som spelare för att se tippningarna</div>
+                            </div>
+                        `;
+                    } else if (Object.keys(matchPreds).length > 0) {
                         predictionsHtml = `
                             <div class="predictions-revealed">
                                 <h4>Alla tippningar:</h4>

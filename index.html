@@ -3630,20 +3630,7 @@ passwords[player] = hashedPassword;
                 const predictionStatusAfter = m.actualOutcome ? `
                     <div class="pred-status-box ${isPostponed ? 'pred-status-box-postponed' : 'pred-status-box-after'}">
                         <div class="pred-status-header ${isPostponed ? 'pred-status-header-postponed' : ''}">📊 Alla tippningar${isPostponed ? ' (Match inställd - alla 0p)' : ''}:</div>
-                        ${currentUser === 'Åskådare'
-                            ? allPlayers.map(player => {
-                                const playerPrediction = matchPredictions[player];
-                                const trophy = getPlayerTrophyHTML(player);
-                                const pName = player + (trophy ? ' ' + trophy : '');
-                                if (!playerPrediction) return `<div class="pred-row pred-row-waiting">❌ ${pName}: Tippade inte</div>`;
-                                if (isPostponed) return `<div class="pred-row pred-row-postponed">⚠️ ${pName}: 0p</div>`;
-                                const isCorrect = playerPrediction === m.actualOutcome;
-                                const icon = isCorrect ? '✅' : '❌';
-                                const pts = getCachedPoints(m.id, player);
-                                const ptsTag = ` <span class="pts-badge ${isCorrect ? 'pts-badge-correct' : 'pts-badge-wrong'}">${pts}p</span>`;
-                                return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}${ptsTag}</div>`;
-                            }).join('') + `<div style="text-align:center; color:#aaa; font-size:0.85em; padding:6px 0 2px;">🔒 Logga in som spelare för att se tippningarna</div>`
-                            : allPlayers.map(player => {
+                        ${allPlayers.map(player => {
                                 const playerPrediction = matchPredictions[player];
                                 const playerExact = matchExactPreds[player];
                                 const outcomeLabels = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam };
@@ -3772,15 +3759,15 @@ passwords[player] = hashedPassword;
                     // Tippning stängd – visa alla spelares tips
                     const matchPreds = predictions[m.id] || {};
                     const matchExactPreds = exactPredictions[m.id] || {};
-                    if (isViewer) {
-                        // Åskådare ser inte vad spelarna tippat
+                    if (isViewer && !m.actualOutcome) {
+                        // Åskådare ser inte tips på orättade matcher
                         const tippedCount = Object.keys(matchPreds).length;
                         predictionsHtml = `
                             <div class="predictions-revealed" style="text-align:center;">
                                 ${tippedCount > 0
                                     ? `<div style="color:#aaa; font-size:0.85em; padding:4px 0;">${tippedCount} av ${PLAYERS.length} har tippat</div>`
                                     : ''}
-                                <div style="color:#aaa; font-size:0.85em; padding:4px 0;">🔒 Logga in som spelare för att se tippningarna</div>
+                                <div style="color:#aaa; font-size:0.85em; padding:4px 0;">🔒 Tippningarna visas när matcherna är rättade</div>
                             </div>
                         `;
                     } else if (Object.keys(matchPreds).length > 0) {

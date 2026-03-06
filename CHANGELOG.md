@@ -7,6 +7,9 @@
 - Aktivitetsloggen markerar när API korrigerat ett manuellt inlagt resultat
 - Inställda matcher (POSTPONED) påverkas inte av API-kontrollen
 
+## 2026-03-06 (fix: rendera om vid inloggning)
+- Vid inloggning renderas nu alla flikar om direkt – tippningar visas/döljs korrekt utan refresh
+
 ## 2026-03-06 (buggfixar + spåkula)
 - **Bugg:** Åskådare såg andras tippningar innan deadline – nu visas tippningarna i Tippa-fliken först när omgången stängt (precis som för vanliga spelare)
 - Åskådarläge visar nu "Tippningarna visas när omgången stänger" tills deadline passerar

@@ -1,5 +1,10 @@
 # Ändringslogg
 
+## 2026-03-10 (API-fix och admin-override)
+- Admin (Hefner) kan nu alltid ändra resultat även om det satts av API
+- Auto-fetch re-checkar API-satta resultat om de är yngre än 48h (fångar API-korrigeringar)
+- API-resultat äldre än 48h låses som tidigare
+
 ## 2026-03-06 (API låser resultat)
 - API kontrollerar nu även matcher som en spelare satt manuellt – om API hittar ett resultat tar det över
 - "Sätt/Ändra resultat"-knappen döljs helt när API bekräftat ett resultat (setBy = 'API')

@@ -3290,7 +3290,13 @@ passwords[player] = hashedPassword;
             // Filter matches that need checking
             const now = new Date();
             const pendingMatches = matches.filter(match => {
-                if (match.setBy === 'API') return false; // API har redan bekräftat – hoppa över
+                if (match.setBy === 'API') {
+                    // Re-checka om resultatet är yngre än 48h (ifall API korrigerar sig)
+                    const setAt = match.setAt ? new Date(match.setAt) : null;
+                    const hoursSinceSet = setAt ? (now - setAt) / (1000 * 60 * 60) : Infinity;
+                    if (hoursSinceSet >= 48) return false; // Låst – äldre än 48h
+                    // Annars: hämta om för att fånga eventuell API-korrigering
+                }
                 if (match.actualOutcome === 'POSTPONED') return false; // Manuellt inställd – hoppa över
                 if (!isMatchStarted(match.date)) return false;
                 const hoursSinceStart = (now - new Date(match.date)) / (1000 * 60 * 60);
@@ -3418,7 +3424,7 @@ passwords[player] = hashedPassword;
         window.openResultModal = function(matchId) {
             if (currentUser === 'Åskådare') { alert('👁 Åskådare kan inte ändra resultat – bara spelare kan göra det.'); return; }
             const match = getMatch(matchId);
-            if (match && match.setBy === 'API') { alert('⚽ Resultatet är hämtat av API och kan inte ändras manuellt.'); return; }
+            if (match && match.setBy === 'API' && currentUser !== 'Hefner') { alert('⚽ Resultatet är hämtat av API och kan inte ändras manuellt.'); return; }
             if (!match) return;
 
             currentModalMatchId = matchId;
@@ -3653,7 +3659,7 @@ passwords[player] = hashedPassword;
                     </div>
                 ` : '';
 
-                const canSetResult = started && m.setBy !== 'API';
+                const canSetResult = started && (m.setBy !== 'API' || currentUser === 'Hefner');
                 const resultControls = canSetResult ? `
                     <div class="match-actions">
                         <button class="btn btn-secondary" onclick="openResultModal('${m.id}')">

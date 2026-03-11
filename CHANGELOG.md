@@ -1,5 +1,10 @@
 # Ändringslogg
 
+## 2026-03-11 (Smart expandering + Unicorn/Sniper)
+- Smart expandering av omgångar: appen öppnar automatiskt rätt omgång baserat på pågående/kommande matcher
+- Unicorn 🦄: ensam rätt 1X2 + rätt exaktresultat
+- Sniper 🎯: ensam rätt 1X2 utan exakt
+
 ## 2026-03-10 (API-fix och admin-override)
 - Admin (Hefner) kan nu alltid ändra resultat även om det satts av API
 - Auto-fetch re-checkar API-satta resultat om de är yngre än 48h (fångar API-korrigeringar)

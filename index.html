@@ -3636,7 +3636,11 @@ passwords[player] = hashedPassword;
                 const predictionStatusAfter = m.actualOutcome ? `
                     <div class="pred-status-box ${isPostponed ? 'pred-status-box-postponed' : 'pred-status-box-after'}">
                         <div class="pred-status-header ${isPostponed ? 'pred-status-header-postponed' : ''}">📊 Alla tippningar${isPostponed ? ' (Match inställd - alla 0p)' : ''}:</div>
-                        ${allPlayers.map(player => {
+                        ${(() => {
+                            const correctOutcomeCount = allPlayers.filter(p =>
+                                (predictions[m.id] || {})[p] === m.actualOutcome
+                            ).length;
+                            return allPlayers.map(player => {
                                 const playerPrediction = matchPredictions[player];
                                 const playerExact = matchExactPreds[player];
                                 const outcomeLabels = { '1': m.homeTeam, 'X': 'Oavgjort', '2': m.awayTeam };
@@ -3649,12 +3653,18 @@ passwords[player] = hashedPassword;
                                 }
                                 const isCorrect = playerPrediction === m.actualOutcome;
                                 const exactCorrect = playerExact && m.actualScore && playerExact === m.actualScore;
+                                const isUnicorn = isCorrect && exactCorrect && correctOutcomeCount === 1;
+                                const isSniper  = isCorrect && correctOutcomeCount === 1 && !isUnicorn;
                                 const icon = isCorrect ? '✅' : '❌';
-                                const exactTag = playerExact ? ` [${playerExact}]${exactCorrect ? ' 🔮+50' : ''}` : '';
+                                const exactTag = playerExact
+                                    ? ` [${playerExact}]${exactCorrect ? ` 🔮+50${isUnicorn ? ' 🦄' : ''}` : ''}`
+                                    : '';
+                                const sniperTag = isSniper ? ' 🎯' : '';
                                 const pts = getCachedPoints(m.id, player);
                                 const ptsTag = ` <span class="pts-badge ${isCorrect ? 'pts-badge-correct' : 'pts-badge-wrong'}">${pts}p</span>`;
-                                return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${ptsTag}</div>`;
-                            }).join('')
+                                return `<div class="pred-row ${isCorrect ? 'pred-row-correct' : 'pred-row-wrong'}">${icon} ${pName}: ${outcomeLabels[playerPrediction]}${exactTag}${sniperTag}${ptsTag}</div>`;
+                            }).join('');
+                        })()}
                         }
                     </div>
                 ` : '';
@@ -3680,6 +3690,35 @@ passwords[player] = hashedPassword;
                 `;
             }
 
+            // Smart expandering: välj rätt omgång att expandera
+            const pendingRounds = new Set(roundOrder.filter(rn =>
+                roundGroups[rn].some(m => isMatchStarted(m.date) && !m.actualOutcome)
+            ));
+            let expandedRounds;
+            if (pendingRounds.size > 0) {
+                expandedRounds = pendingRounds;
+            } else {
+                const mixedRound = roundOrder.find(rn => {
+                    const ms = roundGroups[rn];
+                    return ms.some(m => m.actualOutcome) && ms.some(m => !m.actualOutcome);
+                });
+                if (mixedRound) {
+                    expandedRounds = new Set([mixedRound]);
+                } else {
+                    const firstUpcoming = roundOrder.find(rn =>
+                        roundGroups[rn].every(m => !isMatchStarted(m.date))
+                    );
+                    if (firstUpcoming) {
+                        expandedRounds = new Set([firstUpcoming]);
+                    } else {
+                        const lastDone = [...roundOrder].reverse().find(rn =>
+                            roundGroups[rn].every(m => m.actualOutcome)
+                        );
+                        expandedRounds = new Set([lastDone || roundOrder[0]]);
+                    }
+                }
+            }
+
             list.innerHTML = roundOrder.map((roundName, idx) => {
                 const roundMatches = roundGroups[roundName];
                 const totalMatches = roundMatches.length;
@@ -3690,8 +3729,7 @@ passwords[player] = hashedPassword;
                         ? `${totalMatches} matcher • ${played}/${totalMatches} spelade`
                         : `${totalMatches} matcher`;
 
-                // First round expanded by default, rest collapsed
-                const isCollapsed = idx > 0;
+                const isCollapsed = !expandedRounds.has(roundName);
                 const bodyClass = isCollapsed ? 'round-body collapsed' : 'round-body';
                 const toggleClass = isCollapsed ? 'round-toggle collapsed' : 'round-toggle';
 

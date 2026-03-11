@@ -1,5 +1,8 @@
 # Ändringslogg
 
+## 2026-03-11 (Ta bort sniper-tabell)
+- Sniper-tabellen borttagen – sniper-kortet visar redan ligans sniper
+
 ## 2026-03-11 (Smart expandering + Unicorn/Sniper)
 - Smart expandering av omgångar: appen öppnar automatiskt rätt omgång baserat på pågående/kommande matcher
 - Unicorn 🦄: ensam rätt 1X2 + rätt exaktresultat

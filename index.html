@@ -2200,21 +2200,6 @@
                         </div>
                     </div>
 
-                    <!-- Ligans Sniper-tabell -->
-                    <div id="sniperTableSection" style="margin-top: 20px; display: none;">
-                        <h3 class="sub-table-header" style="color: #8B5CF6;">🎯 Ligans Sniper</h3>
-                        <p class="sub-table-desc">Antal gånger man var ensam om att gissa rätt 1X2</p>
-                        <table class="leaderboard-table leaderboard-table-sm">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Spelare</th>
-                                    <th>Solo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sniperTableBody"></tbody>
-                        </table>
-                    </div>
 
                 </div>
             </div>
@@ -4194,22 +4179,6 @@ passwords[player] = hashedPassword;
                 unicornSection.style.display = 'none';
             }
 
-            // Render Sniper table
-            const sniperTableSection = document.getElementById('sniperTableSection');
-            const sniperTableBody = document.getElementById('sniperTableBody');
-            const sniperWithData = sniperCounts.filter(p => p.soloCorrect > 0);
-            if (sniperWithData.length > 0) {
-                sniperTableBody.innerHTML = sniperWithData.map((p, i) => `
-                    <tr>
-                        <td><span class="rank">${i + 1}</span></td>
-                        <td>${nameWithTrophy(p.player)}</td>
-                        <td><strong>${p.soloCorrect}</strong></td>
-                    </tr>
-                `).join('');
-                sniperTableSection.style.display = 'block';
-            } else {
-                sniperTableSection.style.display = 'none';
-            }
 
         }
 

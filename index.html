@@ -2297,7 +2297,7 @@
                     <div id="sec-load" class="admin-collapsible collapsed">
                         <p style="color: #666; margin-bottom: 10px; font-size: 0.9em;">Hämtar kommande omgångar från vald liga via API.</p>
                         <p style="color: #f59e0b; margin-bottom: 15px; font-size: 0.85em; background: #fef3c7; padding: 8px; border-radius: 5px;">
-                            ℹ️ Använder CORS proxy (corsproxy.io). Om det inte fungerar, prova igen om några minuter.
+                            ℹ️ Använder Cloudflare Worker-proxy. Om det inte fungerar, prova igen om några minuter.
                         </p>
                         <div class="admin-flex-row" style="margin-bottom: 10px;">
                             <label for="competitionSelect" class="admin-label">Liga:</label>
@@ -2981,11 +2981,11 @@ passwords[player] = hashedPassword;
 
             // Helper: fetch and convert matches for one competition
             async function fetchCompetitionMatches(code, rounds) {
-                const apiUrl = `https://api.football-data.org/v4/competitions/${code}/matches?status=SCHEDULED,TIMED`;
-                const url = 'https://corsproxy.io/?' + encodeURIComponent(apiUrl);
+                const path = `competitions/${code}/matches?status=SCHEDULED,TIMED`;
+                const url = 'https://football-proxy.davhef.workers.dev/?path=' + encodeURIComponent(path);
                 adminLog(`🔗 Hämtar ${code}...`, 'info');
 
-                const response = await fetch(url, { headers: { 'X-Auth-Token': plApiKey } });
+                const response = await fetch(url);
                 if (!response.ok) throw new Error(`${code} API svarade ${response.status}`);
 
                 const data = await response.json();
@@ -3316,12 +3316,11 @@ passwords[player] = hashedPassword;
             for (const key of groupKeys) {
                 const group = groups[key];
                 try {
-                    const apiUrl = `https://api.football-data.org/v4/competitions/${group.competitionCode}/matches?dateFrom=${group.matchDate}&dateTo=${group.matchDate}`;
-                    const url = 'https://corsproxy.io/?' + encodeURIComponent(apiUrl);
+                    const path = `competitions/${group.competitionCode}/matches?dateFrom=${group.matchDate}&dateTo=${group.matchDate}`;
+                    const url = 'https://football-proxy.davhef.workers.dev/?path=' + encodeURIComponent(path);
 
                     const response = await fetch(url, {
-                        method: 'GET',
-                        headers: { 'X-Auth-Token': plApiKey }
+                        method: 'GET'
                     });
 
                     if (response.status === 429) {

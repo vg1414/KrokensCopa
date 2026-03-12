@@ -1,5 +1,10 @@
 # Ändringslogg
 
+## 2026-03-12 (Byt CORS-proxy till Cloudflare Worker)
+- Ersatte corsproxy.io med egen Cloudflare Worker (football-proxy.davhef.workers.dev)
+- API-nyckeln lagras nu säkert som Worker Secret – skickas inte längre från frontend
+- Löser CORS-problem med preflight-requests
+
 ## 2026-03-11 (Ta bort sniper-tabell)
 - Sniper-tabellen borttagen – sniper-kortet visar redan ligans sniper
 

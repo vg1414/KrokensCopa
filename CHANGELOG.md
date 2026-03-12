@@ -1,5 +1,8 @@
 # Ändringslogg
 
+## 2026-03-12 (Fix: felaktig "}" visades i CL-matchvyn)
+- Tog bort en löst liggande "}" som renderades som text under varje CL-match
+
 ## 2026-03-12 (Byt CORS-proxy till Cloudflare Worker)
 - Ersatte corsproxy.io med egen Cloudflare Worker (football-proxy.davhef.workers.dev)
 - API-nyckeln lagras nu säkert som Worker Secret – skickas inte längre från frontend
